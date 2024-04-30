@@ -1,6 +1,6 @@
-import { EntryService } from "../port/entryService";
+import { EntryService } from "../ports/entryService";
 import { MoodEntry } from "../types/entries";
-import { moodEntryModel } from "../mongoDB/models/entry";
+import { moodEntryModel } from "../integrations/mongoDB/models/entry";
 
 class MongoDBService implements EntryService {
     constructor() {}

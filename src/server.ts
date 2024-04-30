@@ -1,5 +1,5 @@
 import express, {Express} from 'express';
-import connectToMongoDB from './mongoDB/config'
+import connectToMongoDB from './integrations/mongoDB/config'
 import router from './routes/addEntry';
 
 const serverPort = 3001;

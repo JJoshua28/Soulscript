@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var config_1 = __importDefault(require("./mongoDB/config"));
+var config_1 = __importDefault(require("./integrations/mongoDB/config"));
 var addEntry_1 = __importDefault(require("./routes/addEntry"));
 var serverPort = 3001;
 var app = (0, express_1.default)();
