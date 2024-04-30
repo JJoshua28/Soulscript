@@ -1,2 +1,2 @@
 # Soulscript
-Journal, mood and gratitude tracker mobile appapp
+Journal, mood tracker and gratitude tracker mobile app
