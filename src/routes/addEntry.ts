@@ -1,5 +1,5 @@
 import express, {Express, Request, Response, Router} from 'express';
-import handleAddEntry from '../handler/addEntry';
+import handleAddEntry from '../handlers/addEntry';
 
 const app:Express = express();
 app.use(express.json());

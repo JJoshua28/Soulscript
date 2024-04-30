@@ -1,6 +1,6 @@
 import {Request} from 'express';
-import MongoDBService from "../adapter/mongoDBService";
-import AddMoodEntryUseCase from "../use case/addMoodEntry";
+import MongoDBService from "../adapters/mongoDBService";
+import AddMoodEntryUseCase from "../use cases/addMoodEntry";
 import { MoodEntry } from '../types/entries';
 
 const handleAddEntry = async (req: Request): Promise<MoodEntry> => {
