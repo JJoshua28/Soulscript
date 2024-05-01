@@ -8,7 +8,7 @@ export interface Entry {
     type: EntryTypes[];
     subject: string | undefined;
     quote: string | undefined;
-    tags: [];
+    tags: string[];
     datetime: Date;
 }
 
