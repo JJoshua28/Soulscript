@@ -12,9 +12,9 @@ describe("Add a mood entry", () => {
     it("should return a mood Entry document", async () => {
         const mockMoodEntry: MoodEntry = {
             type: ["mood"],
-            subject: "bored with life",
-            quote: "I seem depressed, always being bothered neverless.",
-            tags: ["mental health"],
+            subject: "test data",
+            quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            tags: ["test"],
             mood: "exhausted",
             datetime: new Date()
         }
