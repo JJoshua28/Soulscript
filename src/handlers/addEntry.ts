@@ -8,8 +8,9 @@ const handleAddEntry = async (req: Request): Promise<MoodEntry> => {
     const addMoodUseCase = new AddMoodEntryUseCase(entryService);
     
     const entryDate = req.body?.datetime? 
-        new Date(req.body.datetime): new Date();
+    new Date(req.body.datetime): new Date();
     const entry = {...req.body, datetime: entryDate}
+    
     return await addMoodUseCase.execute(entry);
 }
 
