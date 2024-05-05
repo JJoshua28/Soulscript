@@ -6,8 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc & mongod --port 27017 & node dist/server.js",
-    "test:unit": "jest --watch src/test/unit/",
-    "test:integration": "jest --watch src/test/integration/*"
+    "test:unit": "jest src/test/unit/",
+    "test:watch:unit": "jest --watch src/test/unit/",
+    "test:integration": "jest src/test/integration/*",
+    "test:watch:integration": "jest --watch src/test/integration/*"
+
   },
   "keywords": [],
   "author": "Joshua",
