@@ -6,7 +6,7 @@ import handleAddEntry from "../../../handlers/addEntry";
 import MongoDBService from "../../../adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../use cases/addMoodEntry";
 
-describe("Adding a mood entry", () => {
+describe("POST /api/add-entry/mood", () => {
     const request = {body: ""} as Request;
     beforeEach(async ()=> {
         await setupTestEnvironment();
