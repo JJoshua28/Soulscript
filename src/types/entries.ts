@@ -12,6 +12,15 @@ export interface Entry {
     datetime: Date;
 }
 
+export interface CustomMoodEntry {
+  type?: string[],
+  subject?: string,
+  quote?: string,
+  tags?: string[],
+  mood?: string,
+  datetime?: Date
+}
+
 export interface MoodEntry extends Entry {
   mood: Moods;
 }

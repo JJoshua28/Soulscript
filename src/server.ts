@@ -1,6 +1,6 @@
 import express, {Express} from 'express';
 import connectToMongoDB from './integrations/mongoDB/config'
-import router from './routes/addEntry';
+import router from './routes/moodEntry';
 
 const serverPort = 3001;
 
@@ -8,7 +8,7 @@ const app: Express = express();
 app.use(express.json());
     
 connectToMongoDB(); 
-app.use("/api/add-entry", router)
+app.use("/api/mood", router)
 app.get("/", (req, res) => {
     res.send("Girl get comfortable!");
 })

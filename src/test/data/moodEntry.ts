@@ -1,15 +1,19 @@
-import { MoodEntry } from "../../types/entries";
+import { CustomMoodEntry, MoodEntry } from "../../types/entries";
 
-const defaultMoodEntry = {
+const defaultMoodEntry:MoodEntry = {
     type: ["mood"],
-     subject: "bored with life",
-     quote: "I seem depressed, always being bothered neverless.",
-     tags: ["mental health"],
-     mood: "exhausted"
-} as MoodEntry
+    subject: "test data",
+    quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    tags: ["test"],
+    mood: "exhausted",
+    datetime: new Date()
+};
 
-const datetimeMoodEntry: MoodEntry = {...defaultMoodEntry,
-    datetime: new Date("2020")
- }
+const createMoodEntry = (entry?:CustomMoodEntry)=> {
+    return {
+        ...defaultMoodEntry,
+        ...entry
+    }
+}
 
-export {defaultMoodEntry, datetimeMoodEntry};
+export {defaultMoodEntry, createMoodEntry};

@@ -1,14 +1,14 @@
 import { EntryService } from "../ports/entryService";
 import { MoodEntry } from "../types/entries";
 
-class AddMoodEntryUseCase {
+class GetMoodEntryByDateUseCase {
     private entryService: EntryService;
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
     }
-    async execute (entry: MoodEntry): Promise<MoodEntry> {
-        return await this.entryService.addMoodEntry(entry)
+    async execute (date: Date): Promise<MoodEntry[] | []> {
+        return await this.entryService.getMoodEntryByDate(date)
     }
 }
 
-export default AddMoodEntryUseCase;
+export default GetMoodEntryByDateUseCase;
