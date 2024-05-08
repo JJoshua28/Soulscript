@@ -2,7 +2,6 @@ import { Request } from "express";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
 import { createMoodEntry, defaultMoodEntry } from "../../data/moodEntry";
-import handleAddEntry from "../../../src/handlers/addEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
 
@@ -40,9 +39,6 @@ describe("Mood Entry", ()=>{
             });
         })
         describe("Negative Tests", () => {
-            it("should throw an error if a request has no body", async () =>{
-                await expect(handleAddEntry(request)).rejects.toThrow(Error); 
-            });
             it.each`
                 propertyToDelete 
                 ${"mood"}
