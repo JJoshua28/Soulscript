@@ -1,8 +1,8 @@
 import {Request} from 'express';
-import handleAddEntry from "../../../handlers/addEntry"
 import { createMoodEntry, defaultMoodEntry } from "../../data/moodEntry"
-import AddMoodEntryUseCase from '../../../use cases/addMoodEntry';
-import { MoodEntry } from '../../../types/entries';
+import handleAddEntry from "../../../src/handlers/addEntry"
+import AddMoodEntryUseCase from '../../../src/use cases/addMoodEntry';
+import { MoodEntry } from '../../../src/types/entries';
 
 describe("Add Mood entry helper", () => {
     afterEach( async()=>{

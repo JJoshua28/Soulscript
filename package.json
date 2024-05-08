@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest src/test/*",
+    "test": "jest ./test/*",
     "start": "tsc & mongod --port 27017 & node dist/server.js",
-    "test:unit": "jest src/test/unit/",
-    "test:watch:unit": "jest --watch src/test/unit/",
-    "test:integration": "jest src/test/integration/*",
-    "test:watch:integration": "jest --watch src/test/integration/*"
+    "test:unit": "jest ./test/unit/*",
+    "test:watch:unit": "jest --watch ./test/unit/*",
+    "test:integration": "jest ./test/integration/*",
+    "test:watch:integration": "jest --watch ./test/integration/*"
   },
   "keywords": [],
   "author": "Joshua",

@@ -1,10 +1,10 @@
 import { Model } from "mongoose";
-import MongoDBService from "../../../adapters/mongoDBService";
-import { moodEntryModel } from "../../../integrations/mongoDB/models/entry";
-import { MoodEntry } from "../../../types/entries";
 import { createMoodEntry } from "../../data/moodEntry";
+import MongoDBService from "../../../src/adapters/mongoDBService";
+import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
+import { MoodEntry } from "../../../src/types/entries";
 
-jest.mock("../../../integrations/mongoDB/models/entry");
+jest.mock("../../../src/services/mongoDB/models/entry");
 
 // Asserting the type of moodEntryModel as jest.Mocked<Model<MoodEntry>>
 const mockMoodEntryModel = moodEntryModel as jest.Mocked<Model<MoodEntry>>;
