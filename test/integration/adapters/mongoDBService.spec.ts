@@ -1,10 +1,11 @@
 import { Request } from "express";
-import { moodEntryModel } from "../../../integrations/mongoDB/models/entry";
-import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../../integrations/mongoDB/test/config"
+import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
+import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
 import { createMoodEntry, defaultMoodEntry } from "../../data/moodEntry";
-import handleAddEntry from "../../../handlers/addEntry";
-import MongoDBService from "../../../adapters/mongoDBService";
-import AddMoodEntryUseCase from "../../../use cases/addMoodEntry";
+import handleAddEntry from "../../../src/handlers/addEntry";
+import MongoDBService from "../../../src/adapters/mongoDBService";
+import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
+
 describe("Mood Entry", ()=>{
 
     beforeAll(async ()=> {

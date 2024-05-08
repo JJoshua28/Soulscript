@@ -1,4 +1,4 @@
-import { CustomMoodEntry, MoodEntry } from "../../types/entries";
+import { CustomMoodEntry, MoodEntry } from "../../src/types/entries";
 
 const defaultMoodEntry:MoodEntry = {
     type: ["mood"],

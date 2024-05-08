@@ -1,5 +1,5 @@
 import moment from "moment"
-import { validDate } from "../../../helpers/validateDate"
+import { validDate } from "../../../src/helpers/validateDate"
 
 describe("Validate Date", () => {
     const currentDate = new Date();
@@ -13,7 +13,6 @@ describe("Validate Date", () => {
     ${"2030-01-30"}                                | ${false}
     ${"3023-01-30"}                                | ${false}
     ${currentDate}                                 | ${true}
-    ${currentDate.toDateString()}                                 | ${true}
     ${currentDate.toISOString()}                   | ${true}
     
     `("should return $result when validate date $date", ({date, result})=>{

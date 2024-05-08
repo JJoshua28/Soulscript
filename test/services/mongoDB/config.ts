@@ -1,8 +1,8 @@
 import mongoose, { Mongoose } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MoodEntry } from '../../../types/entries';
+import { MoodEntry } from '../../../src/types/entries';
 import { createMoodEntry } from '../../../test/data/moodEntry';
-import { moodEntryModel } from '../models/entry';
+import { moodEntryModel } from '../../../src/services/mongoDB/models/entry';
 
 let dbConnection: Mongoose;
 let mongoServer: MongoMemoryServer;

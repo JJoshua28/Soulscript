@@ -1,11 +1,11 @@
 import moment from "moment";
-import { createMoodEntry} from "../../data/moodEntry"
-import handleGetMoodEntryByDate from '../../../handlers/getMoodEntryByDate';
-import GetMoodEntryByDateUseCase from '../../../use cases/getMoodEntryByDateUseCase';
-import { validDate } from "../../../helpers/validateDate";
 import { Request } from "express";
+import { createMoodEntry} from "../../data/moodEntry"
+import handleGetMoodEntryByDate from '../../../src/handlers/getMoodEntryByDate';
+import GetMoodEntryByDateUseCase from '../../../src/use cases/getMoodEntryByDateUseCase';
+import { validDate } from "../../../src/helpers/validateDate";
 
-jest.mock("../../../helpers/validateDate");
+jest.mock("../../../src/helpers/validateDate");
 
 const mockValidDate = validDate as jest.MockedFunction<typeof validDate>;
 
