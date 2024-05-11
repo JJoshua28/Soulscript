@@ -1,18 +1,21 @@
-import { Model } from "mongoose";
-import { createMoodEntry } from "../../data/moodEntry";
+import { Document, Model } from "mongoose";
+import { createMoodEntry, mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import { MoodEntry } from "../../../src/types/entries";
+import { mockDeep } from "jest-mock-extended";
+import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 
 jest.mock("../../../src/services/mongoDB/models/entry");
 
 // Asserting the type of moodEntryModel as jest.Mocked<Model<MoodEntry>>
 const mockMoodEntryModel = moodEntryModel as jest.Mocked<Model<MoodEntry>>;
 
-describe("Mood Entry", ()=> {
+describe.only("Mood Entry", ()=> {
     
-    describe("Add entry", () => {
-        it("should return a mood Entry document", async () => {
+    describe.only("Add entry", () => {
+        it.only("should return a mood Entry document", async () => {
+            mockMoodEntryModel.create.mockResolvedValue([mockMoodEntryDocument] as MoodEntryDocument[]);
             const mockMoodEntry: MoodEntry = {
                 type: ["mood"],
                 subject: "test data",

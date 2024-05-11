@@ -22,6 +22,7 @@ export interface CustomMoodEntry {
 }
 
 export interface MoodEntry extends Entry {
+  id?: any;
   mood: Moods;
 }
 
