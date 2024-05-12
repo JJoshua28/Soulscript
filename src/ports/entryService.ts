@@ -1,6 +1,6 @@
-import { MoodEntry } from "../types/entries";
+import { MoodEntry, NewMoodEntry } from "../types/entries";
 
 export interface EntryService {
-    addMoodEntry(entry: MoodEntry): Promise<MoodEntry>;
+    addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry>;
     getMoodEntryByDate(date: Date): Promise<MoodEntry[] | []>
 }

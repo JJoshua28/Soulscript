@@ -1,9 +1,9 @@
 import moment from "moment";
 import { Request } from "express";
-import { createMoodEntry} from "../../data/moodEntry"
 import handleGetMoodEntryByDate from '../../../src/handlers/getMoodEntryByDate';
 import GetMoodEntryByDateUseCase from '../../../src/use cases/getMoodEntryByDateUseCase';
 import { validDate } from "../../../src/helpers/validateDate";
+import { createMoodEntry } from "../../data/helpers/moodEntry";
 
 jest.mock("../../../src/helpers/validateDate");
 

@@ -20,12 +20,10 @@ export const mapDocumentToMoodEntry = (document: MoodEntryDocument):MoodEntry =>
         datetime,
         mood
     };
-    return mappedMoodEntry as MoodEntry;
+    return mappedMoodEntry;
 } 
 
-
-
-export const mapDocumentsToMoodEntry = (document: MoodEntryDocument[]): MoodEntry[] => {
+export const mapDocumentsToMoodEntry = (document: MoodEntryDocument[]):MoodEntry[] => {
     const mappedMoodEntries = document.map(document => {
         const {
             _id:id, 
@@ -45,7 +43,7 @@ export const mapDocumentsToMoodEntry = (document: MoodEntryDocument[]): MoodEntr
             datetime,
             mood
         };
-        return mappedMoodEntry as MoodEntry;
+        return mappedMoodEntry;
     })
     return mappedMoodEntries;
 }

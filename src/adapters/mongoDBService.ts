@@ -1,12 +1,12 @@
 import { EntryService } from "../ports/entryService";
-import { MoodEntry } from "../types/entries";
+import { MoodEntry, NewMoodEntry } from "../types/entries";
 import { moodEntryModel } from "../services/mongoDB/models/entry";
 import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
 
 class MongoDBService implements EntryService {
     constructor() {}
-    async addMoodEntry(entry: MoodEntry): Promise<MoodEntry> {
+    async addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry> {
         try {
             const response = await moodEntryModel.create({...entry})
             const mappedMoodEntry = mapDocumentToMoodEntry(response);

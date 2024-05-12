@@ -1,8 +1,9 @@
 import {Request} from 'express';
-import { createMoodEntry, defaultMoodEntry } from "../../data/moodEntry"
+import { MoodEntry } from '../../../src/types/entries';
+import { defaultMoodEntry } from "../../data/moodEntry"
 import handleAddEntry from "../../../src/handlers/addEntry"
 import AddMoodEntryUseCase from '../../../src/use cases/addMoodEntry';
-import { MoodEntry } from '../../../src/types/entries';
+import { createNewMoodEntry } from '../../data/helpers/moodEntry';
 
 describe("Add Mood entry helper", () => {
     afterEach( async()=>{
@@ -12,10 +13,10 @@ describe("Add Mood entry helper", () => {
         
         it.each`
         date            | entry
-        ${"2020-01-01"} | ${createMoodEntry({datetime: new Date("2020-01-01")})}
-        ${"2021-05-06"} | ${createMoodEntry({datetime: new Date("2021-05-06")})}
-        ${"2022-08-12"} | ${createMoodEntry({datetime: new Date("2022-08-12")})}
-        ${"2023-11-26"} | ${createMoodEntry({datetime: new Date("2023-11-26")})}
+        ${"2020-01-01"} | ${createNewMoodEntry({datetime: new Date("2020-01-01")})}
+        ${"2021-05-06"} | ${createNewMoodEntry({datetime: new Date("2021-05-06")})}
+        ${"2022-08-12"} | ${createNewMoodEntry({datetime: new Date("2022-08-12")})}
+        ${"2023-11-26"} | ${createNewMoodEntry({datetime: new Date("2023-11-26")})}
         `("should create a mood entry with date $date", async ({date, entry})=> {
             
             const request = { body: entry } as Request
