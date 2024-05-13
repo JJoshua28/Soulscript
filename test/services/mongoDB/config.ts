@@ -1,8 +1,9 @@
 import mongoose, { Mongoose } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MoodEntry } from '../../../src/types/entries';
-import { createMoodEntry } from '../../../test/data/moodEntry';
+
+import { NewMoodEntry } from '../../../src/types/entries';
 import { moodEntryModel } from '../../../src/services/mongoDB/models/entry';
+import { createNewMoodEntry } from '../../data/helpers/moodEntry';
 
 let dbConnection: Mongoose;
 let mongoServer: MongoMemoryServer;
@@ -18,11 +19,11 @@ const tearDownTestEnvironment = async () => {
 }
 
 const seedTestData = () => {
-    let testData: MoodEntry[] = [
-        createMoodEntry({datetime: new Date(), mood: "happy"}) as MoodEntry,
-        createMoodEntry({datetime: new Date(), mood: "exhausted"}) as MoodEntry,
-        createMoodEntry({datetime: new Date("2020-10-25"), mood: "depressed"}) as MoodEntry,
-        createMoodEntry({datetime: new Date("2015-05-15"), mood: "depressed"}) as MoodEntry
+    let testData: NewMoodEntry[] = [
+        createNewMoodEntry({datetime: new Date(), mood: "happy"}),
+        createNewMoodEntry({datetime: new Date(), mood: "exhausted"}),
+        createNewMoodEntry({datetime: new Date("2020-10-25"), mood: "depressed"}),
+        createNewMoodEntry({datetime: new Date("2015-05-15"), mood: "depressed"})
     ];  
     moodEntryModel.insertMany(testData);
 }

@@ -1,9 +1,13 @@
 import { Request } from "express";
+import mongoose from "mongoose";
+
+import { defaultMoodEntry, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
-import { createMoodEntry, defaultMoodEntry } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
+import { createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
 
 describe("Mood Entry", ()=>{
 
@@ -14,28 +18,30 @@ describe("Mood Entry", ()=>{
         await tearDownTestEnvironment();
     })
 
-    describe("POST /api/add-entry/mood", () => {
+    describe("POST /api/mood/add-entry", () => {
         const request = {body: ""} as Request;
         afterEach(async () => {
             request.body = "";
         })
         describe("Positive Tests", () => {
             it.each`
-                entry                                                  | expectation                                                | message
-                ${createMoodEntry({datetime: new Date("2020")})}       | ${{...defaultMoodEntry, datetime: new Date("2020")}}       | ${"mood entry with a previous custom date in 2020"}
-                ${createMoodEntry({datetime: new Date("2022-03-22")})} | ${{...defaultMoodEntry, datetime: new Date("2022-03-22")}} | ${"mood entry with a previous custom date in 2022"}
-                ${createMoodEntry({datetime: new Date()})}             | ${{...defaultMoodEntry, datetime: new Date()}}             | ${"mood entry with todays date"}
+                date                      | message
+                ${new Date("2020")}       | ${"mood entry with a previous custom date in 2020"}
+                ${new Date("2022-03-22")} | ${"mood entry with a previous custom date in 2022"}
+                ${new Date()}             | ${"mood entry with todays date"}
             `
-            ("should add a $message", async ({entry, expectation}) => {
-                
+            ("should add a $message", async ({date}) => {
+                const entry = createNewMoodEntry({datetime: date})
                 const mongoService = new MongoDBService();
                 const response = await mongoService.addMoodEntry(entry);
                        
-                expect(response).toEqual(expect.objectContaining({...expectation}));
-                ;
-                const [findResponse] = await moodEntryModel.find({...expectation});
-                expect(findResponse).toEqual(expect.objectContaining({...expectation}));
-                
+                expect(response).toEqual(expect.objectContaining(moodEntryExpectation));
+                expect(response).toHaveProperty("datetime", date);
+                expect(response).toHaveProperty("type", ["mood"]);
+
+                const [findResponse] = await moodEntryModel.find(entry);
+                expect(findResponse).toEqual(expect.objectContaining(moodEntryDocumentExpectation));
+                expect(findResponse).toHaveProperty("datetime", date);
             });
         })
         describe("Negative Tests", () => {
@@ -58,7 +64,7 @@ describe("Mood Entry", ()=>{
             })
         })
     })
-    describe("GET /api", ()=>{
+    describe("GET /api/mood/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             const currentDate = new Date();
             beforeAll(async ()=>{
@@ -83,16 +89,7 @@ describe("Mood Entry", ()=>{
                 const [response] = await mongoService.getMoodEntryByDate(new Date());
                 const {datetime} = response;
 
-                expect(response).toEqual(expect.objectContaining({
-                    type: expect.arrayContaining([expect.any(String)]),
-                    subject: expect.any(String),
-                    quote: expect.any(String),
-                    tags: expect.arrayContaining([expect.any(String)]),
-                    mood: expect.any(String),
-                    datetime: expect.anything() 
-                  
-
-                }));   
+                expect(response).toEqual(expect.objectContaining(moodEntryExpectation));   
                 expect(datetime.toDateString()).toStrictEqual(currentDate.toDateString())            
             })
             it("should return an empty array if no entries exist for that date", async ()=>{
@@ -101,11 +98,49 @@ describe("Mood Entry", ()=>{
 
                 expect(response).toStrictEqual(expect.arrayContaining([]))
                 expect(response.length).toStrictEqual(0);
-
-
             })
         })
+    })
+    describe("PUT /api/mood/update-entry", ()=> {
+        describe("Positive tests", ()=> {
+            seedTestData();
+            it.each`
+                findQuery                                                | updates
+                ${{...getByDateQuery(new Date()), mood: "happy"}}        | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], mood: "unsure" }}
+                ${{...getByDateQuery(new Date()), mood: "exhausted"}}    | ${{quote: " "}}
+                ${{datetime: new Date("2020-10-25"), mood: "depressed"}} | ${{mood: "tired", quote: "I am the stone that the builder refused"}}
+                ${{datetime: new Date("2015-05-15"), mood: "depressed"}} | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+            `("should update a mood entry with data $updates", async ({findQuery, updates}) => {
         
+                let document = await moodEntryModel.findOne(findQuery);
+                const options = {
+                    new: true,
+                    runValidators: true,
+                    returnDocument: "after" as "after"
+                }
+                if(!document) throw new Error(`no document exist with query: ${findQuery}`)
+    
+                const mongoService = new MongoDBService();
+                const response = await mongoService.updateMoodEntry(document._id, updates);
+                        
+                expect(response.id).toEqual(document._id);
+                expect(response).toMatchObject({
+                    ...updates,
+                    type: ["mood"]
+                });
+                expect(response).not.toEqual(document);
+            })
+        })
+        describe("Negative Tests", () => {
+            it("should throw an error if no documents exists for that ID", async ()=> {
+                const id = new mongoose.Types.ObjectId();
+                const update = {quote: " "};
+                const mongoService = new MongoDBService();
+                await expect(mongoService.updateMoodEntry(id, update)).rejects.toThrow(Error)
+            })
+            
+        })
+
 
     })
     

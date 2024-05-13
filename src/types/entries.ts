@@ -1,10 +1,23 @@
-export type Moods = "happy" | "sad" | "excited" | "bored" | "tired" 
-| "exhausted" | "unsure" | "anxious" | "relaxed" | "stressed" 
-| "angry" | "sick";
+import mongoose from "mongoose";
 
-export type EntryTypes = typeof process.env.MOOD_ENTRY_TYPE | typeof process.env.JOURNAL_ENTRY_TYPE | typeof process.env.MOOD_ENTRY_TYPE | "multiple-entry";
+export const Moods = {
+  happy: "happy",
+  sad: "sad",
+  excited: "excited",
+  bored: "bored",
+  tired: "tired",
+  exhausted: "exhausted",
+  unsure: "unsure",
+  anxious: "anxious",
+  relaxed: "relaxed",
+  stressed: "stressed",
+  angry: "angry",
+  sick: "sick",
+  depressed: "depressed"
+} as const
+export type EntryTypes = "mood" | "journal" | "gratitude" | "multiple-entry";
 
-export interface Entry {
+export interface NewEntry {
     type: EntryTypes[];
     subject: string | undefined;
     quote: string | undefined;
@@ -12,29 +25,37 @@ export interface Entry {
     datetime: Date;
 }
 
-export interface CustomMoodEntry {
-  type?: string[],
+export interface Entry extends NewEntry {
+  id: mongoose.Types.ObjectId;
+}
+
+export interface NewCustomMoodEntry {
+  type?: EntryTypes[],
   subject?: string,
   quote?: string,
   tags?: string[],
-  mood?: string,
+  mood?: keyof typeof Moods,
+  datetime?: string | Date
+}
+export interface CustomMoodEntry extends Omit<NewCustomMoodEntry, "datetime"> {
   datetime?: Date
 }
 
-export interface MoodEntry extends Entry {
-  mood: Moods;
+export interface NewMoodEntry extends NewEntry {
+  mood: keyof typeof Moods;
 }
+export interface MoodEntry extends Entry, NewMoodEntry {}
 
-export interface JournalEntry extends Entry {
+export interface JournalEntry extends NewEntry {
   journal: string;
 }
 
-export interface GratitudeEntry extends Entry {
+export interface GratitudeEntry extends NewEntry {
   gratitude: string[];
 }
 
-export interface MultipleEntry extends Entry {
-  mood?: Moods;
+export interface MultipleEntry extends NewEntry {
+  mood?: keyof typeof Moods;
   journal?: string;
   gratitude?: string[];
 }
