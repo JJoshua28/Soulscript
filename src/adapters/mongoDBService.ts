@@ -1,5 +1,6 @@
-import { EntryService } from "../ports/entryService";
 import { MoodEntry, NewMoodEntry } from "../types/entries";
+import { EntryService } from "../ports/entryService";
+
 import { moodEntryModel } from "../services/mongoDB/models/entry";
 import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
@@ -25,7 +26,6 @@ class MongoDBService implements EntryService {
         }
         
     }
-
 }
 
 export default MongoDBService;

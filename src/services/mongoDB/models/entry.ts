@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
-import { MoodEntrySchema } from "../../../schemas/mongdoDB";
+
+import { MoodEntrySchema } from "../schemas/entries";
 import { MoodEntryDocument } from "../types/document";
 
 /*MongoDB converts the collection name into lowercase and pluralizes it.
