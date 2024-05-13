@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest ./test/*",
-    "start": "tsc & mongod --port 27017 & node dist/server.js",
+    "start": "tsc & mongod --port 27017 & node dist/index.js",
     "test:unit": "jest ./test/unit/*",
     "test:watch:unit": "jest --watch ./test/unit/*",
     "test:integration": "jest ./test/integration/*",

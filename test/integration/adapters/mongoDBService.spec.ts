@@ -1,4 +1,5 @@
 import { Request } from "express";
+import mongoose from "mongoose";
 
 import { defaultMoodEntry, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
@@ -7,7 +8,6 @@ import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
 import { createNewMoodEntry } from "../../data/helpers/moodEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
-import mongoose from "mongoose";
 
 describe("Mood Entry", ()=>{
 

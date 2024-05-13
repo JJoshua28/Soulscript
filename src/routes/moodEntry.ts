@@ -1,6 +1,7 @@
 import express, {Express, Request, Response, Router} from 'express';
-import handleAddEntry from '../handlers/addEntry';
+import handleAddEntry from '../handlers/addMoodEntry';
 import handleGetMoodEntryByDate from '../handlers/getMoodEntryByDate';
+import handleUpdateMoodEntry from '../handlers/updateMoodEntry';
 
 const app:Express = express();
 app.use(express.json());
@@ -22,6 +23,13 @@ router.get("/get-entry-by-date", (req: Request, res: Response) => {
     })
     .catch(error => res.status(500).send(error.message));
 })
+
+router.put("/update-entry", (req: Request, res: Response) => {
+    handleUpdateMoodEntry(req)
+    .then(response => res.send(response).status(200))
+    .catch(error => res.status(500).send(error.message));
+})
+
 
 export default router;
 

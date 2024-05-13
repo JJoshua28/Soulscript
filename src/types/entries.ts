@@ -29,13 +29,15 @@ export interface Entry extends NewEntry {
   id: mongoose.Types.ObjectId;
 }
 
-
-export interface CustomMoodEntry {
+export interface NewCustomMoodEntry {
   type?: EntryTypes[],
   subject?: string,
   quote?: string,
   tags?: string[],
   mood?: keyof typeof Moods,
+  datetime?: string | Date
+}
+export interface CustomMoodEntry extends Omit<NewCustomMoodEntry, "datetime"> {
   datetime?: Date
 }
 

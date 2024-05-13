@@ -1,7 +1,7 @@
 import {Request} from 'express';
 import { MoodEntry } from '../../../src/types/entries';
 import { defaultMoodEntry } from "../../data/moodEntry"
-import handleAddEntry from "../../../src/handlers/addEntry"
+import handleAddEntry from "../../../src/handlers/addMoodEntry"
 import AddMoodEntryUseCase from '../../../src/use cases/addMoodEntry';
 import { createNewMoodEntry } from '../../data/helpers/moodEntry';
 
