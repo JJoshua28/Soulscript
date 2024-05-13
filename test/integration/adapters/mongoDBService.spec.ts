@@ -6,6 +6,8 @@ import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
 import { createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
+import mongoose from "mongoose";
 
 describe("Mood Entry", ()=>{
 
@@ -16,7 +18,7 @@ describe("Mood Entry", ()=>{
         await tearDownTestEnvironment();
     })
 
-    describe("POST /api/add-entry/mood", () => {
+    describe("POST /api/mood/add-entry", () => {
         const request = {body: ""} as Request;
         afterEach(async () => {
             request.body = "";
@@ -62,7 +64,7 @@ describe("Mood Entry", ()=>{
             })
         })
     })
-    describe("GET /api", ()=>{
+    describe("GET /api/mood/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             const currentDate = new Date();
             beforeAll(async ()=>{
@@ -96,11 +98,49 @@ describe("Mood Entry", ()=>{
 
                 expect(response).toStrictEqual(expect.arrayContaining([]))
                 expect(response.length).toStrictEqual(0);
-
-
             })
         })
+    })
+    describe("PUT /api/mood/update-entry", ()=> {
+        describe("Positive tests", ()=> {
+            seedTestData();
+            it.each`
+                findQuery                                                | updates
+                ${{...getByDateQuery(new Date()), mood: "happy"}}        | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], mood: "unsure" }}
+                ${{...getByDateQuery(new Date()), mood: "exhausted"}}    | ${{quote: " "}}
+                ${{datetime: new Date("2020-10-25"), mood: "depressed"}} | ${{mood: "tired", quote: "I am the stone that the builder refused"}}
+                ${{datetime: new Date("2015-05-15"), mood: "depressed"}} | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+            `("should update a mood entry with data $updates", async ({findQuery, updates}) => {
         
+                let document = await moodEntryModel.findOne(findQuery);
+                const options = {
+                    new: true,
+                    runValidators: true,
+                    returnDocument: "after" as "after"
+                }
+                if(!document) throw new Error(`no document exist with query: ${findQuery}`)
+    
+                const mongoService = new MongoDBService();
+                const response = await mongoService.updateMoodEntry(document._id, updates);
+                        
+                expect(response.id).toEqual(document._id);
+                expect(response).toMatchObject({
+                    ...updates,
+                    type: ["mood"]
+                });
+                expect(response).not.toEqual(document);
+            })
+        })
+        describe("Negative Tests", () => {
+            it("should throw an error if no documents exists for that ID", async ()=> {
+                const id = new mongoose.Types.ObjectId();
+                const update = {quote: " "};
+                const mongoService = new MongoDBService();
+                await expect(mongoService.updateMoodEntry(id, update)).rejects.toThrow(Error)
+            })
+            
+        })
+
 
     })
     

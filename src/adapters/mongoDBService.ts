@@ -1,4 +1,6 @@
-import { MoodEntry, NewMoodEntry } from "../types/entries";
+import mongoose from "mongoose";
+
+import { CustomMoodEntry, MoodEntry, NewMoodEntry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
 import { moodEntryModel } from "../services/mongoDB/models/entry";
@@ -25,6 +27,21 @@ class MongoDBService implements EntryService {
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`)
         }
         
+    }
+    async updateMoodEntry(id: mongoose.Types.ObjectId, update: CustomMoodEntry): Promise<MoodEntry> {
+        try {
+            const options = {
+                new: true,
+                runValidators: true,
+                returnDocument: "after" as "after"
+            }
+            const response = await moodEntryModel.findByIdAndUpdate(id, update, options);
+            if(!response) throw new Error(`No entry exists with ID: ${id}`);
+            const mappedMoodEntry = mapDocumentToMoodEntry((response));
+            return mappedMoodEntry;
+        } catch (error) {
+            throw Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error}`)
+        }
     }
 }
 
