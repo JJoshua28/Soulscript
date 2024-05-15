@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest ./test/*",
-    "start": "tsc & mongod --port 27017 & node dist/index.js",
+    "start": "tsc && mongod --port 27017 & node dist/index.js",
     "test:unit": "jest ./test/unit/*",
     "test:watch:unit": "jest --watch ./test/unit/*",
     "test:integration": "jest ./test/integration/*",
@@ -26,7 +26,8 @@
     "mockingoose": "^2.16.2",
     "mongodb-memory-server": "^9.2.0",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

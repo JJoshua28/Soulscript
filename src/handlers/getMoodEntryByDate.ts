@@ -2,7 +2,7 @@ import { Request } from "express";
 import MongoDBService from "../adapters/mongoDBService";
 import { validDate } from "../helpers/validateDate";
 import { MoodEntry } from "../types/entries";
-import GetMoodEntryByDateUseCase from "../use cases/getMoodEntryByDateUseCase";
+import GetMoodEntryByDateUseCase from "../use cases/getMoodEntryByDate";
 
 const handleGetMoodEntryByDate = async (req: Request): Promise<MoodEntry[] | []> => {
     const entryService = new MongoDBService();

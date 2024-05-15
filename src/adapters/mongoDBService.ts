@@ -43,6 +43,16 @@ class MongoDBService implements EntryService {
             throw Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error}`)
         }
     }
+    async deleteMoodEntry(id: mongoose.Types.ObjectId): Promise<null | MoodEntry>  {
+        try {
+            const response = await moodEntryModel.findByIdAndDelete(id);
+
+            return response && mapDocumentToMoodEntry(response);
+        } catch (error){
+            throw new Error(`Something went wrong trying to remove a document with ID: ${id}`)
+        }
+        
+    }
 }
 
 export default MongoDBService;

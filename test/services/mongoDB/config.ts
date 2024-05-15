@@ -18,14 +18,14 @@ const tearDownTestEnvironment = async () => {
     mongoServer.stop();
 }
 
-const seedTestData = () => {
+const seedTestData = async () => {
     let testData: NewMoodEntry[] = [
         createNewMoodEntry({datetime: new Date(), mood: "happy"}),
         createNewMoodEntry({datetime: new Date(), mood: "exhausted"}),
         createNewMoodEntry({datetime: new Date("2020-10-25"), mood: "depressed"}),
         createNewMoodEntry({datetime: new Date("2015-05-15"), mood: "depressed"})
     ];  
-    moodEntryModel.insertMany(testData);
+    await moodEntryModel.insertMany(testData);
 }
 
 

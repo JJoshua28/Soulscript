@@ -7,6 +7,6 @@ export const getByDateQuery = (date: Date) => {
 
     return { 
         datetime: {$gte: earliestDate, $lte:latestDate},
-        type: ["mood"]
+        type: { $in: ["mood"]}
     }
 }

@@ -1,13 +1,16 @@
 import { Request } from "express";
 import mongoose from "mongoose";
+import waitForExpect from 'wait-for-expect';
+
+import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
 
 import { defaultMoodEntry, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
-import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
 import { createNewMoodEntry } from "../../data/helpers/moodEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
+import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 
 describe("Mood Entry", ()=>{
 
@@ -142,6 +145,40 @@ describe("Mood Entry", ()=>{
         })
 
 
+    })
+    describe("DELETE /api/mood/remove-entry", () => {
+        describe("Positive Tests", ()=> {
+            it("should delete a document with the specified ID and return that document", async () => {
+                const documents =  await moodEntryModel.find<MoodEntryDocument>({});
+                const [document] = documents; 
+    
+                const mongoDBService = new MongoDBService();
+                const response  = await mongoDBService.deleteMoodEntry(document._id) as MoodEntryDocument;
+                
+                expect(response.id).toEqual(document._id);
+                expect(response).toEqual(expect.objectContaining({
+                    type: document.type,
+                    subject: document.subject,
+                    quote: document.quote,
+                    tags: document.tags,
+                    mood: document.mood,
+                    datetime: document.datetime 
+                }));
+                await waitForExpect(async () => {
+                    const foundDocument = await moodEntryModel.findById(document._id);
+                    expect(foundDocument).toBeNull();
+                });
+
+
+            });
+            it("should return null if no documents exists with that ID", async () => {
+                const mongoDBService = new MongoDBService();
+                const id = new mongoose.Types.ObjectId();
+                const response  = await mongoDBService.deleteMoodEntry(id);
+                
+                expect(response).toBeNull();
+            })
+        })
     })
     
 })
