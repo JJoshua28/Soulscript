@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest ./test/*",
     "start": "tsc && mongod --port 27017 & node dist/index.js",
+    "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & pkill -f 'mongod --port 27017'",
     "test:unit": "jest ./test/unit/*",
     "test:watch:unit": "jest --watch ./test/unit/*",
     "test:integration": "jest ./test/integration/*",
