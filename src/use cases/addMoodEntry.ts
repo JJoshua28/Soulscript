@@ -1,5 +1,5 @@
-import { EntryService } from "../ports/entryService";
 import { MoodEntry, NewMoodEntry } from "../types/entries";
+import { EntryService } from "../ports/entryService";
 
 class AddMoodEntryUseCase {
     private entryService: EntryService;

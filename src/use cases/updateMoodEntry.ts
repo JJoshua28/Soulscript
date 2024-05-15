@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
-import { EntryService } from "../ports/entryService";
+
 import { CustomMoodEntry, MoodEntry } from "../types/entries";
+import { EntryService } from "../ports/entryService";
 
 class UpdateMoodEntryUseCase {
     private entryService: EntryService;
