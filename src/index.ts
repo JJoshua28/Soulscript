@@ -9,10 +9,6 @@ app.use(express.json());
     
 connectToMongoDB(); 
 app.use("/api/mood", router)
-app.get("/", (req, res) => {
-    res.send("Girl get comfortable!");
-})
-
 
 app.listen(serverPort, function () {
     console.log(`Server running on port ${serverPort}`)
