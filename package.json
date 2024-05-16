@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "jest ./test/*",
-    "start": "tsc && mongod --port 27017 & node dist/index.js",
-    "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & pkill -f 'mongod --port 27017'",
+    "start": "tsc && node dist/index.js",
+    "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & killall mongod & killall jest",
     "test:unit": "jest ./test/unit/*",
     "test:watch:unit": "jest --watch ./test/unit/*",
     "test:integration": "jest ./test/integration/*",
-    "test:watch:integration": "jest --watch ./test/integration/*"
+    "test:watch:integration": "jest --watch ./test/integration/*",
+    "test:smoke": "jest ./test/smoke/*"
   },
   "keywords": [],
   "author": "Joshua",
@@ -24,8 +25,10 @@
     "@types/mongodb-memory-server": "^2.3.0",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20.12.7",
+    "@types/supertest": "^6.0.2",
     "mockingoose": "^2.16.2",
     "mongodb-memory-server": "^9.2.0",
+    "supertest": "^7.0.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5",
     "wait-for-expect": "^3.0.2"

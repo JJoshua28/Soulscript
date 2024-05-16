@@ -2,11 +2,12 @@ const mockingoose = require("mockingoose");
 import mongoose, { Model } from "mongoose";
 
 import { NewMoodEntry } from "../../../src/types/entries";
-import { mockMoodEntryDocument, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
+import { mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { moodEntryExpectation } from "../../assertions/moodEntry";
 
 describe("Mood Entry", ()=> {
     beforeEach(() => {

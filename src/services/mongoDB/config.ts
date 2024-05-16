@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 
 dotenv.config();
 
-const mongoURL = `mongodb://${process.env.HOST}:${process.env.PORT}/${process.env.DB_NAME}`;
+const mongoURL = `mongodb://${process.env.HOST}:${process.env.MONGODB_PORT}/${process.env.DB_NAME}`;
 
 const connectToMongoDB = async () => {
     try {
