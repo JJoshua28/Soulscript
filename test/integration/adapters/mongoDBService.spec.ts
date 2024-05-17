@@ -172,12 +172,14 @@ describe("Mood Entry", ()=>{
 
 
             });
-            it("should return null if no documents exists with that ID", async () => {
+        })
+        describe("Negative Tests", ()=> {
+
+            it("should throw and error if no documents exists with that ID", async () => {
                 const mongoDBService = new MongoDBService();
                 const id = new mongoose.Types.ObjectId();
-                const response  = await mongoDBService.deleteMoodEntry(id);
                 
-                expect(response).toBeNull();
+                await expect(mongoDBService.deleteMoodEntry(id)).rejects.toThrow(Error);
             })
         })
     })

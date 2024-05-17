@@ -38,7 +38,8 @@ class MongoDBService implements EntryService {
             }
             const response = await moodEntryModel.findByIdAndUpdate(id, update, options);
             console.log("and here is the response: "+ response);
-            if(!response) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(!response) throw new Error();
             const mappedMoodEntry = mapDocumentToMoodEntry((response));
             return mappedMoodEntry;
         } catch (error: any) {
@@ -50,7 +51,8 @@ class MongoDBService implements EntryService {
         try {
             const response = await moodEntryModel.findByIdAndDelete(id);
 
-            if (!response) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if (!response) throw new Error();
 
             return response && mapDocumentToMoodEntry(response);
         } catch (error: any){
