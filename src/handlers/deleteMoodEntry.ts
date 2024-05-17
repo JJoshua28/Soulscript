@@ -5,6 +5,7 @@ import { MoodEntry } from "../types/entries";
 
 import DeleteMoodEntryUseCase from "../use cases/deleteMoodEntry";
 import MongoDBService from "../adapters/mongoDBService";
+import CustomMoodErrors from "../types/error";
 
 
 const handleDeleteMoodEntry = async (req: Request): Promise<MoodEntry | null> => {
@@ -17,7 +18,7 @@ const handleDeleteMoodEntry = async (req: Request): Promise<MoodEntry | null> =>
         } = (req.body as {
         id: mongoose.Types.ObjectId, 
     }) 
-    if(!id) throw  new Error("No ID sent with the request to delete the mood entry!")
+    if(!id) throw  new Error(CustomMoodErrors.INVALID_REQUEST)
     return await deleteMoodUseCase.execute(id);
 }
 
