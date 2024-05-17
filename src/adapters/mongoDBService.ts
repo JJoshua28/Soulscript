@@ -37,7 +37,6 @@ class MongoDBService implements EntryService {
                 returnDocument: "after" as "after"
             }
             const response = await moodEntryModel.findByIdAndUpdate(id, update, options);
-            console.log("and here is the response: "+ response);
             if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if(!response) throw new Error();
             const mappedMoodEntry = mapDocumentToMoodEntry((response));
