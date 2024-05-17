@@ -2,23 +2,24 @@ import { Request } from "express";
 import mongoose from "mongoose";
 import waitForExpect from 'wait-for-expect';
 
-import { seedTestData, setupTestEnvironment, tearDownTestEnvironment } from "../../services/mongoDB/config"
+import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 
-import { defaultMoodEntry, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
+import { defaultMoodEntry } from "../../data/moodEntry";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry";
-import { createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { createNewMoodEntry, seedTestData } from "../../data/helpers/moodEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
-import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
+import { moodEntryExpectation, moodEntryDocumentExpectation } from "../../assertions/moodEntry";
+import mongooseMemoryDB from "../../services/mongoDB/config";
 
 describe("Mood Entry", ()=>{
 
     beforeAll(async ()=> {
-        await setupTestEnvironment();
+        await mongooseMemoryDB.setupTestEnvironment();
     })
     afterAll(async () => {
-        await tearDownTestEnvironment();
+        await mongooseMemoryDB.tearDownTestEnvironment();
     })
 
     describe("POST /api/mood/add-entry", () => {
@@ -71,8 +72,8 @@ describe("Mood Entry", ()=>{
         describe("Positive Tests", () => {
             const currentDate = new Date();
             beforeAll(async ()=>{
-                await tearDownTestEnvironment();
-                await setupTestEnvironment();
+                await mongooseMemoryDB.tearDownTestEnvironment();
+                await mongooseMemoryDB.setupTestEnvironment();
                 await seedTestData();
             })
             it.each`
@@ -171,12 +172,14 @@ describe("Mood Entry", ()=>{
 
 
             });
-            it("should return null if no documents exists with that ID", async () => {
+        })
+        describe("Negative Tests", ()=> {
+
+            it("should throw and error if no documents exists with that ID", async () => {
                 const mongoDBService = new MongoDBService();
                 const id = new mongoose.Types.ObjectId();
-                const response  = await mongoDBService.deleteMoodEntry(id);
                 
-                expect(response).toBeNull();
+                await expect(mongoDBService.deleteMoodEntry(id)).rejects.toThrow(Error);
             })
         })
     })

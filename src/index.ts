@@ -1,15 +1,8 @@
-import express, {Express} from 'express';
-import connectToMongoDB from './services/mongoDB/config'
-import router from './routes/moodEntry';
+import app from "./config/server"
+import connectToMongoDB from "./services/mongoDB/config";
 
-const serverPort = 3001;
+connectToMongoDB();
 
-const app: Express = express();
-app.use(express.json());
-    
-connectToMongoDB(); 
-app.use("/api/mood", router)
-
-app.listen(serverPort, function () {
-    console.log(`Server running on port ${serverPort}`)
+app.listen(process.env.SERVER_PORT, function () {
+    console.log(`Server running on port ${process.env.SERVER_PORT}`)
 })

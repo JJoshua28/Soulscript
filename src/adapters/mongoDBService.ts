@@ -6,6 +6,7 @@ import { EntryService } from "../ports/entryService";
 import { moodEntryModel } from "../services/mongoDB/models/entry";
 import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
+import CustomMoodErrors from "../types/error";
 
 class MongoDBService implements EntryService {
     constructor() {}
@@ -36,10 +37,12 @@ class MongoDBService implements EntryService {
                 returnDocument: "after" as "after"
             }
             const response = await moodEntryModel.findByIdAndUpdate(id, update, options);
-            if(!response) throw new Error(`No entry exists with ID: ${id}`);
+            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(!response) throw new Error();
             const mappedMoodEntry = mapDocumentToMoodEntry((response));
             return mappedMoodEntry;
-        } catch (error) {
+        } catch (error: any) {
+            if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
             throw Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error}`)
         }
     }
@@ -47,8 +50,12 @@ class MongoDBService implements EntryService {
         try {
             const response = await moodEntryModel.findByIdAndDelete(id);
 
+            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if (!response) throw new Error();
+
             return response && mapDocumentToMoodEntry(response);
-        } catch (error){
+        } catch (error: any){
+            if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
             throw new Error(`Something went wrong trying to remove a document with ID: ${id}`)
         }
         

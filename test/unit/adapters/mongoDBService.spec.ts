@@ -2,11 +2,12 @@ const mockingoose = require("mockingoose");
 import mongoose, { Model } from "mongoose";
 
 import { NewMoodEntry } from "../../../src/types/entries";
-import { mockMoodEntryDocument, moodEntryDocumentExpectation, moodEntryExpectation } from "../../data/moodEntry";
+import { mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { moodEntryExpectation } from "../../assertions/moodEntry";
 
 describe("Mood Entry", ()=> {
     beforeEach(() => {
@@ -134,20 +135,18 @@ describe("Mood Entry", ()=> {
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
                 expect(response).toEqual(expect.objectContaining(moodEntryExpectation))
             })
-            it("should return null if no document exists with that ID", async () => {
+        })
+        describe("Negative Tests", () => {
+            it("should throw a error if no document exists with that ID", async () => {
                 const mongooseID = new mongoose.Types.ObjectId();
                 
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(null);
-
+        
                 const entryService  = new MongoDBService();
-                const response = await entryService.deleteMoodEntry(mongooseID);
+                await expect(entryService.deleteMoodEntry(mongooseID)).rejects.toThrow(Error);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
-                expect(response).toEqual(null);
-
             })
-        })
-        describe("Negative Tests", () => {
             it("should throw and error if something goes wrong when trying to delete a document", async () => {
                 const mongooseID = new mongoose.Types.ObjectId();
                 

@@ -1,6 +1,10 @@
+import mongoose from "mongoose";
+
 import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 import { CustomMoodEntry, NewMoodEntry, MoodEntry } from "../../../src/types/entries";
+
 import { defaultMoodEntry } from "../moodEntry";
+import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
 
 const createNewMoodEntry = (entry?:CustomMoodEntry): NewMoodEntry=> {
     const {
@@ -69,4 +73,24 @@ const createMoodEntryDocument = (entry?:CustomMoodEntry) => {
     } as MoodEntryDocument
 }
 
-export { createNewMoodEntry, createMoodEntry, createMoodEntryDocument}
+const seedTestData = async () => {
+    const defaultMoodEntry:MoodEntry = {
+        id: new mongoose.Types.ObjectId(),
+        type: ["mood"],
+        subject: "test data",
+        quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        tags: ["test"],
+        mood: "exhausted",
+        datetime: new Date()
+    };
+    let testData: NewMoodEntry[] = [
+        {...defaultMoodEntry, datetime: new Date(), mood: "happy"},
+        {...defaultMoodEntry, datetime: new Date(), mood: "exhausted"},
+        {...defaultMoodEntry, datetime: new Date("2020-10-25"), mood: "depressed"},
+        {...defaultMoodEntry, datetime: new Date("2015-05-15"), mood: "depressed"}
+    ];  
+    await moodEntryModel.insertMany(testData);
+}
+
+
+export { createNewMoodEntry, createMoodEntry, createMoodEntryDocument, seedTestData}

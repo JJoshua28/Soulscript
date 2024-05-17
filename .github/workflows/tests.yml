@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  unit-tests:
+  setup:
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,32 +27,45 @@ jobs:
 
       - name: Install Jest
         run: npm i -g jest
+
+  smoke-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy setup results
+        run: npm ci
+
+      - name: Run Smoke tests
+        run: npm run test:smoke
+
+  unit-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy setup results
+        run: npm ci
 
       - name: Run Unit tests
         run: npm run test:unit
 
   integration-tests:
+    needs: setup
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
+      - name: Copy setup results
         run: npm ci
 
-      - name: Install Jest
-        run: npm i -g jest
-
-      - name: Run integration tests
+      - name: Run Integration tests
         run: npm run test:integration
