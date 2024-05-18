@@ -1,7 +1,8 @@
 const mockingoose = require("mockingoose");
 import mongoose, { Model } from "mongoose";
 
-import { NewMoodEntry } from "../../../src/types/entries";
+import { EntryTypes, NewMoodEntry } from "../../../src/types/entries";
+
 import { mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
@@ -20,7 +21,7 @@ describe("Mood Entry", ()=> {
                 "save"
             );
             const mockMoodEntry: NewMoodEntry = createNewMoodEntry();
-            const mongoService = new MongoDBService(moodEntryModel);
+            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
             const response = await mongoService.addMoodEntry(mockMoodEntry);
             
             expect(response).toEqual(expect.objectContaining(moodEntryExpectation));
@@ -38,7 +39,7 @@ describe("Mood Entry", ()=> {
                 datetime: new Date()
             } as NewMoodEntry;
             
-            const mongoService = new MongoDBService(mockMoodEntryModel);
+            const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
             
             await expect(mongoService.addMoodEntry(mockMoodEntry)).rejects.toThrow(Error);
             jest.clearAllMocks();
@@ -54,7 +55,7 @@ describe("Mood Entry", ()=> {
         `("should return all entries for date $date", async ({date}) => {
             const entry = createMoodEntryDocument({datetime: date});
             mockingoose(moodEntryModel).toReturn([entry], "find");
-            const mongoService = new MongoDBService(moodEntryModel);
+            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
     
             const response =  await mongoService.getMoodEntryByDate(date);
             
@@ -66,7 +67,7 @@ describe("Mood Entry", ()=> {
         it("should return an empty array if not entries are found", async () => {
             mockingoose(moodEntryModel).toReturn([], "find");
             const date = new Date();
-            const mongoService = new MongoDBService(moodEntryModel);
+            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
     
             const response =  await mongoService.getMoodEntryByDate(date);
             
@@ -76,7 +77,7 @@ describe("Mood Entry", ()=> {
         it("should throw an error if something goes wrong", async ()=> {
             mockingoose(moodEntryModel).toReturn(new Error("something went wrong"), "find");
             const date = new Date();
-            const mongoService = new MongoDBService(moodEntryModel);
+            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
             
             await expect(mongoService.getMoodEntryByDate(date)).rejects.toThrow(Error);
         })
@@ -98,7 +99,7 @@ describe("Mood Entry", ()=> {
             `("should return all entries for date $date", async ({update}) => {
                 const entry = createMoodEntryDocument(update);
                 mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
-                const mongoService = new MongoDBService(mockMoodEntryModel);
+                const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 
                 const response =  await mongoService.updateMoodEntry(entry.id, update);
                 
@@ -111,7 +112,7 @@ describe("Mood Entry", ()=> {
             it("should throw an error if not record exists with that id", async ()=> {
                 const update = {mood: "tired" as "tired", quote: "I am the stone that the builder refused"};
                 mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
-                const mongoService = new MongoDBService(mockMoodEntryModel);
+                const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 
                 await expect(mongoService.updateMoodEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
                 
@@ -129,7 +130,7 @@ describe("Mood Entry", ()=> {
                 
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(document);
 
-                const entryService  = new MongoDBService(mockMoodEntryModel);
+                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 const response = await entryService.deleteMoodEntry(mongooseID);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
@@ -142,7 +143,7 @@ describe("Mood Entry", ()=> {
                 
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(null);
         
-                const entryService  = new MongoDBService(mockMoodEntryModel);
+                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 await expect(entryService.deleteMoodEntry(mongooseID)).rejects.toThrow(Error);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
@@ -152,7 +153,7 @@ describe("Mood Entry", ()=> {
                 
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockRejectedValue(new Error());
 
-                const entryService  = new MongoDBService(mockMoodEntryModel);
+                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 await expect(entryService.deleteMoodEntry(mongooseID)).rejects.toThrow(Error);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);

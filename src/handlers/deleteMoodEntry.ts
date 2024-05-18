@@ -1,7 +1,7 @@
 import { Request } from "express";
 import mongoose from "mongoose";
 
-import { MoodEntry } from "../types/entries";
+import { EntryTypes, MoodEntry } from "../types/entries";
 import CustomMoodErrors from "../types/error";
 
 import DeleteMoodEntryUseCase from "../use cases/deleteMoodEntry";
@@ -10,7 +10,7 @@ import { moodEntryModel } from "../services/mongoDB/models/entry";
 
 
 const handleDeleteMoodEntry = async (req: Request): Promise<MoodEntry | null> => {
-    const entryService = new MongoDBService(moodEntryModel);
+    const entryService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
     const deleteMoodUseCase = new DeleteMoodEntryUseCase(entryService);
     
     let {id} 

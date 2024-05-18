@@ -1,17 +1,19 @@
 import mongoose, { Model } from "mongoose";
 
-import { CustomMoodEntry, MoodEntry, NewMoodEntry } from "../types/entries";
+import { CustomMoodEntry, EntryTypes, MoodEntry, NewMoodEntry } from "../types/entries";
+import { MoodEntryDocument } from "../services/mongoDB/types/document";
+import CustomMoodErrors from "../types/error";
 import { EntryService } from "../ports/entryService";
 
 import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
-import CustomMoodErrors from "../types/error";
-import { MoodEntryDocument } from "../services/mongoDB/types/document";
 
 class MongoDBService implements EntryService {
     private model: Model<MoodEntryDocument>;
-    constructor(model: Model<MoodEntryDocument>) {
+    private entryType: EntryTypes;
+    constructor(model: Model<MoodEntryDocument>, entryType: EntryTypes) {
         this.model = model;
+        this.entryType = entryType
     }
     async addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry> {
         try {
@@ -24,7 +26,7 @@ class MongoDBService implements EntryService {
     }
     async getMoodEntryByDate(date: Date): Promise<MoodEntry[] | []> {
         try {
-           const dateQuery = getByDateQuery(date);
+           const dateQuery = getByDateQuery(date, this.entryType);
             const response = await this.model.find(dateQuery);
             return mapDocumentsToMoodEntry(response);
         } catch (error) {

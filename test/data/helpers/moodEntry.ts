@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
-import { CustomMoodEntry, NewMoodEntry, MoodEntry } from "../../../src/types/entries";
+import { CustomMoodEntry, NewMoodEntry, MoodEntry, EntryTypes } from "../../../src/types/entries";
 
 import { defaultMoodEntry } from "../moodEntry";
 import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
@@ -76,7 +76,7 @@ const createMoodEntryDocument = (entry?:CustomMoodEntry) => {
 const seedTestData = async () => {
     const defaultMoodEntry:MoodEntry = {
         id: new mongoose.Types.ObjectId(),
-        type: ["mood"],
+        type: [EntryTypes.MOOD],
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         tags: ["test"],

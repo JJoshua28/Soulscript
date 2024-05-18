@@ -14,8 +14,21 @@ export const Moods = {
   angry: "angry",
   sick: "sick",
   depressed: "depressed"
-} as const
-export type EntryTypes = "mood" | "journal" | "gratitude" | "multiple-entry";
+} as const;
+
+export enum EntryTypes {
+  MOOD = "mood",
+  JOURNAL = "journal",
+  GRATITUDE = "gratitude",
+  MULTIPLE_ENTRY = "multiple-entry"
+ };
+
+enum EntryType {
+  MOOD = "mood",
+  JOURNAL = "journal",
+  GRATITUDE = "gratitude",
+  MULTIPLE_ENTRY = "multiple-entry"
+ }
 
 export interface NewEntry {
     type: EntryTypes[];

@@ -1,7 +1,7 @@
 import {Request} from 'express';
 
 import CustomErrors from '../types/error';
-import { MoodEntry } from '../types/entries';
+import { EntryTypes, MoodEntry } from '../types/entries';
 
 import { validDate } from '../helpers/validateDate';
 import MongoDBService from "../adapters/mongoDBService";
@@ -10,7 +10,7 @@ import { moodEntryModel } from '../services/mongoDB/models/entry';
 
 const handleAddEntry = async (req: Request): Promise<MoodEntry> => {
     if(!req.body?.mood || typeof req.body?.mood != "string") throw new Error(CustomErrors.INVALID_REQUEST)
-    const entryService = new MongoDBService(moodEntryModel);
+    const entryService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
     const addMoodUseCase = new AddMoodEntryUseCase(entryService);
 
     const {datetime} = (req.body as { datetime?: string })

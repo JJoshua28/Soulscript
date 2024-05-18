@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-import { MoodEntry } from "../../src/types/entries";
+import { EntryTypes, MoodEntry } from "../../src/types/entries";
 import { MoodEntryDocument } from "../../src/services/mongoDB/types/document";
 
 const defaultMoodEntry:MoodEntry = {
     id: new mongoose.Types.ObjectId(),
-    type: ["mood"],
+    type: [EntryTypes.MOOD],
     subject: "test data",
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
