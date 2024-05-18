@@ -2,14 +2,15 @@ import { Request } from "express";
 import mongoose from "mongoose";
 
 import { MoodEntry } from "../types/entries";
+import CustomMoodErrors from "../types/error";
 
 import DeleteMoodEntryUseCase from "../use cases/deleteMoodEntry";
 import MongoDBService from "../adapters/mongoDBService";
-import CustomMoodErrors from "../types/error";
+import { moodEntryModel } from "../services/mongoDB/models/entry";
 
 
 const handleDeleteMoodEntry = async (req: Request): Promise<MoodEntry | null> => {
-    const entryService = new MongoDBService();
+    const entryService = new MongoDBService(moodEntryModel);
     const deleteMoodUseCase = new DeleteMoodEntryUseCase(entryService);
     
     let {id} 

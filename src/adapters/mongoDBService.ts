@@ -1,18 +1,21 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 import { CustomMoodEntry, MoodEntry, NewMoodEntry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
-import { moodEntryModel } from "../services/mongoDB/models/entry";
 import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
 import CustomMoodErrors from "../types/error";
+import { MoodEntryDocument } from "../services/mongoDB/types/document";
 
 class MongoDBService implements EntryService {
-    constructor() {}
+    private model: Model<MoodEntryDocument>;
+    constructor(model: Model<MoodEntryDocument>) {
+        this.model = model;
+    }
     async addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry> {
         try {
-            const response = await moodEntryModel.create({...entry})
+            const response = await this.model.create({...entry})
             const mappedMoodEntry = mapDocumentToMoodEntry(response);
             return mappedMoodEntry;
         } catch (error) {
@@ -22,7 +25,7 @@ class MongoDBService implements EntryService {
     async getMoodEntryByDate(date: Date): Promise<MoodEntry[] | []> {
         try {
            const dateQuery = getByDateQuery(date);
-            const response = await moodEntryModel.find(dateQuery);
+            const response = await this.model.find(dateQuery);
             return mapDocumentsToMoodEntry(response);
         } catch (error) {
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`)
@@ -36,8 +39,8 @@ class MongoDBService implements EntryService {
                 runValidators: true,
                 returnDocument: "after" as "after"
             }
-            const response = await moodEntryModel.findByIdAndUpdate(id, update, options);
-            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            const response = await this.model.findByIdAndUpdate(id, update, options);
+            if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if(!response) throw new Error();
             const mappedMoodEntry = mapDocumentToMoodEntry((response));
             return mappedMoodEntry;
@@ -48,9 +51,9 @@ class MongoDBService implements EntryService {
     }
     async deleteMoodEntry(id: mongoose.Types.ObjectId): Promise<null | MoodEntry>  {
         try {
-            const response = await moodEntryModel.findByIdAndDelete(id);
+            const response = await this.model.findByIdAndDelete(id);
 
-            if(!response && !await moodEntryModel.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if (!response) throw new Error();
 
             return response && mapDocumentToMoodEntry(response);

@@ -7,9 +7,10 @@ import MongoDBService from "../adapters/mongoDBService";
 import { validDate } from "../helpers/validateDate";
 import UpdateMoodEntryUseCase from "../use cases/updateMoodEntry";
 import CustomMoodErrors from "../types/error";
+import { moodEntryModel } from "../services/mongoDB/models/entry";
 
 const handleUpdateMoodEntry = async (req: Request): Promise<MoodEntry> => {
-    const entryService = new MongoDBService();
+    const entryService = new MongoDBService(moodEntryModel);
     const updateMoodUseCase = new UpdateMoodEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id) throw new Error(CustomMoodErrors.INVALID_REQUEST);

@@ -4,9 +4,10 @@ import { validDate } from "../helpers/validateDate";
 import { MoodEntry } from "../types/entries";
 import GetMoodEntryByDateUseCase from "../use cases/getMoodEntryByDate";
 import CustomMoodErrors from "../types/error";
+import { moodEntryModel } from "../services/mongoDB/models/entry";
 
 const handleGetMoodEntryByDate = async (req: Request): Promise<MoodEntry[] | []> => {
-    const entryService = new MongoDBService();
+    const entryService = new MongoDBService(moodEntryModel);
     const getMoodEntryUseCase = new GetMoodEntryByDateUseCase(entryService);
     
     if (!req?.body?.datetime) throw new Error(CustomMoodErrors.INVALID_REQUEST)
