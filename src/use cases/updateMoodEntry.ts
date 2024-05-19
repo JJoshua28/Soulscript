@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { CustomMoodEntry, MoodEntry } from "../types/entries";
+import { CustomEntry, Entry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
 class UpdateMoodEntryUseCase {
@@ -8,8 +8,8 @@ class UpdateMoodEntryUseCase {
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
     }
-    async execute (id: mongoose.Types.ObjectId, update: CustomMoodEntry): Promise<MoodEntry> {
-        return await this.entryService.updateMoodEntry(id, update)
+    async execute (id: mongoose.Types.ObjectId, update: CustomEntry): Promise<Entry> {
+        return await this.entryService.updateEntry(id, update)
     }
 }
 

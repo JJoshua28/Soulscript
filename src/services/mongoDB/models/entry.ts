@@ -1,13 +1,13 @@
-import { Schema, model } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
-import { MoodEntrySchema } from "../schemas/entries";
-import { MoodEntryDocument } from "../types/document";
+import EntryDocument from "../types/document";
+import EntrySchema from "../schemas/entries";
 
 /*MongoDB converts the collection name into lowercase and pluralizes it.
 The collection name will really be "entries". */
 const collectionName = "Entry"
 
-const moodEntrySchema = new Schema<MoodEntryDocument>({...MoodEntrySchema});
-const moodEntryModel = model<MoodEntryDocument>(collectionName, moodEntrySchema);
+const entrySchema = new Schema<EntryDocument>(EntrySchema);
+const entryModel: Model<EntryDocument> = model<EntryDocument>(collectionName, entrySchema);
 
-export {moodEntryModel}
+export default entryModel;

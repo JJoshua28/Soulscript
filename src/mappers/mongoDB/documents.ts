@@ -1,47 +1,51 @@
-import { MoodEntryDocument } from "../../services/mongoDB/types/document";
-import { MoodEntry } from "../../types/entries";
+import EntryDocument from "../../services/mongoDB/types/document";
+import { Entry } from "../../types/entries";
 
-export const mapDocumentToMoodEntry = (document: MoodEntryDocument):MoodEntry => {
+export const mapDocumentToEntry = (document: EntryDocument):Entry => {
     const {
-        _id:id, 
+        _id:id,
+        sharedID, 
         type, 
         subject, 
         quote, 
         tags, 
         datetime, 
-        mood 
+        content 
     } = document
-    const mappedMoodEntry: MoodEntry = {
+    const mappedEntry: Entry = {
         id,
+        sharedID: undefined || sharedID,
         type,
         subject,
         quote,
         tags,
-        datetime,
-        mood
+        content,
+        datetime
     };
-    return mappedMoodEntry;
+    return mappedEntry;
 } 
 
-export const mapDocumentsToMoodEntry = (document: MoodEntryDocument[]):MoodEntry[] => {
+export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
     const mappedMoodEntries = document.map(document => {
         const {
             _id:id, 
-            type, 
+            type,
+            sharedID, 
             subject, 
             quote, 
             tags, 
-            datetime, 
-            mood 
+            content, 
+            datetime 
         } = document
-        const mappedMoodEntry: MoodEntry = {
+        const mappedMoodEntry: Entry = {
             id,
+            sharedID: undefined ||sharedID,
             type,
             subject,
             quote,
             tags,
-            datetime,
-            mood
+            content,
+            datetime
         };
         return mappedMoodEntry;
     })

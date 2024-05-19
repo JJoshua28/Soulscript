@@ -1,13 +1,15 @@
 import { Request } from "express";
+
+import { Entry, EntryTypes } from "../types/entries";
+import CustomMoodErrors from "../types/error";
+
 import MongoDBService from "../adapters/mongoDBService";
 import { validDate } from "../helpers/validateDate";
-import { EntryTypes, MoodEntry } from "../types/entries";
 import GetMoodEntryByDateUseCase from "../use cases/getMoodEntryByDate";
-import CustomMoodErrors from "../types/error";
-import { moodEntryModel } from "../services/mongoDB/models/entry";
+import entryModel from "../services/mongoDB/models/entry";
 
-const handleGetMoodEntryByDate = async (req: Request): Promise<MoodEntry[] | []> => {
-    const entryService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
+const handleGetMoodEntryByDate = async (req: Request): Promise<Entry[] | []> => {
+    const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
     const getMoodEntryUseCase = new GetMoodEntryByDateUseCase(entryService);
     
     if (!req?.body?.datetime) throw new Error(CustomMoodErrors.INVALID_REQUEST)

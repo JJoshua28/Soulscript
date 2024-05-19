@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest ./test/*",
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && mongod --port 27017 & node dist/index.js",
     "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & killall mongod & killall jest",
     "test:unit": "jest ./test/unit/*",
     "test:watch:unit": "jest --watch ./test/unit/*",

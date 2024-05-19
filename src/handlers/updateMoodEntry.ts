@@ -1,16 +1,16 @@
 import { Request } from "express";
 import mongoose from "mongoose"
 ;
-import { CustomMoodEntry, EntryTypes, MoodEntry, NewCustomMoodEntry } from "../types/entries";
+import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../types/entries";
+import CustomMoodErrors from "../types/error";
 
 import MongoDBService from "../adapters/mongoDBService";
 import { validDate } from "../helpers/validateDate";
 import UpdateMoodEntryUseCase from "../use cases/updateMoodEntry";
-import CustomMoodErrors from "../types/error";
-import { moodEntryModel } from "../services/mongoDB/models/entry";
+import entryModel from "../services/mongoDB/models/entry";
 
-const handleUpdateMoodEntry = async (req: Request): Promise<MoodEntry> => {
-    const entryService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
+const handleUpdateMoodEntry = async (req: Request): Promise<Entry> => {
+    const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
     const updateMoodUseCase = new UpdateMoodEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id) throw new Error(CustomMoodErrors.INVALID_REQUEST);
@@ -18,16 +18,16 @@ const handleUpdateMoodEntry = async (req: Request): Promise<MoodEntry> => {
     let {id, 
         update}: {
             id: mongoose.Types.ObjectId,
-            update: NewCustomMoodEntry
+            update: NewCustomEntry
         } = (req.body as {
         id: mongoose.Types.ObjectId, 
-        update: NewCustomMoodEntry
+        update: NewCustomEntry
     }) 
     if(update?.datetime) update = {
         ...update,
         datetime: new Date(update?.datetime)
-    } as CustomMoodEntry;
-    const entryUpdate:CustomMoodEntry = {...update  as CustomMoodEntry} 
+    } as CustomEntry;
+    const entryUpdate:CustomEntry = {...update  as CustomEntry} 
     return await updateMoodUseCase.execute(id, entryUpdate);
 }
 

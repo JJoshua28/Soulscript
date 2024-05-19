@@ -1,26 +1,39 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
-import { EntryTypes, MoodEntry } from "../../src/types/entries";
-import { MoodEntryDocument } from "../../src/services/mongoDB/types/document";
+import { Entry, EntryTypes } from "../../src/types/entries";
+import EntryDocument from "../../src/services/mongoDB/types/document";
 
-const defaultMoodEntry:MoodEntry = {
+const defaultMoodEntry:Entry = {
     id: new mongoose.Types.ObjectId(),
-    type: [EntryTypes.MOOD],
+    sharedID: new mongoose.Types.ObjectId(),
+    type: EntryTypes.MOOD,
     subject: "test data",
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
-    mood: "exhausted",
+    content: "exhausted",
     datetime: new Date()
 };
 
-const mockMoodEntryDocument: MoodEntryDocument = {
+const mockMoodEntryDocument: EntryDocument = {
     _id: new mongoose.Types.ObjectId(),
-    type: ["mood"],
+    sharedID: new mongoose.Types.ObjectId(),
+    type: EntryTypes.MOOD,
     subject: "test data",
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
-    mood: "exhausted",
+    content: "exhausted",
     datetime: new Date()
-} as MoodEntryDocument;
+} as EntryDocument;
+
+const mockMultipleEntriesMoodEntryDocument: EntryDocument = {
+    _id: new mongoose.Types.ObjectId(),
+    sharedID: new mongoose.Types.ObjectId(),
+    type: EntryTypes.MOOD,
+    subject: "test data",
+    quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    tags: ["test"],
+    content: "exhausted",
+    datetime: new Date()
+} as EntryDocument;
 
 export { defaultMoodEntry, mockMoodEntryDocument };

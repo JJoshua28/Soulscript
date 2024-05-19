@@ -1,40 +1,40 @@
 import mongoose, { Model } from "mongoose";
 
-import { CustomMoodEntry, EntryTypes, MoodEntry, NewMoodEntry } from "../types/entries";
-import { MoodEntryDocument } from "../services/mongoDB/types/document";
+import { CustomEntry, Entry, EntryTypes, NewEntry } from "../types/entries";
 import CustomMoodErrors from "../types/error";
 import { EntryService } from "../ports/entryService";
+import EntryDocument from "../services/mongoDB/types/document";
 
-import { mapDocumentToMoodEntry, mapDocumentsToMoodEntry } from "../mappers/mongoDB/documents";
+import { mapDocumentToEntry, mapDocumentsToEntry } from "../mappers/mongoDB/documents";
 import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
 
 class MongoDBService implements EntryService {
-    private model: Model<MoodEntryDocument>;
+    private model: Model<EntryDocument>;
     private entryType: EntryTypes;
-    constructor(model: Model<MoodEntryDocument>, entryType: EntryTypes) {
+    constructor(model: Model<EntryDocument>, entryType: EntryTypes) {
         this.model = model;
         this.entryType = entryType
     }
-    async addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry> {
+    async addEntry(entry: NewEntry): Promise<Entry> {
         try {
             const response = await this.model.create({...entry})
-            const mappedMoodEntry = mapDocumentToMoodEntry(response);
+            const mappedMoodEntry = mapDocumentToEntry(response);
             return mappedMoodEntry;
         } catch (error) {
             throw Error(`Something went wrong trying to create this Entry.\n Entry: ${JSON.stringify(entry)}\nError: ${error}`)
         }
     }
-    async getMoodEntryByDate(date: Date): Promise<MoodEntry[] | []> {
+    async getEntryByDate(date: Date): Promise<Entry[] | []> {
         try {
            const dateQuery = getByDateQuery(date, this.entryType);
             const response = await this.model.find(dateQuery);
-            return mapDocumentsToMoodEntry(response);
+            return mapDocumentsToEntry(response);
         } catch (error) {
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`)
         }
         
     }
-    async updateMoodEntry(id: mongoose.Types.ObjectId, update: CustomMoodEntry): Promise<MoodEntry> {
+    async updateEntry(id: mongoose.Types.ObjectId, update: CustomEntry): Promise<Entry> {
         try {
             const options = {
                 new: true,
@@ -44,21 +44,21 @@ class MongoDBService implements EntryService {
             const response = await this.model.findByIdAndUpdate(id, update, options);
             if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if(!response) throw new Error();
-            const mappedMoodEntry = mapDocumentToMoodEntry((response));
+            const mappedMoodEntry = mapDocumentToEntry((response));
             return mappedMoodEntry;
         } catch (error: any) {
             if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
             throw Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error}`)
         }
     }
-    async deleteMoodEntry(id: mongoose.Types.ObjectId): Promise<null | MoodEntry>  {
+    async deleteEntry(id: mongoose.Types.ObjectId): Promise<Entry>  {
         try {
             const response = await this.model.findByIdAndDelete(id);
 
             if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if (!response) throw new Error();
 
-            return response && mapDocumentToMoodEntry(response);
+            return response && mapDocumentToEntry(response);
         } catch (error: any){
             if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
             throw new Error(`Something went wrong trying to remove a document with ID: ${id}`)

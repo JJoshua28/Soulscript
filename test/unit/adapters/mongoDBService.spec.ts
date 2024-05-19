@@ -1,49 +1,85 @@
 const mockingoose = require("mockingoose");
 import mongoose, { Model } from "mongoose";
 
-import { EntryTypes, NewMoodEntry } from "../../../src/types/entries";
+import { EntryTypes, NewEntry } from "../../../src/types/entries";
+import EntryDocument from "../../../src/services/mongoDB/types/document";
+import { entryExpectation } from "../../assertions/entries";
 
-import { mockMoodEntryDocument } from "../../data/moodEntry";
+import { defaultMoodEntry, mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
-import { moodEntryModel } from "../../../src/services/mongoDB/models/entry";
-import { MoodEntryDocument } from "../../../src/services/mongoDB/types/document";
 import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
-import { moodEntryExpectation } from "../../assertions/moodEntry";
+import entryModel from "../../../src/services/mongoDB/models/entry";
 
-describe("Mood Entry", ()=> {
+describe("Entry", ()=> {
     beforeEach(() => {
         jest.restoreAllMocks();
     });
     describe("Add", () => {
-        it("should return a mood Entry document", async () => {
-            mockingoose(moodEntryModel).toReturn(
-                mockMoodEntryDocument, 
-                "save"
-            );
-            const mockMoodEntry: NewMoodEntry = createNewMoodEntry();
-            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
-            const response = await mongoService.addMoodEntry(mockMoodEntry);
+        describe("Mood", () => {
+            it("should return a mood Entry document", async () => {
+                mockingoose(entryModel).toReturn(
+                    mockMoodEntryDocument, 
+                    "save"
+                );
+                const mockMoodEntry: NewEntry = createNewMoodEntry(defaultMoodEntry);
+                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const response = await mongoService.addEntry(mockMoodEntry);
+                
+                expect(response).toEqual(expect.objectContaining(entryExpectation));
+            });
             
-            expect(response).toEqual(expect.objectContaining(moodEntryExpectation));
+            it("should throw an error if unable to create", async () => {
+                jest.mock("../../../src/services/mongoDB/models/entry");
+                const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+                mockMoodEntryModel.create = jest.fn().mockRejectedValueOnce(new Error());
+                
+                const mockMoodEntry = {
+                    type: EntryTypes.MOOD,
+                    subject: "xo tour life",
+                    tags: ["mental health"],
+                    datetime: new Date()
+                } as NewEntry;
+                
+                const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
+                
+                await expect(mongoService.addEntry(mockMoodEntry)).rejects.toThrow(Error);
+                jest.clearAllMocks();
+            });
         });
-        
-        it("should throw an error if unable to create", async () => {
-            jest.mock("../../../src/services/mongoDB/models/entry");
-            const mockMoodEntryModel = moodEntryModel as jest.Mocked<Model<MoodEntryDocument>>;
-            mockMoodEntryModel.create = jest.fn().mockRejectedValueOnce(new Error());
+        /*
+        describe.skip("Gratitude", () => {
+            it("should return a mood Entry document", async () => {
+                mockingoose(entryModel).toReturn(
+                    mockGratitudeEntryDocument, 
+                    "save"
+                );
+                const mockGratitudeEntry: NewEntry = createNewGratitudeEntry(); 
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response = await mongoService.addEntry(mockGratitudeEntry);
+                
+                expect(response).toEqual(expect.objectContaining(entryExpectation));
+            });
             
-            const mockMoodEntry = {
-                type: ["mood"],
-                subject: "xo tour life",
-                tags: ["mental health"],
-                datetime: new Date()
-            } as NewMoodEntry;
-            
-            const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-            
-            await expect(mongoService.addMoodEntry(mockMoodEntry)).rejects.toThrow(Error);
-            jest.clearAllMocks();
-        });
+            it("should throw an error if unable to create", async () => {
+                jest.mock("../../../src/services/mongoDB/models/entry");
+                const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+                mockGratitudeEntryModel.create = jest.fn().mockRejectedValueOnce(new Error());
+                
+                const mockGratitudeEntry = {
+                    type: EntryTypes.GRATITUDE,
+                    subject: "xo tour life",
+                    tags: ["mental health"],
+                    datetime: Date()()
+                } as NewEntry;
+                
+                const mongoService = new MongoDBService(mockGratitudeEntryModel, EntryTypes.GRATITUDE);
+                
+                await expect(mongoService.addEntry(mockGratitudeEntry)).rejects.toThrow(Error);
+                jest.clearAllMocks();
+            });
+
+        })
+        */
     });
     describe("Find by date", () => {
         it.each`
@@ -52,69 +88,69 @@ describe("Mood Entry", ()=> {
         ${new Date("2021-05-06")}
         ${new Date("2022-08-12")}
         ${new Date("2021-11-26")}
-        `("should return all entries for date $date", async ({date}) => {
-            const entry = createMoodEntryDocument({datetime: date});
-            mockingoose(moodEntryModel).toReturn([entry], "find");
-            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
+        `("should return all entries for date $date", async ({date}: {date: Date}) => {
+            const entry = createMoodEntryDocument(defaultMoodEntry, {datetime: date});
+            mockingoose(entryModel).toReturn([entry], "find");
+            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
     
-            const response =  await mongoService.getMoodEntryByDate(date);
+            const response =  await mongoService.getEntryByDate(date);
             
-            expect(response).toEqual(expect.arrayContaining([expect.objectContaining(moodEntryExpectation)]));
+            expect(response).toEqual(expect.arrayContaining([expect.objectContaining(entryExpectation)]));
             expect(response[0]).toHaveProperty("datetime", date);
-            expect(response[0]).toHaveProperty("type", ["mood"]);
+            expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
     
         });
         it("should return an empty array if not entries are found", async () => {
-            mockingoose(moodEntryModel).toReturn([], "find");
+            mockingoose(entryModel).toReturn([], "find");
             const date = new Date();
-            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
+            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
     
-            const response =  await mongoService.getMoodEntryByDate(date);
+            const response =  await mongoService.getEntryByDate(date);
             
             expect(response).toStrictEqual([]);
 
         })
         it("should throw an error if something goes wrong", async ()=> {
-            mockingoose(moodEntryModel).toReturn(new Error("something went wrong"), "find");
+            mockingoose(entryModel).toReturn(new Error("something went wrong"), "find");
             const date = new Date();
-            const mongoService = new MongoDBService(moodEntryModel, EntryTypes.MOOD);
+            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
             
-            await expect(mongoService.getMoodEntryByDate(date)).rejects.toThrow(Error);
+            await expect(mongoService.getEntryByDate(date)).rejects.toThrow(Error);
         })
     })
     describe("Update Entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
-        const mockMoodEntryModel = moodEntryModel as jest.Mocked<Model<MoodEntryDocument>>;
+        const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
         describe("Positive tests", ()=> {
             it.each`
             update
             ${{datetime: new Date("2012-08-12")} }
             ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
-            ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], mood: "unsure" }}
-            ${{mood: "happy"}}
+            ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
+            ${{content: "happy"}}
             ${{tags: ["mental health", "sports", "boondocks"]}}
             ${{quote: " "}}
             ${{subject: "Lorum Ipsum"}}
-            ${{mood: "tired", quote: "I am the stone that the builder refused"}}
+            ${{content: "tired", quote: "I am the stone that the builder refused"}}
             `("should return all entries for date $date", async ({update}) => {
-                const entry = createMoodEntryDocument(update);
+                const entry = createMoodEntryDocument(defaultMoodEntry, update);
                 mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
                 const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 
-                const response =  await mongoService.updateMoodEntry(entry.id, update);
+                const response =  await mongoService.updateEntry(entry.id, update);
                 
-                expect(response).toEqual(expect.objectContaining(moodEntryExpectation));
+                expect(response).toEqual(expect.objectContaining(entryExpectation));
     
-                expect(response).toHaveProperty("type", ["mood"]);
+                expect(response).toHaveProperty("type", EntryTypes.MOOD);
             });
         })
         describe("Negative tests", ()=> {
             it("should throw an error if not record exists with that id", async ()=> {
-                const update = {mood: "tired" as "tired", quote: "I am the stone that the builder refused"};
+                const update = {content: "tired" as "tired", quote: "I am the stone that the builder refused"};
                 mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
                 const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                 
-                await expect(mongoService.updateMoodEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
+                await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
                 
             } )
 
@@ -122,19 +158,19 @@ describe("Mood Entry", ()=> {
     })
     describe("Delete entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
-        const mockMoodEntryModel = moodEntryModel as jest.Mocked<Model<MoodEntryDocument>>;
+        const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
         describe("Positive Tests", ()=> {
             it("should remove a mood entry and return it",  async () => {
-                const document =  createMoodEntryDocument();
+                const document =  createMoodEntryDocument(defaultMoodEntry);
                 const mongooseID = new mongoose.Types.ObjectId();
                 
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(document);
 
                 const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                const response = await entryService.deleteMoodEntry(mongooseID);
+                const response = await entryService.deleteEntry(mongooseID);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
-                expect(response).toEqual(expect.objectContaining(moodEntryExpectation))
+                expect(response).toEqual(expect.objectContaining(entryExpectation))
             })
         })
         describe("Negative Tests", () => {
@@ -144,7 +180,7 @@ describe("Mood Entry", ()=> {
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(null);
         
                 const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                await expect(entryService.deleteMoodEntry(mongooseID)).rejects.toThrow(Error);
+                await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
             })
@@ -154,7 +190,7 @@ describe("Mood Entry", ()=> {
                 jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockRejectedValue(new Error());
 
                 const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                await expect(entryService.deleteMoodEntry(mongooseID)).rejects.toThrow(Error);
+                await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
 
