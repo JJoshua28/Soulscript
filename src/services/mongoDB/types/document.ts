@@ -1,7 +1,7 @@
 import mongoose, { Document } from "mongoose";
-import { Entry, NewEntry } from "../../../types/entries";
+import { NewEntry } from "../../../types/entries";
 
-interface EntryDocument extends Document, Omit<Entry, "id"> {
+interface EntryDocument extends Document, NewEntry {
     _id: mongoose.Types.ObjectId;
 }
 

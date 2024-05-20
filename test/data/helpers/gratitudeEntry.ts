@@ -2,12 +2,14 @@ import { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../../src/types/
 import EntryDocument  from "../../../src/services/mongoDB/types/document";
 
 import entryModel from "../../../src/services/mongoDB/models/entry";
+import moment from "moment";
 
 
 const createNewGratitudeEntry = (defaultEntry: NewEntry ,entry?:NewCustomEntry): NewEntry=> {
     const {
         type, 
         subject, 
+        sharedID, 
         quote, 
         tags, 
         datetime, 
@@ -18,6 +20,7 @@ const createNewGratitudeEntry = (defaultEntry: NewEntry ,entry?:NewCustomEntry):
         type,
         subject,
         quote,
+        sharedID, 
         tags,
         datetime,
         content,
@@ -30,7 +33,8 @@ const createGratitudeEntry = (defaultEntry: Entry ,entry?:NewCustomEntry): Entry
         id,
         type, 
         subject, 
-        quote, 
+        quote,
+        sharedID, 
         tags, 
         datetime, 
         content 
@@ -39,6 +43,7 @@ const createGratitudeEntry = (defaultEntry: Entry ,entry?:NewCustomEntry): Entry
     return {
         id,
         type,
+        sharedID,
         subject,
         quote,
         tags,
@@ -74,17 +79,18 @@ const createGratitudeEntryDocument = (defaultEntry: Entry ,entry?:NewCustomEntry
 const seedTestData = async () => {
     const gratitudeEntry:NewEntry = {
         type: EntryTypes.GRATITUDE,
+        sharedID: null,
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         tags: ["test"],
         content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."],
-        datetime: Date()()
+        datetime: new Date(moment().startOf("day").toISOString())
     };
     let testData: NewEntry[] = [
-        {...gratitudeEntry, datetime: Date()(), content: ["Lorem ipsum dolor sit amet."]},
-        {...gratitudeEntry, datetime: Date()(), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"]},
-        {...gratitudeEntry, datetime: Date()("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."]},
-        {...gratitudeEntry, datetime: Date()("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}
+        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet."]},
+        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"]},
+        {...gratitudeEntry, datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."]},
+        {...gratitudeEntry, datetime: new Date("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}
     ];  
     await entryModel.insertMany(testData);
 }

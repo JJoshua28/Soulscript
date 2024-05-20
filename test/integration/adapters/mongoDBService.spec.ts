@@ -1,6 +1,7 @@
 import { Request } from "express";
 import mongoose from "mongoose";
 import waitForExpect from 'wait-for-expect';
+import moment from "moment";
 
 import { EntryTypes } from "../../../src/types/entries";
 import { entryDocumentExpectation, entryExpectation } from "../../assertions/entries" 
@@ -13,7 +14,6 @@ import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry"
 import mongooseMemoryDB from "../../services/mongoDB/config";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import EntryDocument from "../../../src/services/mongoDB/types/document";
-import moment from "moment";
 
 describe("Mood Entry", ()=>{
 
@@ -72,7 +72,7 @@ describe("Mood Entry", ()=>{
     })
     describe("GET /api/mood/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
-            const currentDate = new Date(moment().format("YYYY-MM-DD"));
+            const currentDate = new Date(new Date(moment().startOf("day").toISOString()));
             beforeAll(async ()=>{
                 await mongooseMemoryDB.tearDownTestEnvironment();
                 await mongooseMemoryDB.setupTestEnvironment();
@@ -80,7 +80,7 @@ describe("Mood Entry", ()=>{
             })
             it.each`
                 date                        | arrayLength 
-                ${new Date(moment().format("YYYY-MM-DD"))}                   | ${2}        
+                ${new Date(new Date(moment().startOf("day").toISOString()))}                   | ${2}        
                 ${new Date("2015-05-15")}   | ${1}        
                 ${new Date("2018-01-01")}   | ${0}      
             `
@@ -92,7 +92,7 @@ describe("Mood Entry", ()=>{
             });
             it("should return a mood entry document", async ()=>{
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const [response] = await mongoService.getEntryByDate(new Date())
+                const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
                 const {datetime} = response;
 
                 expect(response).toEqual(expect.objectContaining(entryExpectation));   
@@ -112,8 +112,8 @@ describe("Mood Entry", ()=>{
             seedTestData();
             it.each`
                 findQuery                                                                 | updates
-                ${ {...getByDateQuery(new Date(), EntryTypes.MOOD), content: "happy"}}    | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
-                ${{...getByDateQuery(new Date(), EntryTypes.MOOD), content: "exhausted"}} | ${{quote: " "}}
+                ${ {...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.MOOD), content: "happy"}}    | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
+                ${{...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.MOOD), content: "exhausted"}} | ${{quote: " "}}
                 ${{datetime: new Date("2020-10-25"), content: "depressed"}}               | ${{content: "tired", quote: "I am the stone that the builder refused"}}
                 ${{datetime: new Date("2015-05-15"), content: "depressed"}}               | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
             `("should update a mood entry with data $updates", async ({findQuery, updates}) => {

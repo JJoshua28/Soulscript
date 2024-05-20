@@ -1,4 +1,5 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
+import moment from "moment";
 
 import { Entry, EntryTypes } from "../../src/types/entries";
 import EntryDocument from "../../src/services/mongoDB/types/document";
@@ -11,7 +12,7 @@ const defaultMoodEntry:Entry = {
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
     content: "exhausted",
-    datetime: new Date()
+    datetime: new Date(moment().startOf("day").toISOString())
 };
 
 const mockMoodEntryDocument: EntryDocument = {
@@ -22,7 +23,7 @@ const mockMoodEntryDocument: EntryDocument = {
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
     content: "exhausted",
-    datetime: new Date()
+    datetime: new Date(moment().startOf("day").toISOString())
 } as EntryDocument;
 
 const mockMultipleEntriesMoodEntryDocument: EntryDocument = {
@@ -33,7 +34,7 @@ const mockMultipleEntriesMoodEntryDocument: EntryDocument = {
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tags: ["test"],
     content: "exhausted",
-    datetime: new Date()
+    datetime: new Date(moment().startOf("day").toISOString())
 } as EntryDocument;
 
 export { defaultMoodEntry, mockMoodEntryDocument };

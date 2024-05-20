@@ -2,10 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const EntrySchema = {
     type: { type: String, required: true},
-    sharedID: { type: mongoose.Types.ObjectId},
-    tags: { type: [String]},
-    subject: {type: String},
-    quote: { type: String},
+    sharedID: { type: mongoose.Types.ObjectId, default: null, required: true},
+    tags: { type: [String], required: true},
+    subject: {type: String,  default: null, required: true},
+    quote: { type: String,  default: null, required: true},
     content: { 
         type: Schema.Types.Mixed,
         required: true,

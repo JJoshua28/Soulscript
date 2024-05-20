@@ -1,6 +1,7 @@
 import request from "supertest"
 import mongoose from "mongoose";
 import waitForExpect from "wait-for-expect";
+import moment from "moment";
 
 import { Entry, NewEntry } from "../../src/types/entries";
 import { HttpErrorCode } from "../../src/types/error";
@@ -10,7 +11,6 @@ import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
 import { createNewMoodEntry } from "../data/helpers/moodEntry";
 import { defaultMoodEntry } from "../data/moodEntry";
-import moment from "moment";
 
 
 describe("Smoke tests", () => {
@@ -49,7 +49,7 @@ describe("Smoke tests", () => {
         const URL = "/api/mood/get-entry-by-date"
         describe("Positive Tests", () => {
             it("should retrieve a mood entry with today's date", async () => {
-                const date = (new Date()).toISOString()
+                const date = (new Date(moment().startOf("day").toISOString())).toISOString()
                 const response = await request(app)
                 .get(URL)
                 .send({

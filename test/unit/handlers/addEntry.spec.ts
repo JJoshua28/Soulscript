@@ -1,11 +1,13 @@
 import {Request} from 'express';
+import moment from 'moment';
 
-import { EntryTypes,  NewEntry } from '../../../src/types/entries';
+import { EntryTypes, NewEntryRequest } from '../../../src/types/entries';
 
 import { defaultMoodEntry } from "../../data/moodEntry"
 import handleAddEntry from "../../../src/handlers/addMoodEntry"
 import AddMoodEntryUseCase from '../../../src/use cases/addMoodEntry';
 import { createMoodEntry, createNewMoodEntry } from '../../data/helpers/moodEntry';
+import mapNewEntry from '../../../src/mappers/newEntry';
 
 describe("Add Mood entry helper", () => {
     afterEach( async()=>{
@@ -34,17 +36,16 @@ describe("Add Mood entry helper", () => {
             expect(response).toHaveProperty("type", EntryTypes.MOOD);
         });
         it("should create a mood entry when a request does not have a datetime", async()=>{
-            const entry = {
-                type: EntryTypes.MOOD,
+            const entry: NewEntryRequest = {
                 subject: "test data",
                 quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 tags: ["test"],
                 content: "exhausted",
-            } as any as NewEntry;
+            };
             
-            const entryExpectation = createMoodEntry(defaultMoodEntry, {...entry, datetime: new Date()})
-            const {id, sharedID, ...toBeCalledExpectation} = entryExpectation; 
-            const request = { body: {...entry, sharedID} } as Request
+            const  newEntryRequest = mapNewEntry(entry, {type:EntryTypes.MOOD, datetime: new Date(moment().format("YYYY-MM-DD HH:mm:ss"))})
+            const entryExpectation = createMoodEntry({...defaultMoodEntry, ...newEntryRequest}); 
+            const request = { body: entry } as Request
             
         
             const executeSpy = jest.spyOn(AddMoodEntryUseCase.prototype, 'execute');
@@ -52,7 +53,7 @@ describe("Add Mood entry helper", () => {
     
             const response = await handleAddEntry(request);
     
-            expect(executeSpy).toHaveBeenCalledWith({...toBeCalledExpectation, sharedID});
+            expect(executeSpy).toHaveBeenCalledWith(newEntryRequest);
             expect(response).toEqual(entryExpectation);
         });
 
@@ -60,14 +61,15 @@ describe("Add Mood entry helper", () => {
     describe("Negative Tests", ()=> {
         
         it("should throw an error if something goes wrong", async ()=>{
+            const requestBody = createNewMoodEntry(defaultMoodEntry);  
     
-            const request = { body: defaultMoodEntry } as Request
+            const request = { body: requestBody } as Request
     
             const executeSpy = jest.spyOn(AddMoodEntryUseCase.prototype, 'execute');
             executeSpy.mockRejectedValue(new Error());
     
             await expect(handleAddEntry(request)).rejects.toThrow(Error);
-            expect(executeSpy).toHaveBeenCalledWith(defaultMoodEntry);
+            expect(executeSpy).toHaveBeenCalledWith(requestBody);
     
         });
     })

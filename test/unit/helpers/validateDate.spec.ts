@@ -3,7 +3,7 @@ import moment from "moment"
 import { validDate } from "../../../src/helpers/validateDate"
 
 describe("Validate Date", () => {
-    const currentDate = new Date();
+    const currentDate = new Date(moment().startOf("day").toISOString())
     it.each`
     date                                           | result
     ${"2020-11-21"}                                | ${true}

@@ -14,7 +14,7 @@ export const mapDocumentToEntry = (document: EntryDocument):Entry => {
     } = document
     const mappedEntry: Entry = {
         id,
-        sharedID: undefined || sharedID,
+        sharedID,
         type,
         subject,
         quote,
@@ -39,7 +39,7 @@ export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
         } = document
         const mappedMoodEntry: Entry = {
             id,
-            sharedID: undefined ||sharedID,
+            sharedID,
             type,
             subject,
             quote,

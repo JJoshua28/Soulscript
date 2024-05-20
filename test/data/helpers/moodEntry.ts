@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
+import moment from "moment";
 
 import EntryDocument from "../../../src/services/mongoDB/types/document";
 import { EntryTypes, Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
 import entryModel from "../../../src/services/mongoDB/models/entry";
-import moment from "moment";
 
-const createNewMoodEntry = (defaultEntry: NewEntry, entry?:NewCustomEntry): NewEntry=> {
+const createNewMoodEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
     const {
         type,
         sharedID, 
@@ -86,11 +86,11 @@ const seedTestData = async () => {
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         tags: ["test"],
         content: "exhausted",
-        datetime: new Date()
+        datetime: new Date(new Date(moment().startOf("day").toISOString()))
     };
     let testData: Entry[] = [
-        {...defaultMoodEntry, datetime: new Date(moment().format("YYYY-MM-DD")),  content: "happy"},
-        {...defaultMoodEntry, datetime: new Date(moment().format("YYYY-MM-DD")), content: "exhausted"},
+        {...defaultMoodEntry, content: "happy"},
+        {...defaultMoodEntry, content: "exhausted"},
         {...defaultMoodEntry, datetime: new Date("2020-10-25"), content: "depressed"},
         {...defaultMoodEntry, datetime: new Date("2015-05-15"), content: "depressed"}
     ];  

@@ -6,23 +6,31 @@ export enum EntryTypes {
   GRATITUDE = "gratitude",
  };
 
+export interface NewEntryRequest {
+  content: string | string[];
+  sharedID?: mongoose.Types.ObjectId;
+  subject?: string;
+  quote?: string;
+  tags?: string[];
+  datetime?: string;
+}
+
 export interface NewEntry {
     type: EntryTypes;
-    sharedID?: mongoose.Types.ObjectId;
-    subject: string | undefined;
-    quote: string | undefined;
+    sharedID: mongoose.Types.ObjectId | null;
+    subject: string | null;
+    quote: string | null;
     tags: string[];
-    datetime: Date | string ;
+    datetime: Date ;
     content: string | string[];
 }
 
 export interface Entry extends NewEntry {
   id: mongoose.Types.ObjectId,
-  datetime: Date
 }
 
 export interface NewCustomEntry {
-  sharedID?: mongoose.Types.ObjectId | undefined,
+  sharedID?: mongoose.Types.ObjectId,
   subject?: string,
   quote?: string,
   tags?: string[],
