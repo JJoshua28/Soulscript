@@ -5,7 +5,7 @@ import { EntryTypes, NewEntryRequest } from '../../../src/types/entries';
 
 import { defaultMoodEntry } from "../../data/moodEntry"
 import handleAddEntry from "../../../src/handlers/addMoodEntry"
-import AddMoodEntryUseCase from '../../../src/use cases/addMoodEntry';
+import AddEntryUseCase from '../../../src/use cases/addEntry';
 import { createMoodEntry, createNewMoodEntry } from '../../data/helpers/moodEntry';
 import mapNewEntry from '../../../src/mappers/newEntry';
 
@@ -25,7 +25,7 @@ describe("Add Mood entry helper", () => {
             
             const request = { body: entry } as Request
     
-            const executeSpy = jest.spyOn(AddMoodEntryUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entry);
     
             const response = await handleAddEntry(request);
@@ -48,7 +48,7 @@ describe("Add Mood entry helper", () => {
             const request = { body: entry } as Request
             
         
-            const executeSpy = jest.spyOn(AddMoodEntryUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entryExpectation);
     
             const response = await handleAddEntry(request);
@@ -65,7 +65,7 @@ describe("Add Mood entry helper", () => {
     
             const request = { body: requestBody } as Request
     
-            const executeSpy = jest.spyOn(AddMoodEntryUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
             executeSpy.mockRejectedValue(new Error());
     
             await expect(handleAddEntry(request)).rejects.toThrow(Error);

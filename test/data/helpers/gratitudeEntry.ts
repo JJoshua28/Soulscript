@@ -5,7 +5,7 @@ import entryModel from "../../../src/services/mongoDB/models/entry";
 import moment from "moment";
 
 
-const createNewGratitudeEntry = (defaultEntry: NewEntry ,entry?:NewCustomEntry): NewEntry=> {
+const createNewGratitudeEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
     const {
         type, 
         subject, 
@@ -28,7 +28,7 @@ const createNewGratitudeEntry = (defaultEntry: NewEntry ,entry?:NewCustomEntry):
     }
 }
 
-const createGratitudeEntry = (defaultEntry: Entry ,entry?:NewCustomEntry): Entry=> {
+const createGratitudeEntry = (defaultEntry: Entry, entry?:NewCustomEntry): Entry=> {
     const {
         id,
         type, 

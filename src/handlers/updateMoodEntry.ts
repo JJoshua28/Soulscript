@@ -6,12 +6,12 @@ import CustomMoodErrors from "../types/error";
 
 import MongoDBService from "../adapters/mongoDBService";
 import { validDate } from "../helpers/validateDate";
-import UpdateMoodEntryUseCase from "../use cases/updateMoodEntry";
+import UpdateEntryUseCase from "../use cases/updateEntry";
 import entryModel from "../services/mongoDB/models/entry";
 
 const handleUpdateMoodEntry = async (req: Request): Promise<Entry> => {
     const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
-    const updateMoodUseCase = new UpdateMoodEntryUseCase(entryService);
+    const updateMoodUseCase = new UpdateEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id) throw new Error(CustomMoodErrors.INVALID_REQUEST);
     if (req?.body?.update?.datetime && !validDate(req?.body?.update?.datetime)) throw new Error(CustomMoodErrors.INVALID_DATE);

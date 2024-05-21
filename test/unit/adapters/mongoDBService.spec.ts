@@ -1,14 +1,17 @@
 const mockingoose = require("mockingoose");
 import mongoose, { Model } from "mongoose";
+import moment from "moment";
 
 import { EntryTypes, NewEntry } from "../../../src/types/entries";
 import EntryDocument from "../../../src/services/mongoDB/types/document";
-import { entryExpectation } from "../../assertions/entries";
+import { defaultEntryExpectation, gratitudeEntryExpectation } from "../../assertions/entries";
 
 import { defaultMoodEntry, mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
 import entryModel from "../../../src/services/mongoDB/models/entry";
+import { defaultGratitudeEntry, mockGratitudeEntryDocument } from "../../data/gratitudeEntry";
+import { createNewGratitudeEntry } from "../../data/helpers/gratitudeEntry";
 
 describe("Entry", ()=> {
     beforeEach(() => {
@@ -25,7 +28,7 @@ describe("Entry", ()=> {
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.addEntry(mockMoodEntry);
                 
-                expect(response).toEqual(expect.objectContaining(entryExpectation));
+                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
             });
             
             it("should throw an error if unable to create", async () => {
@@ -46,18 +49,22 @@ describe("Entry", ()=> {
                 jest.clearAllMocks();
             });
         });
-        /*
-        describe.skip("Gratitude", () => {
-            it("should return a mood Entry document", async () => {
-                mockingoose(entryModel).toReturn(
-                    mockGratitudeEntryDocument, 
-                    "save"
-                );
-                const mockGratitudeEntry: NewEntry = createNewGratitudeEntry(); 
+        
+        describe("Gratitude", () => {
+            beforeEach( async () => {
+                await mockingoose.resetAll();
+            });
+            it("should return a gratitude Entry document", async () => {
+                jest.mock("../../../src/services/mongoDB/models/entry");
+                const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+                mockMoodEntryModel.create = jest.fn().mockResolvedValue(mockGratitudeEntryDocument);
+                
+                const mockGratitudeEntry: NewEntry = createNewGratitudeEntry(defaultGratitudeEntry); 
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.addEntry(mockGratitudeEntry);
                 
-                expect(response).toEqual(expect.objectContaining(entryExpectation));
+                
+                expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
             });
             
             it("should throw an error if unable to create", async () => {
@@ -69,7 +76,7 @@ describe("Entry", ()=> {
                     type: EntryTypes.GRATITUDE,
                     subject: "xo tour life",
                     tags: ["mental health"],
-                    datetime: Date()()
+                    datetime: new Date(moment().startOf("day").toISOString())
                 } as NewEntry;
                 
                 const mongoService = new MongoDBService(mockGratitudeEntryModel, EntryTypes.GRATITUDE);
@@ -79,7 +86,6 @@ describe("Entry", ()=> {
             });
 
         })
-        */
     });
     describe("Find by date", () => {
         it.each`
@@ -95,7 +101,7 @@ describe("Entry", ()=> {
     
             const response =  await mongoService.getEntryByDate(date);
             
-            expect(response).toEqual(expect.arrayContaining([expect.objectContaining(entryExpectation)]));
+            expect(response).toEqual(expect.arrayContaining([expect.objectContaining(defaultEntryExpectation)]));
             expect(response[0]).toHaveProperty("datetime", date);
             expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
     
@@ -139,7 +145,7 @@ describe("Entry", ()=> {
                 
                 const response =  await mongoService.updateEntry(entry.id, update);
                 
-                expect(response).toEqual(expect.objectContaining(entryExpectation));
+                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
     
                 expect(response).toHaveProperty("type", EntryTypes.MOOD);
             });
@@ -170,7 +176,7 @@ describe("Entry", ()=> {
                 const response = await entryService.deleteEntry(mongooseID);
 
                 expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
-                expect(response).toEqual(expect.objectContaining(entryExpectation))
+                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation))
             })
         })
         describe("Negative Tests", () => {

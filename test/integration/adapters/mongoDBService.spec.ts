@@ -4,16 +4,18 @@ import waitForExpect from 'wait-for-expect';
 import moment from "moment";
 
 import { EntryTypes } from "../../../src/types/entries";
-import { entryDocumentExpectation, entryExpectation } from "../../assertions/entries" 
+import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../assertions/entries" 
+import EntryDocument from "../../../src/services/mongoDB/types/document";
 
-import AddMoodEntryUseCase from "../../../src/use cases/addMoodEntry"
+import AddEntryUseCase from "../../../src/use cases/addEntry"
 import { defaultMoodEntry } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
 import { createNewMoodEntry, seedTestData } from "../../data/helpers/moodEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
 import mongooseMemoryDB from "../../services/mongoDB/config";
 import entryModel from "../../../src/services/mongoDB/models/entry";
-import EntryDocument from "../../../src/services/mongoDB/types/document";
+import {createGratitudeEntry, createNewGratitudeEntry} from "../../data/helpers/gratitudeEntry";
+import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
 
 describe("Mood Entry", ()=>{
 
@@ -41,7 +43,7 @@ describe("Mood Entry", ()=>{
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.addEntry(entry);
                        
-                expect(response).toEqual(expect.objectContaining(entryExpectation));
+                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
                 expect(response).toHaveProperty("datetime", new Date(date));
                 expect(response).toHaveProperty("type", EntryTypes.MOOD);
 
@@ -61,7 +63,7 @@ describe("Mood Entry", ()=>{
             `
             ("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                 const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const addMoodUseCase = new AddMoodEntryUseCase(entryService);
+                const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
                 delete entry[propertyToDelete];
     
@@ -95,7 +97,7 @@ describe("Mood Entry", ()=>{
                 const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
                 const {datetime} = response;
 
-                expect(response).toEqual(expect.objectContaining(entryExpectation));   
+                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));   
                 expect(datetime).toEqual(currentDate);            
             })
             it("should return an empty array if no entries exist for that date", async ()=>{
@@ -186,4 +188,54 @@ describe("Mood Entry", ()=>{
         })
     })
     
+})
+
+describe("Gratitude Entry", () => {
+    beforeAll(async ()=> {
+        await mongooseMemoryDB.setupTestEnvironment();
+    });
+    afterAll(async () => {
+        await mongooseMemoryDB.tearDownTestEnvironment();
+    });
+    describe("POST /api/gratitude/add-entry", () => {
+        describe("Positive Tests", () => {
+            it.each`
+                date                      | message
+                ${new Date("2020")}       | ${"a previous custom date in 2020"}
+                ${new Date(moment().format("YYYY-MM-DD HH:MM:ss"))} | ${"today's date"}
+            `
+            ("should add a gratitude entry with $message", async ({date}) => {
+                const entry = createNewGratitudeEntry (defaultGratitudeEntry, {datetime: date})
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response = await mongoService.addEntry(entry);
+                       
+                expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
+                expect(response).toHaveProperty("datetime", date);
+                expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
+
+                const findResponse = await entryModel.find(entry);
+                expect(findResponse[0]).toEqual(expect.objectContaining(gratitudeEntryDocumentExpectation));
+                expect(findResponse[0]).toHaveProperty("datetime", date);
+            });
+        })
+        describe("Negative Tests", () => {
+            it.each`
+                propertyToDelete 
+                ${EntryTypes.MOOD}
+                ${"type"}
+                ${"subject"}
+                ${"type"}
+                ${"tags"}
+            `
+            ("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
+                const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const addMoodUseCase = new AddEntryUseCase(entryService);
+                const entry = Object.create(defaultMoodEntry);
+                delete entry[propertyToDelete];
+    
+                await expect(addMoodUseCase.execute(entry)).rejects.toThrow(Error);
+                
+            })
+        })
+    })
 })

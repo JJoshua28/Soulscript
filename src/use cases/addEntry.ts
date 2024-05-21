@@ -1,7 +1,7 @@
 import { EntryService } from "../ports/entryService";
 import { Entry, NewEntry } from "../types/entries";
 
-class AddMoodEntryUseCase {
+class AddEntryUseCase {
     private entryService: EntryService;
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
@@ -11,4 +11,4 @@ class AddMoodEntryUseCase {
     }
 }
 
-export default AddMoodEntryUseCase;
+export default AddEntryUseCase;

@@ -4,14 +4,14 @@ import mongoose from "mongoose";
 import { Entry, EntryTypes } from "../types/entries";
 import CustomMoodErrors from "../types/error";
 
-import DeleteMoodEntryUseCase from "../use cases/deleteMoodEntry";
+import DeleteEntryUseCase from "../use cases/deleteEntry";
 import MongoDBService from "../adapters/mongoDBService";
 import entryModel from "../services/mongoDB/models/entry";
 
 
 const handleDeleteMoodEntry = async (req: Request): Promise<Entry> => {
     const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
-    const deleteMoodUseCase = new DeleteMoodEntryUseCase(entryService);
+    const deleteMoodUseCase = new DeleteEntryUseCase(entryService);
     
     if(!req.body.id) throw  new Error(CustomMoodErrors.INVALID_REQUEST)
     let {id} 

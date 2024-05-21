@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { CustomEntry, Entry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
-class UpdateMoodEntryUseCase {
+class UpdateEntryUseCase {
     private entryService: EntryService;
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
@@ -13,4 +13,4 @@ class UpdateMoodEntryUseCase {
     }
 }
 
-export default UpdateMoodEntryUseCase;
+export default UpdateEntryUseCase;

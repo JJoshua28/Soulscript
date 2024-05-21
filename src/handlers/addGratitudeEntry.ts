@@ -10,10 +10,10 @@ import AddEntryUseCase from "../use cases/addEntry";
 import entryModel from '../services/mongoDB/models/entry';
 import mapNewEntry from '../mappers/newEntry';
 
-const handleAddMoodEntry = async (req: Request): Promise<Entry> => {
-    if(!req.body?.content || typeof req.body?.content != "string") throw new Error(CustomErrors.INVALID_REQUEST)
-    const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
-    const addMoodUseCase = new AddEntryUseCase(entryService);
+const handleAddGratitudeEntry = async (req: Request): Promise<Entry> => {
+    if(!req.body?.content || !Array.isArray(req.body?.content) || req.body?.content.length < 1) throw new Error(CustomErrors.INVALID_REQUEST)
+    const entryService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+    const addGratitudeUseCase = new AddEntryUseCase(entryService);
 
     const {datetime} = (req.body as { datetime?: string })
     
@@ -21,9 +21,9 @@ const handleAddMoodEntry = async (req: Request): Promise<Entry> => {
     
     const formatedDate = datetime? 
     moment(datetime).format("YYYY-MM-DD HH:mm:ss"): moment().format("YYYY-MM-DD HH:mm:ss");
-    const entry = mapNewEntry({...req.body}, {type: EntryTypes.MOOD, datetime: new Date(formatedDate)})
+    const entry = mapNewEntry({...req.body}, {type: EntryTypes.GRATITUDE, datetime: new Date(formatedDate)})
     
-    return await addMoodUseCase.execute(entry);
+    return await addGratitudeUseCase.execute(entry);
 }
 
-export default handleAddMoodEntry;
+export default handleAddGratitudeEntry;

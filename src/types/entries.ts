@@ -30,9 +30,9 @@ export interface Entry extends NewEntry {
 }
 
 export interface NewCustomEntry {
-  sharedID?: mongoose.Types.ObjectId,
-  subject?: string,
-  quote?: string,
+  sharedID?: mongoose.Types.ObjectId | null,
+  subject?: string | null,
+  quote?: string | null,
   tags?: string[],
   datetime?: Date
   content?: string | string[],

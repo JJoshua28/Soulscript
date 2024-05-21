@@ -1,7 +1,7 @@
 import { Request } from "express";
 
 import handleGetMoodEntryByDate from '../../../src/handlers/getMoodEntryByDate';
-import GetMoodEntryByDateUseCase from '../../../src/use cases/getMoodEntryByDate';
+import GetEntryByDateUseCase from '../../../src/use cases/getEntryByDate';
 import { validDate } from "../../../src/helpers/validateDate";
 import { createMoodEntry } from "../../data/helpers/moodEntry";
 import { defaultMoodEntry } from "../../data/moodEntry";
@@ -32,7 +32,7 @@ describe("Get Mood entry  by date helper", () => {
             const request = ({body:  {datetime: date}} as Request)
             
             
-            const executeSpy = jest.spyOn(GetMoodEntryByDateUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(GetEntryByDateUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entry);
             
             const response = await handleGetMoodEntryByDate(request);

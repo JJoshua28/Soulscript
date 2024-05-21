@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Entry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
-class DeleteMoodEntryUseCase {
+class DeleteEntryUseCase {
     private entryService: EntryService;
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
@@ -13,4 +13,4 @@ class DeleteMoodEntryUseCase {
     }
 }
 
-export default DeleteMoodEntryUseCase;
+export default DeleteEntryUseCase;
