@@ -1,10 +1,12 @@
-import moment from "moment";
 import { Request } from "express";
 
 import handleGetMoodEntryByDate from '../../../src/handlers/getMoodEntryByDate';
-import GetMoodEntryByDateUseCase from '../../../src/use cases/getMoodEntryByDate';
+import GetEntryByDateUseCase from '../../../src/use cases/getEntryByDate';
 import { validDate } from "../../../src/helpers/validateDate";
 import { createMoodEntry } from "../../data/helpers/moodEntry";
+import { defaultMoodEntry } from "../../data/moodEntry";
+import { EntryTypes } from "../../../src/types/entries";
+import moment from "moment";
 
 jest.mock("../../../src/helpers/validateDate");
 
@@ -21,16 +23,16 @@ describe("Get Mood entry  by date helper", () => {
         
         it.each`
         date            | entry
-        ${"2020-01-01"} | ${[createMoodEntry({datetime: new Date("2020-01-01")}), createMoodEntry({datetime: new Date("2020-01-01"), subject: "test"})]}
-        ${"2021-05-06"} | ${[createMoodEntry({datetime: new Date("2021-05-06")})]}
-        ${"2022-08-12"} | ${[createMoodEntry({datetime: new Date("2022-08-12")}), createMoodEntry({datetime: new Date("2022-08-12"), quote: "its a test thing"})]}
-        ${"2023-11-26"} | ${[createMoodEntry({datetime: new Date("2023-11-26")})]}
+        ${"2020-01-01"} | ${[createMoodEntry(defaultMoodEntry, {datetime: new Date("2020-01-01")}), createMoodEntry(defaultMoodEntry, {datetime: new Date("2020-01-01"), subject: "test"})]}
+        ${"2021-05-06"} | ${[createMoodEntry(defaultMoodEntry, {datetime: new Date("2021-05-06")})]}
+        ${"2022-08-12"} | ${[createMoodEntry(defaultMoodEntry, {datetime: new Date("2022-08-12")}), createMoodEntry(defaultMoodEntry, {datetime: new Date("2022-08-12"), quote: "its a test thing"})]}
+        ${"2023-11-26"} | ${[createMoodEntry(defaultMoodEntry, {datetime: new Date("2023-11-26")})]}
         `("should get a mood entry with date $date", async ({date, entry})=> {
             
             const request = ({body:  {datetime: date}} as Request)
             
             
-            const executeSpy = jest.spyOn(GetMoodEntryByDateUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(GetEntryByDateUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entry);
             
             const response = await handleGetMoodEntryByDate(request);
@@ -38,7 +40,7 @@ describe("Get Mood entry  by date helper", () => {
             expect(executeSpy).toHaveBeenCalledWith(new Date(date));
             expect(response).toEqual(expect.arrayContaining(entry));
             expect(response[0]).toHaveProperty("datetime", new Date(date));
-            expect(response[0]).toHaveProperty("type", ["mood"]);
+            expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
         });
     })
     describe("Negative Tests", ()=> {

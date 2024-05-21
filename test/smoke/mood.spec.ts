@@ -1,39 +1,40 @@
 import request from "supertest"
+import mongoose from "mongoose";
+import waitForExpect from "wait-for-expect";
 import moment from "moment";
 
-import { MoodEntry, NewMoodEntry } from "../../src/types/entries";
+import { Entry, NewEntry } from "../../src/types/entries";
+import { HttpErrorCode } from "../../src/types/error";
+import { httpEntryExpectation } from "../assertions/entries";
 
 import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
-import {createNewMoodEntry} from "../../test/data/helpers/moodEntry";
-import { httpMoodEntryExpectation } from "../assertions/moodEntry";
-import waitForExpect from "wait-for-expect";
-import CustomMoodErrors, { HttpErrorCode } from "../../src/types/error";
-import mongoose from "mongoose";
+import { createNewMoodEntry } from "../data/helpers/moodEntry";
+import { defaultMoodEntry } from "../data/moodEntry";
 
 
 describe("Smoke tests", () => {
     beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
-    let moodEntry: MoodEntry;
+    let moodEntry: Entry;
     describe("POST /api/mood/add-entry", () => {
         const URL = "/api/mood/add-entry"
         describe("Positive Tests", () => {
             it("should add a mood entry", async () => {
-                const entry: NewMoodEntry = createNewMoodEntry();
+                const entry: NewEntry = createNewMoodEntry(defaultMoodEntry);
                 const response = await request(app)
                     .post(URL)
                     .send(entry)
                     .expect(200);
     
-                expect(response.body).toEqual(expect.objectContaining(httpMoodEntryExpectation));
+                expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
                 moodEntry = response.body;
             });
         });
         describe("Negative Tests", () => {
             it.each`
                 requestData
-                ${{datetime: "test", mood: "happy"}}
-                ${{mood: ""}}
+                ${{datetime: "test", content: "happy"}}
+                ${{content: ""}}
             `(`should throw because of invalid request body: $requestData`, async ({ requestData }) => {
                 const response = await request(app)
                     .post(URL)
@@ -48,7 +49,7 @@ describe("Smoke tests", () => {
         const URL = "/api/mood/get-entry-by-date"
         describe("Positive Tests", () => {
             it("should retrieve a mood entry with today's date", async () => {
-                const date = (new Date()).toISOString()
+                const date = (new Date(moment().startOf("day").toISOString())).toISOString()
                 const response = await request(app)
                 .get(URL)
                 .send({
@@ -56,7 +57,7 @@ describe("Smoke tests", () => {
                 })
                 .expect(200)
     
-                expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(httpMoodEntryExpectation)]));
+                expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(httpEntryExpectation)]));
                 expect(response.body).toEqual(expect.arrayContaining([moodEntry]));
             });
             it("should return an empty array if no entries exist with that date", async () => {
@@ -96,19 +97,19 @@ describe("Smoke tests", () => {
             const {id} = moodEntry
          
             const tags = ["life, philosophy"];
-            const mood = "unsure" 
+            const content = "unsure" 
             const response  = await request(app)
             .put(URL)
             .send({id, update: {
                 tags,
-                mood
+                content
             }})
             .expect(200);
 
             expect(response.body.id).toEqual(id);
             expect(response.body.tags).toEqual(tags);
-            expect(response.body.mood).toEqual(mood);
-            expect(response.body).toEqual(expect.objectContaining(httpMoodEntryExpectation));
+            expect(response.body.content).toEqual(content);
+            expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
             });
         });
         describe("Negative Tests", () => {
@@ -133,7 +134,7 @@ describe("Smoke tests", () => {
                 const updateRequest = {
                     id: new mongoose.Types.ObjectId(),
                     update: {
-                        mood: "happy"
+                        content: "happy"
                     }
                 } as any
                 const response = await request(app)
@@ -160,7 +161,7 @@ describe("Smoke tests", () => {
                 expect(response.body.id).toEqual(id);
                 expect(response.body.datetime).toEqual(moodEntry.datetime);
     
-                expect(response.body).toEqual(expect.objectContaining(httpMoodEntryExpectation));
+                expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
     
                 await waitForExpect(async () => {
                     const foundDocument = await request(app)

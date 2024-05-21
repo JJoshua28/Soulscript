@@ -1,4 +1,6 @@
-export const getByDateQuery = (date: Date) => {
+import { EntryTypes } from "../../../types/entries";
+
+export const getByDateQuery = (date: Date, entryType: EntryTypes) => {
     const earliestDate = new Date(date);
     earliestDate.setUTCHours(0, 0, 0, 0);
 
@@ -7,6 +9,6 @@ export const getByDateQuery = (date: Date) => {
 
     return { 
         datetime: {$gte: earliestDate, $lte:latestDate},
-        type: { $in: ["mood"]}
+        type: { $in: [entryType]}
     }
 }

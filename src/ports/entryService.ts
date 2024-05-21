@@ -1,7 +1,7 @@
-import { CustomMoodEntry, MoodEntry, NewMoodEntry } from "../types/entries";
+import { CustomEntry, Entry, NewEntry } from "../types/entries";
 
 export interface EntryService {
-    addMoodEntry(entry: NewMoodEntry): Promise<MoodEntry>;
-    getMoodEntryByDate(date: Date): Promise<MoodEntry[] | []>
-    updateMoodEntry(id: any, update: CustomMoodEntry): Promise<MoodEntry>
-    deleteMoodEntry(id: any): Promise<MoodEntry| null>}
+    addEntry(entry: NewEntry): Promise<Entry>;
+    getEntryByDate(date: Date): Promise<Entry[] | []>
+    updateEntry(id: any, update: CustomEntry): Promise<Entry>
+    deleteEntry(id: any): Promise<Entry>}

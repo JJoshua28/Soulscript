@@ -1,5 +1,5 @@
 import express, {Express, Request, Response, Router} from 'express';
-import handleAddEntry from '../handlers/addMoodEntry';
+import handleAddMoodEntry from '../handlers/addMoodEntry';
 import handleGetMoodEntryByDate from '../handlers/getMoodEntryByDate';
 import handleUpdateMoodEntry from '../handlers/updateMoodEntry';
 import handleDeleteMoodEntry from '../handlers/deleteMoodEntry';
@@ -9,10 +9,10 @@ const app:Express = express();
 app.use(express.json());
 
 
-const router: Router = express.Router();
+const moodRouter: Router = express.Router();
 
-router.post("/add-entry", (req: Request, res: Response) => {
-    handleAddEntry(req)
+moodRouter.post("/add-entry", (req: Request, res: Response) => {
+    handleAddMoodEntry(req)
     .then(response => res.send(response).status(200))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
@@ -20,7 +20,7 @@ router.post("/add-entry", (req: Request, res: Response) => {
     });
 })
 
-router.get("/get-entry-by-date", (req: Request, res: Response) => {
+moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
     handleGetMoodEntryByDate(req)
     .then(response => {
         if (response.length == 0) return res.status(204).send(response);
@@ -32,7 +32,7 @@ router.get("/get-entry-by-date", (req: Request, res: Response) => {
     });
 })
 
-router.put("/update-entry", (req: Request, res: Response) => {
+moodRouter.put("/update-entry", (req: Request, res: Response) => {
     handleUpdateMoodEntry(req)
     .then(response => res.send(response).status(200))
     .catch(error => {
@@ -41,7 +41,7 @@ router.put("/update-entry", (req: Request, res: Response) => {
     });
 })
 
-router.delete("/remove-entry", (req: Request, res: Response) => {
+moodRouter.delete("/remove-entry", (req: Request, res: Response) => {
     handleDeleteMoodEntry(req)
     .then(response => {
         if (!response) return res.status(204).send(response);
@@ -54,5 +54,5 @@ router.delete("/remove-entry", (req: Request, res: Response) => {
 })
 
 
-export default router;
+export default moodRouter;
 
