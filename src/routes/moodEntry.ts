@@ -18,7 +18,7 @@ moodRouter.post("/add-entry", (req: Request, res: Response) => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
-})
+});
 
 moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
     handleGetMoodEntryByDate(req)
@@ -30,7 +30,7 @@ moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
-})
+});
 
 moodRouter.put("/update-entry", (req: Request, res: Response) => {
     handleUpdateMoodEntry(req)

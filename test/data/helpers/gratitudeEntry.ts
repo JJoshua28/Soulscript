@@ -3,6 +3,7 @@ import EntryDocument  from "../../../src/services/mongoDB/types/document";
 
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import moment from "moment";
+import mongoose from "mongoose";
 
 
 const createNewGratitudeEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
@@ -57,6 +58,7 @@ const createGratitudeEntryDocument = (defaultEntry: Entry ,entry?:NewCustomEntry
     const {
         id,
         type, 
+        sharedID,
         subject, 
         quote, 
         tags, 
@@ -66,6 +68,7 @@ const createGratitudeEntryDocument = (defaultEntry: Entry ,entry?:NewCustomEntry
 
     return {
         _id: id,
+        sharedID,
         type,
         subject,
         quote,
@@ -76,17 +79,28 @@ const createGratitudeEntryDocument = (defaultEntry: Entry ,entry?:NewCustomEntry
     } as EntryDocument
 }
 
-const seedTestData = async () => {
+const seedGratitudeEntryTestData = async () => {
     const gratitudeEntry:NewEntry = {
         type: EntryTypes.GRATITUDE,
-        sharedID: null,
+        sharedID: new mongoose.Types.ObjectId(),
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         tags: ["test"],
         content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."],
         datetime: new Date(moment().startOf("day").toISOString())
     };
+    const basicGratitudeEntry:NewEntry = {
+        type: EntryTypes.GRATITUDE,
+        sharedID: null,
+        subject: null,
+        quote: null,
+        tags: [],
+        content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."],
+        datetime: new Date(moment().startOf("day").toISOString())
+    };
+
     let testData: NewEntry[] = [
+        basicGratitudeEntry,
         {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet."]},
         {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"]},
         {...gratitudeEntry, datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."]},
@@ -96,4 +110,4 @@ const seedTestData = async () => {
 }
 
 
-export { createNewGratitudeEntry, createGratitudeEntry, createGratitudeEntryDocument, seedTestData}
+export { createNewGratitudeEntry, createGratitudeEntry, createGratitudeEntryDocument, seedGratitudeEntryTestData }

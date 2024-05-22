@@ -11,7 +11,7 @@ import MongoDBService from "../../../src/adapters/mongoDBService";
 import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import { defaultGratitudeEntry, mockGratitudeEntryDocument } from "../../data/gratitudeEntry";
-import { createNewGratitudeEntry } from "../../data/helpers/gratitudeEntry";
+import { createGratitudeEntryDocument, createNewGratitudeEntry } from "../../data/helpers/gratitudeEntry";
 
 describe("Entry", ()=> {
     beforeEach(() => {
@@ -56,8 +56,8 @@ describe("Entry", ()=> {
             });
             it("should return a gratitude Entry document", async () => {
                 jest.mock("../../../src/services/mongoDB/models/entry");
-                const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
-                mockMoodEntryModel.create = jest.fn().mockResolvedValue(mockGratitudeEntryDocument);
+                const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+                mockGratitudeEntryModel.create = jest.fn().mockResolvedValue(mockGratitudeEntryDocument);
                 
                 const mockGratitudeEntry: NewEntry = createNewGratitudeEntry(defaultGratitudeEntry); 
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
@@ -88,42 +88,77 @@ describe("Entry", ()=> {
         })
     });
     describe("Find by date", () => {
-        it.each`
-        date
-        ${new Date("2020-01-01")}
-        ${new Date("2021-05-06")}
-        ${new Date("2022-08-12")}
-        ${new Date("2021-11-26")}
-        `("should return all entries for date $date", async ({date}: {date: Date}) => {
-            const entry = createMoodEntryDocument(defaultMoodEntry, {datetime: date});
-            mockingoose(entryModel).toReturn([entry], "find");
-            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+       afterEach( async () => {
+            await mockingoose.resetAll();
+       })
+        describe("Mood", () => {
+            it.each`
+            date
+            ${new Date("2020-01-01")}
+            ${new Date("2021-05-06")}
+            ${new Date("2022-08-12")}
+            ${new Date("2021-11-26")}
+            `("should return all entries for date $date", async ({date}: {date: Date}) => {
+                const entry = createMoodEntryDocument(defaultMoodEntry, {datetime: date});
+                mockingoose(entryModel).toReturn([entry], "find");
+                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toEqual(expect.arrayContaining([expect.objectContaining(defaultEntryExpectation)]));
+                expect(response[0]).toHaveProperty("datetime", date);
+                expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
+        
+            });
+            it("should return an empty array if no entries are found", async () => {
+                mockingoose(entryModel).toReturn([], "find");
+                const date = new Date();
+                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toStrictEqual([]);
     
-            const response =  await mongoService.getEntryByDate(date);
-            
-            expect(response).toEqual(expect.arrayContaining([expect.objectContaining(defaultEntryExpectation)]));
-            expect(response[0]).toHaveProperty("datetime", date);
-            expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
-    
+            });
+            it("should throw an error if something goes wrong", async ()=> {
+                mockingoose(entryModel).toReturn(new Error("something went wrong"), "find");
+                const date = new Date();
+                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                
+                await expect(mongoService.getEntryByDate(date)).rejects.toThrow(Error);
+            });
         });
-        it("should return an empty array if not entries are found", async () => {
-            mockingoose(entryModel).toReturn([], "find");
-            const date = new Date();
-            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+        describe("Gratitude", () => {
+            it.each`
+            date
+            ${new Date("2020-01-01")}
+            ${new Date("2021-05-06")}
+            ${new Date("2022-08-12")}
+            ${new Date("2021-11-26")}
+            `("should return all entries for date $date", async ({date}: {date: Date}) => {
+                const entry = createGratitudeEntryDocument(defaultGratitudeEntry, {datetime: date});
+                mockingoose(entryModel).toReturn([entry], "find");
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toEqual(expect.arrayContaining([expect.objectContaining(gratitudeEntryExpectation)]));
+                expect(response[0]).toHaveProperty("datetime", date);
+                expect(response[0]).toHaveProperty("type", EntryTypes.GRATITUDE);
+        
+            });
+            it("should return an empty array if no entries are found", async () => {
+                mockingoose(entryModel).toReturn([], "find");
+                const date = new Date();
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toStrictEqual([]);
     
-            const response =  await mongoService.getEntryByDate(date);
-            
-            expect(response).toStrictEqual([]);
-
-        })
-        it("should throw an error if something goes wrong", async ()=> {
-            mockingoose(entryModel).toReturn(new Error("something went wrong"), "find");
-            const date = new Date();
-            const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
-            
-            await expect(mongoService.getEntryByDate(date)).rejects.toThrow(Error);
-        })
-    })
+            });
+        });
+    });
     describe("Update Entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
         const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
