@@ -10,21 +10,20 @@ import EntryDocument from "../../../src/services/mongoDB/types/document";
 import AddEntryUseCase from "../../../src/use cases/addEntry"
 import { defaultMoodEntry } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
-import { createNewMoodEntry, seedTestData } from "../../data/helpers/moodEntry";
+import { createNewMoodEntry, seedMoodEntryTestData } from "../../data/helpers/moodEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
 import mongooseMemoryDB from "../../services/mongoDB/config";
 import entryModel from "../../../src/services/mongoDB/models/entry";
-import {createGratitudeEntry, createNewGratitudeEntry} from "../../data/helpers/gratitudeEntry";
 import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
+import { createNewGratitudeEntry, seedGratitudeEntryTestData } from "../../data/helpers/gratitudeEntry";
 
 describe("Mood Entry", ()=>{
-
     beforeAll(async ()=> {
         await mongooseMemoryDB.setupTestEnvironment();
-    })
+    });
     afterAll(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
-    })
+    });
 
     describe("POST /api/mood/add-entry", () => {
         const request = {body: ""} as Request;
@@ -71,14 +70,14 @@ describe("Mood Entry", ()=>{
                 
             })
         })
-    })
+    });
     describe("GET /api/mood/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             const currentDate = new Date(new Date(moment().startOf("day").toISOString()));
             beforeAll(async ()=>{
                 await mongooseMemoryDB.tearDownTestEnvironment();
                 await mongooseMemoryDB.setupTestEnvironment();
-                await seedTestData();
+                await seedMoodEntryTestData();
             })
             it.each`
                 date                        | arrayLength 
@@ -108,10 +107,10 @@ describe("Mood Entry", ()=>{
                 expect(response.length).toStrictEqual(0);
             })
         })
-    })
+    });
     describe("PUT /api/mood/update-entry", ()=> {
         describe("Positive tests", ()=> {
-            seedTestData();
+            seedMoodEntryTestData();
             it.each`
                 findQuery                                                                 | updates
                 ${ {...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.MOOD), content: "happy"}}    | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
@@ -150,7 +149,7 @@ describe("Mood Entry", ()=>{
         })
 
 
-    })
+    });
     describe("DELETE /api/mood/remove-entry", () => {
         describe("Positive Tests", ()=> {
             it("should delete a document with the specified ID and return that document", async () => {
@@ -186,15 +185,15 @@ describe("Mood Entry", ()=>{
                 await expect(mongoDBService.deleteEntry(id)).rejects.toThrow(Error);
             })
         })
-    })
-    
-})
+    });
+});
 
 describe("Gratitude Entry", () => {
-    beforeAll(async ()=> {
+    beforeEach(async ()=> {
         await mongooseMemoryDB.setupTestEnvironment();
+        await seedGratitudeEntryTestData();
     });
-    afterAll(async () => {
+    afterEach(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
     describe("POST /api/gratitude/add-entry", () => {
@@ -235,6 +234,37 @@ describe("Gratitude Entry", () => {
     
                 await expect(addMoodUseCase.execute(entry)).rejects.toThrow(Error);
                 
+            })
+        })
+    });
+    describe("GET /api/gratitude/get-entry-by-date", ()=>{
+        describe("Positive Tests", () => {
+            it.each`
+                date                                                            | arrayLength 
+                ${new Date(new Date(moment().startOf("day").toISOString()))}    | ${3}        
+                ${new Date("2015-05-15")}                                       | ${1}        
+                ${new Date("2018-01-01")}                                       | ${0}      
+            `
+            ("should find $arrayLength gratitude entries with date add a $message", async ({date, arrayLength}) => {
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response = await mongoService.getEntryByDate(date);
+                       
+                expect(response).toHaveLength(arrayLength);             
+            });
+            it("should return a gratitude entry document", async ()=>{
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const [response] = await mongoService.getEntryByDate(new Date("2020-10-25"));
+                const {datetime} = response;
+
+                expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));   
+                expect(datetime).toEqual(new Date("2020-10-25"));            
+            })
+            it("should return an empty array if no entries exist for that date", async ()=>{
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response = await mongoService.getEntryByDate(new Date("2000-05-30"));
+
+                expect(response).toStrictEqual(expect.arrayContaining([]))
+                expect(response.length).toStrictEqual(0);
             })
         })
     })

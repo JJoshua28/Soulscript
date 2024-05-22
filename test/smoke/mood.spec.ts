@@ -44,7 +44,7 @@ describe("Smoke tests", () => {
                 expect(response).toHaveProperty("text", expect.any(String))
             });
         })
-    })
+    });
     describe("GET /api/mood/get-entry-by-date", () => {
         const URL = "/api/mood/get-entry-by-date"
         describe("Positive Tests", () => {
@@ -89,7 +89,7 @@ describe("Smoke tests", () => {
             });
         })
 
-    })
+    });
     describe("PUT api/mood/update-entry", () => {
         const URL = "/api/mood/update-entry";
         describe("Positive Tests", () => {
@@ -146,7 +146,7 @@ describe("Smoke tests", () => {
             })
         })
 
-    }) 
+    }); 
     describe("DEL /api/mood/remove-entry", () => {
         const URL = "/api/mood/remove-entry";
         describe("Positive Tests", () => {
@@ -187,6 +187,6 @@ describe("Smoke tests", () => {
                 expect(response).toHaveProperty("text", expect.any(String))
             });
         })
-    })
+    });
     afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
 })

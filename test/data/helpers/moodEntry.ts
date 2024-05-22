@@ -77,7 +77,7 @@ const createMoodEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => 
     } as EntryDocument
 }
 
-const seedTestData = async () => {
+const seedMoodEntryTestData = async () => {
     const defaultMoodEntry:Entry = {
         id: new mongoose.Types.ObjectId(),
         sharedID: new mongoose.Types.ObjectId(),
@@ -98,4 +98,4 @@ const seedTestData = async () => {
 }
 
 
-export { createNewMoodEntry, createMoodEntry, createMoodEntryDocument, seedTestData}
+export { createNewMoodEntry, createMoodEntry, createMoodEntryDocument, seedMoodEntryTestData }
