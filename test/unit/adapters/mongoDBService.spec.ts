@@ -239,43 +239,74 @@ describe("Entry", ()=> {
     })
     describe("Delete entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
-        const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
-        describe("Positive Tests", ()=> {
-            it("should remove a mood entry and return it",  async () => {
-                const document =  createMoodEntryDocument(defaultMoodEntry);
-                const mongooseID = new mongoose.Types.ObjectId();
-                
-                jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(document);
-
-                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                const response = await entryService.deleteEntry(mongooseID);
-
-                expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
-                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation))
-            })
-        })
-        describe("Negative Tests", () => {
-            it("should throw a error if no document exists with that ID", async () => {
-                const mongooseID = new mongoose.Types.ObjectId();
-                
-                jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockResolvedValue(null);
+        const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+        describe("Mood", () => {    
+            describe("Positive Tests", ()=> {
+                it("should remove a mood entry and return it",  async () => {
+                    const document =  createMoodEntryDocument(defaultMoodEntry);
+                    const mongooseID = new mongoose.Types.ObjectId();
+                    
+                    jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(document);
         
-                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
-
-                expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
+                    const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.MOOD);
+                    const response = await entryService.deleteEntry(mongooseID);
+        
+                    expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID)
+                    expect(response).toEqual(expect.objectContaining(defaultEntryExpectation))
+                })
             })
-            it("should throw and error if something goes wrong when trying to delete a document", async () => {
-                const mongooseID = new mongoose.Types.ObjectId();
-                
-                jest.spyOn(mockMoodEntryModel, "findByIdAndDelete").mockRejectedValue(new Error());
-
-                const entryService  = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
-
-                expect(mockMoodEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
-
+            describe("Negative Tests", () => {
+                it("should throw a error if no document exists with that ID", async () => {
+                    const mongooseID = new mongoose.Types.ObjectId();
+                    
+                    jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(null);
+            
+                    const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.MOOD);
+                    await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
+        
+                    expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
+                })
+                it("should throw and error if something goes wrong when trying to delete a document", async () => {
+                    const mongooseID = new mongoose.Types.ObjectId();
+                    
+                    jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockRejectedValue(new Error());
+        
+                    const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.MOOD);
+                    await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
+        
+                    expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
+        
+                })
             })
         })
+        describe("Gratitude", () => {
+            describe("Positive Tests", ()=> {
+                it("should remove a gratitude entry and return it",  async () => {
+                    const document =  createGratitudeEntryDocument(defaultGratitudeEntry);
+                    const mongooseID = new mongoose.Types.ObjectId();
+                    
+                    jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(document);
+    
+                    const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.GRATITUDE);
+                    const response = await entryService.deleteEntry(mongooseID);
+    
+                    expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
+                    expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
+                });
+            })
+            describe("Negative Tests", () => {
+                it("should throw a error if no document exists with that ID", async () => {
+                    const mongooseID = new mongoose.Types.ObjectId();
+                    
+                    jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(null);
+            
+                    const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.GRATITUDE);
+                    await expect(entryService.deleteEntry(mongooseID)).rejects.toThrow(Error);
+    
+                    expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
+                });
+            });
+        })
+            
     })
 })

@@ -165,7 +165,7 @@ describe("Smoke tests", () => {
                 expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
     
                 await waitForExpect(async () => {
-                    const foundDocument = await request(app)
+                    await request(app)
                     .get("/api/mood/get-entry-by-date")
                     .send({datetime: moodEntry.datetime})
                     .expect(204)
@@ -177,12 +177,12 @@ describe("Smoke tests", () => {
         });
         describe("Negative Tests", () => {
             it("should throw 404 when attempting a valid delete an entry with an ID that does not exist", async () => {
-                const updateRequest = {
+                const deleteRequest = {
                     id: new mongoose.Types.ObjectId(),
                 } as any
                 const response = await request(app)
                     .del(URL)
-                    .send(updateRequest)
+                    .send(deleteRequest)
                     .expect(HttpErrorCode.NOT_FOUND);
     
                 expect(response).toHaveProperty("text", expect.any(String))
