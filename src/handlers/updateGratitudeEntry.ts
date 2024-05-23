@@ -9,12 +9,12 @@ import { validDate } from "../helpers/validateDate";
 import UpdateEntryUseCase from "../use cases/updateEntry";
 import entryModel from "../services/mongoDB/models/entry";
 
-const handleUpdateMoodEntry = async (req: Request): Promise<Entry> => {
-    const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
-    const updateMoodUseCase = new UpdateEntryUseCase(entryService);
+const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
+    const entryService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+    const updateGratitudeUseCase = new UpdateEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id) throw new Error(CustomMoodErrors.INVALID_REQUEST);
-    if(req?.body?.update?.content && typeof req?.body?.update?.content !== "string" || req?.body?.update?.content === "" || req?.body?.update?.content === " ") throw new Error(CustomMoodErrors.INVALID_REQUEST);
+    if(req?.body?.update?.content && !Array.isArray(req?.body?.update?.content) || req?.body?.update?.content?.length < 1) throw new Error(CustomMoodErrors.INVALID_REQUEST);
     if (req?.body?.update?.datetime && !validDate(req?.body?.update?.datetime)) throw new Error(CustomMoodErrors.INVALID_DATE);
     let {id, 
         update}: {
@@ -29,7 +29,7 @@ const handleUpdateMoodEntry = async (req: Request): Promise<Entry> => {
         datetime: new Date(update?.datetime)
     } as CustomEntry;
     const entryUpdate:CustomEntry = {...update  as CustomEntry} 
-    return await updateMoodUseCase.execute(id, entryUpdate);
+    return await updateGratitudeUseCase.execute(id, entryUpdate);
 }
 
-export default handleUpdateMoodEntry;
+export default handleUpdateGratitudeEntry;

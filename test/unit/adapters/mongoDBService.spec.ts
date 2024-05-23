@@ -162,40 +162,80 @@ describe("Entry", ()=> {
     describe("Update Entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
         const mockMoodEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
-        describe("Positive tests", ()=> {
-            it.each`
-            update
-            ${{datetime: new Date("2012-08-12")} }
-            ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
-            ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
-            ${{content: "happy"}}
-            ${{tags: ["mental health", "sports", "boondocks"]}}
-            ${{quote: " "}}
-            ${{subject: "Lorum Ipsum"}}
-            ${{content: "tired", quote: "I am the stone that the builder refused"}}
-            `("should return all entries for date $date", async ({update}) => {
-                const entry = createMoodEntryDocument(defaultMoodEntry, update);
-                mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
-                const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                
-                const response =  await mongoService.updateEntry(entry.id, update);
-                
-                expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
+        describe("Mood", () => {
+            describe("Positive tests", ()=> {
+                it.each`
+                update
+                ${{datetime: new Date("2012-08-12")} }
+                ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+                ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
+                ${{content: "happy"}}
+                ${{tags: ["mental health", "sports", "boondocks"]}}
+                ${{quote: " "}}
+                ${{subject: "Lorum Ipsum"}}
+                ${{content: "tired", quote: "I am the stone that the builder refused"}}
+                `("should update entry by with id with updates: $update", async ({update}) => {
+                    const entry = createMoodEntryDocument(defaultMoodEntry, update);
+                    mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
+                    const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
+                    
+                    const response =  await mongoService.updateEntry(entry.id, update);
+                    
+                    expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
+        
+                    expect(response).toHaveProperty("type", EntryTypes.MOOD);
+                });
+            })
+            describe("Negative tests", ()=> {
+                it("should throw an error if no record exists with that id", async ()=> {
+                    const update = {content: "tired" as "tired", quote: "I am the stone that the builder refused"};
+                    mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
+                    const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
+                    
+                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
+                    
+                } )
     
-                expect(response).toHaveProperty("type", EntryTypes.MOOD);
-            });
-        })
-        describe("Negative tests", ()=> {
-            it("should throw an error if not record exists with that id", async ()=> {
-                const update = {content: "tired" as "tired", quote: "I am the stone that the builder refused"};
-                mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
-                const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
-                
-                await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
-                
-            } )
+            })
+        });
+        describe("Gratitude", () => {
+            describe("Positive tests", ()=> {
+                it.each`
+                update
+                ${{datetime: new Date("2012-08-12")} }
+                ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+                ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: ["unsure"] }}
+                ${{content: ["happy"]}}
+                ${{tags: ["mental health", "sports", "boondocks"]}}
+                ${{quote: " "}}
+                ${{subject: "Lorum Ipsum"}}
+                ${{content: ["tired"], quote: "I am the stone that the builder refused"}}
+                `("should update entry by with id with updates: $update", async ({update}) => {
+                    const entry = createGratitudeEntryDocument(defaultGratitudeEntry, update);
+                    mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
+                    const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.GRATITUDE);
+                    
+                    const response =  await mongoService.updateEntry(entry._id, update);
+                    
+                    expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
+        
+                    expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
+                    expect(response).toHaveProperty("id", entry._id);
 
-        })
+                });
+            })
+            describe("Negative tests", ()=> {
+                it("should throw an error if no record exists with that id", async ()=> {
+                    const update = {content: ["tired"], quote: "I am the stone that the builder refused"};
+                    mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
+                    const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.GRATITUDE);
+                    
+                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
+                    
+                } )
+    
+            })
+        });
     })
     describe("Delete entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");

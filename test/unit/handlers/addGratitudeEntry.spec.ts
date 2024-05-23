@@ -47,15 +47,13 @@ describe("Add Gratitude entry helper", () => {
         });
         it("should create an entry when a request does not have a datetime", async()=>{
             const {datetime, ...newEntryRequest} = createNewGratitudeEntry(defaultGratitudeEntry);
-            console.log(`This is the new gratitude entry: ${JSON.stringify(newEntryRequest)}`) 
             const id = new mongoose.Types.ObjectId(); 
             const entry = createGratitudeEntry({
                 datetime,
                 id, 
                 ...newEntryRequest
             });
-            console.log(`This is the gratitude entry: ${JSON.stringify(entry)}`) 
-            
+           
             const request = { body: newEntryRequest } as Request
             
         
