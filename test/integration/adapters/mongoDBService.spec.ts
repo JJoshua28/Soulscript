@@ -310,4 +310,40 @@ describe("Gratitude Entry", () => {
 
 
     });
+    describe("DELETE /api/gratitude/remove-entry", () => {
+        describe("Positive Tests", ()=> {
+            it("should delete a document with the specified ID and return that document", async () => {
+                const documents =  await entryModel.find<EntryDocument>({});
+                const [document] = documents; 
+    
+                const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response  = await mongoDBService.deleteEntry(document._id) as EntryDocument;
+                
+                expect(response.id).toEqual(document._id);
+                expect(response).toEqual(expect.objectContaining({
+                    type: document.type,
+                    subject: document.subject,
+                    quote: document.quote,
+                    tags: document.tags,
+                    content: document.content,
+                    datetime: document.datetime 
+                }));
+                await waitForExpect(async () => {
+                    const foundDocument = await entryModel.findById(document._id);
+                    expect(foundDocument).toBeNull();
+                });
+
+
+            });
+        })
+        describe("Negative Tests", ()=> {
+
+            it("should throw and error if no documents exists with that ID", async () => {
+                const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const id = new mongoose.Types.ObjectId();
+                
+                await expect(mongoDBService.deleteEntry(id)).rejects.toThrow(Error);
+            })
+        })
+    });
 })

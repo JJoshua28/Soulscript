@@ -1,6 +1,7 @@
 import moment from "moment";
 import request from "supertest"
 import mongoose from "mongoose";
+import waitForExpect from "wait-for-expect";
 
 import { Entry, EntryTypes, NewEntryRequest } from "../../src/types/entries";
 import { HttpErrorCode } from "../../src/types/error";
@@ -9,7 +10,6 @@ import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
 import { createNewGratitudeEntry, seedGratitudeEntryTestData } from "../data/helpers/gratitudeEntry";
 import { defaultGratitudeEntry } from "../data/gratitudeEntry";
-
 
 describe("Smoke tests", () => {
     beforeAll ( async () => {
@@ -186,6 +186,56 @@ describe("Smoke tests", () => {
                 expect(response).toHaveProperty("text", expect.any(String))
             })
         })
+    });
+    describe("DEL /api/gratitude/remove-entry", () => {
+        const URL = "/api/gratitude/remove-entry";
+        describe("Positive Tests", () => {
+            it("should remove the mood entry by id", async () => {
+    
+                const response = await request(app)
+                .del(URL)
+                .send({id: gratitudeEntry.id})
+                .expect(200);
+    
+                expect(response.body.id).toEqual(gratitudeEntry.id);
+                expect(response.body.tags).not.toEqual(gratitudeEntry.tags);
+                expect(response.body.content).not.toEqual(gratitudeEntry.content);
+                expect(response.body.sharedID).not.toEqual(gratitudeEntry.sharedID);
+                    
+                expect(response.body).toHaveProperty("datetime", expect.any(String));
+                expect(response.body).toHaveProperty("content", expect.arrayContaining([expect.any(String)]));
+                expect(response.body).toHaveProperty("tags", expect.arrayContaining([expect.any(String)]));
+                expect(response.body).toHaveProperty("sharedID", expect.any(String));
+                expect(response.body).toHaveProperty("id", expect.any(String));
+                
+                setTimeout(async() =>{
+                    await waitForExpect(async () => {
+                        await request(app)
+                        .get("/api/gratitude/get-entry-by-date")
+                        .send({datetime: gratitudeEntry.datetime})
+                        .expect(204)
+                    });
 
-    }); 
+                },2000);
+    
+    
+    
+            });
+        });
+        describe("Negative Tests", () => {
+            it("should throw 404 when attempting a valid delete an entry with an ID that does not exist", async () => {
+                const deleteRequest = {
+                    id: new mongoose.Types.ObjectId(),
+                } as any
+                const response = await request(app)
+                    .del(URL)
+                    .send(deleteRequest)
+                    .expect(HttpErrorCode.NOT_FOUND);
+    
+                expect(response).toHaveProperty("text", expect.any(String))
+            });
+        })
+    });
+    afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
+
 })

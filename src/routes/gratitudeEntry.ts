@@ -4,6 +4,7 @@ import handleErrorMapper from '../mappers/handleErrors';
 import handleAddGratitudeEntry from '../handlers/addGratitudeEntry';
 import handleGetGratitudeEntryByDate from '../handlers/getGratitudeEntryByDate';
 import handleUpdateGratitudeEntry from '../handlers/updateGratitudeEntry';
+import handleDeleteGratitudeEntry from '../handlers/deleteGratitudeEntry.ts';
 
 const app:Express = express();
 app.use(express.json());
@@ -37,6 +38,14 @@ gratitudeRouter.put("/update-entry", (req: Request, res: Response) => {
         res.status(errorResponse.statusCode).send(errorResponse.message);
     });
 });
+gratitudeRouter.delete("/remove-entry", (req: Request, res: Response) => {
+    handleDeleteGratitudeEntry(req)
+    .then(response => res.status(200).send(response))
+    .catch(error => {
+        const errorResponse = handleErrorMapper(error.message, req);
+        res.status(errorResponse.statusCode).send(errorResponse.message)
+    });
+})
 
 
 export default gratitudeRouter;
