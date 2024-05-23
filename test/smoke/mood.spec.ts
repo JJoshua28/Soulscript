@@ -121,6 +121,7 @@ describe("Smoke tests", () => {
                 ${{ update: {}, id: new mongoose.Types.ObjectId() }}
                 ${{ update: "" }}
                 ${{ update: "", id: new mongoose.Types.ObjectId() }}
+                ${{ update: { content: ["I'm grateful to test my code!"]}, id: moodEntry?.id }}
                 ${{ update: { datetime: "Invalid date"}, id: moodEntry?.id }}
             `(`should throw because of invalid request body: $requestData`, async ({ requestData }) => {
                 const response = await request(app)

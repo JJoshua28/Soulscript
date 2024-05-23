@@ -101,10 +101,10 @@ const seedGratitudeEntryTestData = async () => {
 
     let testData: NewEntry[] = [
         basicGratitudeEntry,
-        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet."]},
-        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"]},
-        {...gratitudeEntry, datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."]},
-        {...gratitudeEntry, datetime: new Date("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}
+        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet."] },
+        {...gratitudeEntry, content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"] },
+        {...gratitudeEntry, datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."] },
+        {...gratitudeEntry, datetime: new Date("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."] }
     ];  
     await entryModel.insertMany(testData);
 }

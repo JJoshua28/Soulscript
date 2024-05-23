@@ -267,5 +267,47 @@ describe("Gratitude Entry", () => {
                 expect(response.length).toStrictEqual(0);
             })
         })
-    })
+    });
+    describe("PUT /api/gratitude/update-entry", ()=> {
+        describe("Positive tests", ()=> {
+            seedGratitudeEntryTestData();
+            it.each`
+                findQuery                                                                                                                                                                       | updates
+                ${{ ...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.GRATITUDE), content: ["Lorem ipsum dolor sit amet."] }}                             | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: ["I'm grateful because I see ghosts!"] }}
+                ${{ ...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.GRATITUDE), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"] }} | ${{ quote: "Lucky me, I see ghosts" }   }
+                ${{datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."] }}                                            | ${{content: ["I'm grateful because I see ghosts!"], quote: "I am the stone that the builder refused"}}
+                ${{datetime: new Date("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."] }}                                                         | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+            `("should update a mood entry with data $updates", async ({findQuery, updates}) => {
+        
+                let document = await entryModel.findOne(findQuery);
+                const options = {
+                    new: true,
+                    runValidators: true,
+                    returnDocument: "after" as "after"
+                }
+                if(!document) throw new Error(`no document exist with query: ${findQuery}`);
+    
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const response = await mongoService.updateEntry(document._id, updates);
+                        
+                expect(response.id).toEqual(document._id);
+                expect(response).toMatchObject({
+                    ...updates,
+                    type: EntryTypes.GRATITUDE
+                });
+                expect(response).not.toEqual(document);
+            })
+        })
+        describe("Negative Tests", () => {
+            it("should throw an error if no documents exists for that ID", async ()=> {
+                const id = new mongoose.Types.ObjectId();
+                const update = {quote: " "};
+                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                await expect(mongoService.updateEntry(id, update)).rejects.toThrow(Error)
+            })
+            
+        })
+
+
+    });
 })

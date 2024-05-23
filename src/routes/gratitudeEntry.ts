@@ -1,17 +1,18 @@
 import express, {Express, Request, Response, Router} from 'express';
+
 import handleErrorMapper from '../mappers/handleErrors';
 import handleAddGratitudeEntry from '../handlers/addGratitudeEntry';
 import handleGetGratitudeEntryByDate from '../handlers/getGratitudeEntryByDate';
+import handleUpdateGratitudeEntry from '../handlers/updateGratitudeEntry';
 
 const app:Express = express();
 app.use(express.json());
-
 
 const gratitudeRouter: Router = express.Router();
 
 gratitudeRouter.post("/add-entry", (req: Request, res: Response) => {
     handleAddGratitudeEntry(req)
-    .then(response => res.send(response).status(200))
+    .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
@@ -27,7 +28,15 @@ gratitudeRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
-})
+});
+gratitudeRouter.put("/update-entry", (req: Request, res: Response) => {
+    handleUpdateGratitudeEntry(req)
+    .then(response => res.status(200).send(response))
+    .catch(error => {
+        const errorResponse = handleErrorMapper(error.message, req);
+        res.status(errorResponse.statusCode).send(errorResponse.message);
+    });
+});
 
 
 export default gratitudeRouter;

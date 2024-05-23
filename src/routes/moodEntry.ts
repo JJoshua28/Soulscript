@@ -8,12 +8,11 @@ import handleErrorMapper from '../mappers/handleErrors';
 const app:Express = express();
 app.use(express.json());
 
-
 const moodRouter: Router = express.Router();
 
 moodRouter.post("/add-entry", (req: Request, res: Response) => {
     handleAddMoodEntry(req)
-    .then(response => res.send(response).status(200))
+    .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
@@ -34,7 +33,7 @@ moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
 
 moodRouter.put("/update-entry", (req: Request, res: Response) => {
     handleUpdateMoodEntry(req)
-    .then(response => res.send(response).status(200))
+    .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
@@ -43,10 +42,7 @@ moodRouter.put("/update-entry", (req: Request, res: Response) => {
 
 moodRouter.delete("/remove-entry", (req: Request, res: Response) => {
     handleDeleteMoodEntry(req)
-    .then(response => {
-        if (!response) return res.status(204).send(response);
-        return res.status(200).send(response);
-    })
+    .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
