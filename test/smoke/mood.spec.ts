@@ -9,7 +9,7 @@ import { httpEntryExpectation } from "../assertions/entries";
 
 import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
-import { createNewMoodEntry } from "../data/helpers/moodEntry";
+import { createNewEntry } from "../data/helpers/customEntry";
 import { defaultMoodEntry } from "../data/moodEntry";
 
 
@@ -20,7 +20,7 @@ describe("Smoke tests", () => {
         const URL = "/api/mood/add-entry"
         describe("Positive Tests", () => {
             it("should add a mood entry", async () => {
-                const entry: NewEntry = createNewMoodEntry(defaultMoodEntry);
+                const entry: NewEntry = createNewEntry(defaultMoodEntry);
                 const response = await request(app)
                     .post(URL)
                     .send(entry)

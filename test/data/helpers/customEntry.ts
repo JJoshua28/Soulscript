@@ -5,7 +5,7 @@ import EntryDocument from "../../../src/services/mongoDB/types/document";
 import { EntryTypes, Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 
-const createNewMoodEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
+const createNewEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
     const {
         type,
         sharedID, 
@@ -28,7 +28,7 @@ const createNewMoodEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntr
     }
 }
 
-const createMoodEntry = (defaultEntry: Entry, entry?:CustomEntry): Entry=> {
+const createEntry = (defaultEntry: Entry, entry?:CustomEntry): Entry=> {
     const {
         id,
         type,
@@ -52,7 +52,7 @@ const createMoodEntry = (defaultEntry: Entry, entry?:CustomEntry): Entry=> {
     }
 }
 
-const createMoodEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => {
+const createEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => {
     const {
         id,
         type,
@@ -98,4 +98,5 @@ const seedMoodEntryTestData = async () => {
 }
 
 
-export { createNewMoodEntry, createMoodEntry, createMoodEntryDocument, seedMoodEntryTestData }
+export { createNewEntry, createEntry, 
+    createEntryDocument, seedMoodEntryTestData }
