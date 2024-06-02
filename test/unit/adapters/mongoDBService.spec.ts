@@ -8,7 +8,7 @@ import { defaultEntryExpectation, gratitudeEntryExpectation } from "../../assert
 
 import { defaultMoodEntry, mockMoodEntryDocument } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
-import { createMoodEntryDocument, createNewMoodEntry } from "../../data/helpers/moodEntry";
+import { createEntryDocument, createNewEntry } from "../../data/helpers/customEntry";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import { defaultGratitudeEntry, mockGratitudeEntryDocument } from "../../data/gratitudeEntry";
 import { createGratitudeEntryDocument, createNewGratitudeEntry } from "../../data/helpers/gratitudeEntry";
@@ -24,7 +24,7 @@ describe("Entry", ()=> {
                     mockMoodEntryDocument, 
                     "save"
                 );
-                const mockMoodEntry: NewEntry = createNewMoodEntry(defaultMoodEntry);
+                const mockMoodEntry: NewEntry = createNewEntry(defaultMoodEntry);
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.addEntry(mockMoodEntry);
                 
@@ -85,7 +85,7 @@ describe("Entry", ()=> {
                 jest.clearAllMocks();
             });
 
-        })
+        });
     });
     describe("Find by date", () => {
        afterEach( async () => {
@@ -99,7 +99,7 @@ describe("Entry", ()=> {
             ${new Date("2022-08-12")}
             ${new Date("2021-11-26")}
             `("should return all entries for date $date", async ({date}: {date: Date}) => {
-                const entry = createMoodEntryDocument(defaultMoodEntry, {datetime: date});
+                const entry = createEntryDocument(defaultMoodEntry, {datetime: date});
                 mockingoose(entryModel).toReturn([entry], "find");
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
         
@@ -175,7 +175,7 @@ describe("Entry", ()=> {
                 ${{subject: "Lorum Ipsum"}}
                 ${{content: "tired", quote: "I am the stone that the builder refused"}}
                 `("should update entry by with id with updates: $update", async ({update}) => {
-                    const entry = createMoodEntryDocument(defaultMoodEntry, update);
+                    const entry = createEntryDocument(defaultMoodEntry, update);
                     mockMoodEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
                     const mongoService = new MongoDBService(mockMoodEntryModel, EntryTypes.MOOD);
                     
@@ -243,7 +243,7 @@ describe("Entry", ()=> {
         describe("Mood", () => {    
             describe("Positive Tests", ()=> {
                 it("should remove a mood entry and return it",  async () => {
-                    const document =  createMoodEntryDocument(defaultMoodEntry);
+                    const document =  createEntryDocument(defaultMoodEntry);
                     const mongooseID = new mongoose.Types.ObjectId();
                     
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(document);
