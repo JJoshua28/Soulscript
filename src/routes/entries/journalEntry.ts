@@ -1,7 +1,8 @@
 import express, {Express, Router, Request, Response} from "express";
 
-import handleAddJournalEntry from "../handlers/addJournalEntry";
-import handleErrorMapper from "../mappers/handleErrors";
+import handleErrorMapper from "../../mappers/handleErrors";
+
+import handleAddJournalEntry from "../../handlers/entries/journal/addJournalEntry";
 
 const app:Express = express();
 app.use(express.json());

@@ -1,12 +1,12 @@
 import { Request } from "express";
 
-import { Entry, EntryTypes } from "../types/entries";
-import CustomMoodErrors from "../types/error";
+import { Entry, EntryTypes } from "../../../types/entries";
+import CustomMoodErrors from "../../../types/error";
 
-import MongoDBService from "../adapters/mongoDBService";
-import { validDate } from "../helpers/validateDate";
-import GetEntryByDateUseCase from "../use cases/getEntryByDate";
-import entryModel from "../services/mongoDB/models/entry";
+import MongoDBService from "../../../adapters/mongoDBService";
+import { validDate } from "../../../helpers/validateDate";
+import GetEntryByDateUseCase from "../../../use cases/getEntryByDate";
+import entryModel from "../../../services/mongoDB/models/entry";
 
 const handleGetGratitudeEntryByDate = async (req: Request): Promise<Entry[] | []> => {
     const entryService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);

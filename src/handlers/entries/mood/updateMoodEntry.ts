@@ -1,13 +1,13 @@
 import { Request } from "express";
 import mongoose from "mongoose"
 ;
-import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../types/entries";
-import CustomMoodErrors from "../types/error";
+import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../../../types/entries";
+import CustomMoodErrors from "../../../types/error";
 
-import MongoDBService from "../adapters/mongoDBService";
-import { validDate } from "../helpers/validateDate";
-import UpdateEntryUseCase from "../use cases/updateEntry";
-import entryModel from "../services/mongoDB/models/entry";
+import MongoDBService from "../../../adapters/mongoDBService";
+import { validDate } from "../../../helpers/validateDate";
+import UpdateEntryUseCase from "../../../use cases/updateEntry";
+import entryModel from "../../../services/mongoDB/models/entry";
 
 const handleUpdateMoodEntry = async (req: Request): Promise<Entry> => {
     const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
