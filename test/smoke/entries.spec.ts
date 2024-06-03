@@ -391,7 +391,7 @@ describe("Entry smoke tests", () => {
                     expect(response.body).toHaveProperty("sharedID", expect.any(String));
                     expect(response.body).toHaveProperty("id", expect.any(String));
                     
-                    setTimeout(async() =>{
+                   async () => await setTimeout(async() =>{
                         await waitForExpect(async () => {
                             await request(app)
                             .get("/api/gratitude/get-entry-by-date")
