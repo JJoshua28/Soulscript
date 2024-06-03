@@ -1,15 +1,13 @@
 import {Request} from 'express';
-import moment from 'moment';
-
-import { EntryTypes, NewEntryRequest } from '../../../src/types/entries';
-
-import { defaultMoodEntry } from "../../data/moodEntry"
-import AddEntryUseCase from '../../../src/use cases/addEntry';
-import mapNewEntry from '../../../src/mappers/newEntry';
-import handleAddGratitudeEntry from "../../../src/handlers/addGratitudeEntry"
 import mongoose from 'mongoose';
-import { createGratitudeEntry, createNewGratitudeEntry } from '../../data/helpers/gratitudeEntry';
-import { defaultGratitudeEntry } from '../../data/gratitudeEntry';
+
+import { EntryTypes, NewEntryRequest } from '../../../../../src/types/entries';
+
+import AddEntryUseCase from '../../../../../src/use cases/addEntry';
+import mapNewEntry from '../../../../../src/mappers/newEntry';
+import handleAddGratitudeEntry from "../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
+import { createEntry, createNewEntry } from '../../../../data/helpers/customEntry';
+import { defaultGratitudeEntry } from '../../../../data/gratitudeEntry';
 
 describe("Add Gratitude entry helper", () => {
     afterEach( async()=>{
@@ -29,7 +27,7 @@ describe("Add Gratitude entry helper", () => {
             
             const request = { body: entry } as Request;
             const newEntry = mapNewEntry(entry, {type: EntryTypes.GRATITUDE, datetime: entry.datetime || new Date()})
-            const entryExpectation = createGratitudeEntry(defaultGratitudeEntry, newEntry)
+            const entryExpectation = createEntry(defaultGratitudeEntry, newEntry)
     
             const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entryExpectation);
@@ -46,9 +44,9 @@ describe("Add Gratitude entry helper", () => {
             expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
         });
         it("should create an entry when a request does not have a datetime", async()=>{
-            const {datetime, ...newEntryRequest} = createNewGratitudeEntry(defaultGratitudeEntry);
+            const {datetime, ...newEntryRequest} = createNewEntry(defaultGratitudeEntry);
             const id = new mongoose.Types.ObjectId(); 
-            const entry = createGratitudeEntry({
+            const entry = createEntry({
                 datetime,
                 id, 
                 ...newEntryRequest

@@ -1,14 +1,14 @@
 import moment from "moment";
 import { Request } from "express";
 
-import { Entry, EntryTypes } from "../types/entries";
-import CustomErrors from '../types/error';
+import CustomErrors from '../../../types/error';
+import { Entry, EntryTypes } from "../../../types/entries";
 
-import MongoDBService from "../adapters/mongoDBService";
-import AddEntryUseCase from "../use cases/addEntry";
-import { validDate } from "../helpers/validateDate";
-import entryModel from "../services/mongoDB/models/entry";
-import mapNewEntry from "../mappers/newEntry";
+import MongoDBService from "../../../adapters/mongoDBService";
+import { validDate } from "../../../helpers/validateDate";
+import mapNewEntry from "../../../mappers/newEntry";
+import entryModel from "../../../services/mongoDB/models/entry";
+import AddEntryUseCase from "../../../use cases/addEntry";
 
 const handleAddJournalEntry = async (req: Request): Promise<Entry> => {
     if(!req.body?.content || typeof req.body?.content != "string" || req?.body?.content === " ") throw new Error(CustomErrors.INVALID_REQUEST)

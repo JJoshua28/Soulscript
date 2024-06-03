@@ -3,19 +3,19 @@ import mongoose from "mongoose";
 import waitForExpect from 'wait-for-expect';
 import moment from "moment";
 
-import { Entry, EntryTypes, NewEntry } from "../../../src/types/entries";
+import { EntryTypes, NewEntry } from "../../../src/types/entries";
 import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../assertions/entries" 
 import EntryDocument from "../../../src/services/mongoDB/types/document";
 
 import AddEntryUseCase from "../../../src/use cases/addEntry"
 import { defaultMoodEntry } from "../../data/moodEntry";
 import MongoDBService from "../../../src/adapters/mongoDBService";
-import { createNewEntry, seedMoodEntryTestData } from "../../data/helpers/customEntry";
+import { createNewEntry } from "../../data/helpers/customEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
 import mongooseMemoryDB from "../../services/mongoDB/config";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
-import { createNewGratitudeEntry, seedGratitudeEntryTestData } from "../../data/helpers/gratitudeEntry";
+import { seedGratitudeEntryTestData, seedMoodEntryTestData } from "../../data/helpers/addTestEntries";
 
 describe("Mood Entry", ()=>{
     beforeAll(async ()=> {
@@ -204,7 +204,7 @@ describe("Gratitude Entry", () => {
                 ${new Date(moment().format("YYYY-MM-DD HH:MM:ss"))} | ${"today's date"}
             `
             ("should add a gratitude entry with $message", async ({date}) => {
-                const entry = createNewGratitudeEntry (defaultGratitudeEntry, {datetime: date})
+                const entry = createNewEntry (defaultGratitudeEntry, {datetime: date})
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.addEntry(entry);
                        

@@ -1,26 +1,27 @@
 import express, {Express, Request, Response, Router} from 'express';
-import handleAddMoodEntry from '../handlers/addMoodEntry';
-import handleGetMoodEntryByDate from '../handlers/getMoodEntryByDate';
-import handleUpdateMoodEntry from '../handlers/updateMoodEntry';
-import handleDeleteMoodEntry from '../handlers/deleteMoodEntry';
-import handleErrorMapper from '../mappers/handleErrors';
+
+import handleErrorMapper from '../../mappers/handleErrors';
+
+import handleAddGratitudeEntry from '../../handlers/entries/gratitude/addGratitudeEntry';
+import handleGetGratitudeEntryByDate from '../../handlers/entries/gratitude/getGratitudeEntryByDate';
+import handleUpdateGratitudeEntry from '../../handlers/entries/gratitude/updateGratitudeEntry';
+import handleDeleteGratitudeEntry from '../../handlers/entries/gratitude/deleteGratitudeEntry.ts';
 
 const app:Express = express();
 app.use(express.json());
 
-const moodRouter: Router = express.Router();
+const gratitudeRouter: Router = express.Router();
 
-moodRouter.post("/add-entry", (req: Request, res: Response) => {
-    handleAddMoodEntry(req)
+gratitudeRouter.post("/add-entry", (req: Request, res: Response) => {
+    handleAddGratitudeEntry(req)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
 });
-
-moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
-    handleGetMoodEntryByDate(req)
+gratitudeRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
+    handleGetGratitudeEntryByDate(req)
     .then(response => {
         if (response.length == 0) return res.status(204).send(response);
         return res.status(200).send(response);
@@ -30,9 +31,16 @@ moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
 });
-
-moodRouter.put("/update-entry", (req: Request, res: Response) => {
-    handleUpdateMoodEntry(req)
+gratitudeRouter.put("/update-entry", (req: Request, res: Response) => {
+    handleUpdateGratitudeEntry(req)
+    .then(response => res.status(200).send(response))
+    .catch(error => {
+        const errorResponse = handleErrorMapper(error.message, req);
+        res.status(errorResponse.statusCode).send(errorResponse.message);
+    });
+});
+gratitudeRouter.delete("/remove-entry", (req: Request, res: Response) => {
+    handleDeleteGratitudeEntry(req)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
@@ -40,15 +48,5 @@ moodRouter.put("/update-entry", (req: Request, res: Response) => {
     });
 })
 
-moodRouter.delete("/remove-entry", (req: Request, res: Response) => {
-    handleDeleteMoodEntry(req)
-    .then(response => res.status(200).send(response))
-    .catch(error => {
-        const errorResponse = handleErrorMapper(error.message, req);
-        res.status(errorResponse.statusCode).send(errorResponse.message)
-    });
-})
 
-
-export default moodRouter;
-
+export default gratitudeRouter;

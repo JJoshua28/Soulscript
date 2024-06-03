@@ -1,12 +1,12 @@
 import { Request } from "express";
 import mongoose from "mongoose";
 
-import { Entry, EntryTypes } from "../types/entries";
-import CustomMoodErrors from "../types/error";
+import { Entry, EntryTypes } from "../../../types/entries";
+import CustomMoodErrors from "../../../types/error";
 
-import DeleteEntryUseCase from "../use cases/deleteEntry";
-import MongoDBService from "../adapters/mongoDBService";
-import entryModel from "../services/mongoDB/models/entry";
+import DeleteEntryUseCase from "../../../use cases/deleteEntry";
+import MongoDBService from "../../../adapters/mongoDBService";
+import entryModel from "../../../services/mongoDB/models/entry";
 
 
 const handleDeleteMoodEntry = async (req: Request): Promise<Entry> => {
