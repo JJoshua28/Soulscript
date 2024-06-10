@@ -1,9 +1,10 @@
 import express, {Express, Request, Response, Router} from 'express';
 
+import { EntryTypes } from '../../types/entries';
 import handleErrorMapper from '../../mappers/handleErrors';
 
 import handleAddMoodEntry from '../../handlers/entries/mood/addMoodEntry';
-import handleGetMoodEntryByDate from '../../handlers/entries/mood/getMoodEntryByDate';
+import handleGetEntryByDate from '../../handlers/entries/getEntryByDate';
 import handleUpdateMoodEntry from '../../handlers/entries/mood/updateMoodEntry';
 import handleDeleteMoodEntry from '../../handlers/entries/mood/deleteMoodEntry';
 
@@ -22,7 +23,7 @@ moodRouter.post("/add-entry", (req: Request, res: Response) => {
 });
 
 moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
-    handleGetMoodEntryByDate(req)
+    handleGetEntryByDate(req, EntryTypes.MOOD)
     .then(response => {
         if (response.length == 0) return res.status(204).send(response);
         return res.status(200).send(response);

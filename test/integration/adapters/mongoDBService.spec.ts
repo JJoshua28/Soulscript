@@ -15,7 +15,8 @@ import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry"
 import mongooseMemoryDB from "../../services/mongoDB/config";
 import entryModel from "../../../src/services/mongoDB/models/entry";
 import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
-import { seedGratitudeEntryTestData, seedMoodEntryTestData } from "../../data/helpers/addTestEntries";
+import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../data/helpers/addTestEntries";
+import { defaultJournalEntry } from "../../data/journalEntry";
 
 describe("Mood Entry", ()=>{
     beforeAll(async ()=> {
@@ -77,7 +78,7 @@ describe("Mood Entry", ()=>{
             beforeAll(async ()=>{
                 await mongooseMemoryDB.tearDownTestEnvironment();
                 await mongooseMemoryDB.setupTestEnvironment();
-                await seedMoodEntryTestData();
+                await seedMoodEntryTestData(entryModel);
             })
             it.each`
                 date                        | arrayLength 
@@ -110,7 +111,7 @@ describe("Mood Entry", ()=>{
     });
     describe("PUT /api/mood/update-entry", ()=> {
         describe("Positive tests", ()=> {
-            seedMoodEntryTestData();
+            seedMoodEntryTestData(entryModel);
             it.each`
                 findQuery                                                                 | updates
                 ${ {...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.MOOD), content: "happy"}}    | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "unsure" }}
@@ -191,7 +192,7 @@ describe("Mood Entry", ()=>{
 describe("Gratitude Entry", () => {
     beforeEach(async ()=> {
         await mongooseMemoryDB.setupTestEnvironment();
-        await seedGratitudeEntryTestData();
+        await seedGratitudeEntryTestData(entryModel);
     });
     afterEach(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
@@ -270,7 +271,7 @@ describe("Gratitude Entry", () => {
     });
     describe("PUT /api/gratitude/update-entry", ()=> {
         describe("Positive tests", ()=> {
-            seedGratitudeEntryTestData();
+            seedGratitudeEntryTestData(entryModel);
             it.each`
                 findQuery                                                                                                                                                                       | updates
                 ${{ ...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.GRATITUDE), content: ["Lorem ipsum dolor sit amet."] }}                             | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: ["I'm grateful because I see ghosts!"] }}
@@ -355,41 +356,38 @@ describe("Journal Entry", () => {
     afterAll(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
-    const defaultJournalEntry: NewEntry = {
-        sharedID: new mongoose.Types.ObjectId(),
-        type: EntryTypes.JOURNAL,
-        subject: "test data",
-        quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        tags: ["test"],
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Section 1.10.32 of 'de Finibus Bonorum et Malorum', written by Cicero in 45 BC Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-        datetime: new Date(moment().startOf("day").toISOString())
-    };
 
     describe("POST /api/journal/add-entry", () => {
         const request = {body: ""} as Request;
         afterEach(async () => {
             request.body = "";
         })
+
         describe("Positive Tests", () => {
-            it.each`
+           it.each`
                 date                      | message
                 ${new Date("2020")}       | ${"a previous custom date in 2020"}
                 ${new Date("2022-03-22")} | ${"a previous custom date in 2022"}
-                ${Date()}                 | ${"todays date"}
+                ${new Date()}             | ${"today's date"}
             `
-            ("should add a journal entry with $message", async ({date}) => {
-                const entry = {...defaultJournalEntry, datetime: date};
+            ("should add a journal entry with $message", async ({ date }) => {
+                const entry = { ...defaultJournalEntry, datetime: date };
                 const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                
                 const response = await mongoService.addEntry(entry);
-                       
+
                 expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
                 expect(response).toHaveProperty("datetime", expect.any(Date));
                 expect(response).toHaveProperty("type", EntryTypes.JOURNAL);
 
-                const [findResponse] = await entryModel.find(entry);
-                expect(findResponse).toEqual(expect.objectContaining(entryDocumentExpectation));
-                expect(findResponse).toHaveProperty("datetime", expect.any(Date));
+                const [findResponse] = await entryModel.find({ _id: response.id });
+
+                await waitForExpect(async () => {
+                    expect(findResponse).toEqual(expect.objectContaining(entryDocumentExpectation));
+                    expect(findResponse).toHaveProperty("datetime", expect.any(Date));
+                })
             });
+
         })
         describe("Negative Tests", () => {
             it.each`
@@ -400,7 +398,7 @@ describe("Journal Entry", () => {
                 ${"type"}
                 ${"tags"}
             `
-            ("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
+            ("should throw an error if a journal entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                 const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
@@ -408,6 +406,51 @@ describe("Journal Entry", () => {
     
                 await expect(addMoodUseCase.execute(entry)).rejects.toThrow(Error);
                 
+            })
+        })
+    });
+
+    describe("GET /api/journal/get-entry-by-date", ()=>{
+        describe("Positive Tests", () => {
+            const currentDate = new Date(new Date(moment().startOf("day").toISOString()));
+            beforeAll(async ()=>{
+                await mongooseMemoryDB.tearDownTestEnvironment();
+                await mongooseMemoryDB.setupTestEnvironment();
+                await seedJournalEntryTestData(entryModel);
+            })
+            it.each`
+                date                                                            | arrayLength 
+                ${new Date(new Date(moment().startOf("day").toISOString()))}    | ${2}        
+                ${new Date("2015-05-15")}                                       | ${1}        
+                ${new Date("2018-01-01")}                                       | ${0}      
+            `
+            ("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
+                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const response = await mongoService.getEntryByDate(date);
+                       
+                expect(response).toHaveLength(arrayLength);             
+            });
+            it("should return a journal entry document", async () => {
+                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
+              
+                expect(response).toHaveProperty("id", expect.any(mongoose.Types.ObjectId));
+                expect(response).toHaveProperty("type", EntryTypes.JOURNAL);
+                expect(response).toHaveProperty("content", expect.any(String));
+                expect(response).toHaveProperty("datetime", expect.any(Date));
+                expect(response).toHaveProperty("tags", expect.any(Array));
+                expect(response).toHaveProperty("subject");
+                expect(response).toHaveProperty("quote");
+                expect(response).toHaveProperty("sharedID");
+
+            });
+            
+            it("should return an empty array if no entries exist for that date", async ()=>{
+                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const response = await mongoService.getEntryByDate(new Date("2000-05-30"));
+
+                expect(response).toStrictEqual(expect.arrayContaining([]))
+                expect(response.length).toStrictEqual(0);
             })
         })
     });

@@ -14,6 +14,7 @@ import { seedGratitudeEntryTestData } from "../data/helpers/addTestEntries";
 import { defaultMoodEntry } from "../data/moodEntry";
 import { httpEntryExpectation } from "../assertions/entries";
 import { defaultJournalEntry } from "../data/journalEntry";
+import entryModel from "../../src/services/mongoDB/models/entry";
 
 describe("Entry smoke tests", () => {
     describe("Mood", () => {
@@ -72,7 +73,6 @@ describe("Entry smoke tests", () => {
                     })
                     .expect(204);
         
-                    expect(response.body).toEqual(expect.arrayContaining([]));
                     expect(response.body).toEqual(expect.arrayContaining([]));
                 })
             });
@@ -197,7 +197,7 @@ describe("Entry smoke tests", () => {
     describe("Gratitude", () => {
         beforeAll ( async () => {
             await mongooseMemoryDB.setupTestEnvironment();
-            await seedGratitudeEntryTestData();
+            await seedGratitudeEntryTestData(entryModel);
         });
         let gratitudeEntry: Entry; 
         describe("POST /api/gratitude/add-entry", () => {
@@ -425,7 +425,7 @@ describe("Entry smoke tests", () => {
         beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
         let journalEntry: Entry;
         describe("POST /api/journal/add-entry", () => {
-            const URL = "/api/jounral/add-entry"
+            const URL = "/api/journal/add-entry"
             describe("Positive Tests", () => {
                 it("should add a jounral entry", async () => {
                     const {content } = defaultJournalEntry;
@@ -462,6 +462,51 @@ describe("Entry smoke tests", () => {
                     expect(response).toHaveProperty("text", expect.any(String))
                 });
             })
+        });
+        describe("GET /api/journal/get-entry-by-date", () => {
+            const URL = "/api/journal/get-entry-by-date"
+            describe("Positive Tests", () => {
+                it("should retrieve a journal entry with today's date", async () => {
+                    const date = (new Date()).toISOString()
+                    const response = await request(app)
+                    .get(URL)
+                    .send({
+                        datetime: date
+                    })
+                    .expect(200)
+                    
+                    expect(response.body).toEqual(expect.arrayContaining([expect.any(Object)]));
+                    expect(response.body).toEqual(expect.arrayContaining([journalEntry]));
+                    
+                });
+                it("should return an empty array if no entries exist with that date", async () => {
+                    const date = (new Date("2020")).toISOString();
+                    const response = await request(app)
+                    .get(URL)
+                    .send({
+                        datetime: date
+                    })
+                    .expect(204);
+        
+                    expect(response.body).toEqual(expect.arrayContaining([]));
+                })
+            });
+            describe("Negative Tests", () => {
+                it.each`
+                    requestData
+                    ${""}
+                    ${{ datetime: "" }}
+                    ${{ datetime: moment().add(1, "week").toISOString() }}
+                `(`should throw because of invalid request body: $requestData`, async ({ requestData }) => {
+                    const response = await request(app)
+                        .get(URL)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                    expect(response).toHaveProperty("text", expect.any(String))
+                });
+            })
+    
         });
         afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
     })

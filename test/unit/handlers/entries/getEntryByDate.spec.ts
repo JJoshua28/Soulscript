@@ -1,15 +1,15 @@
 import { Request } from "express";
 import moment from "moment";
 
-import { EntryTypes } from "../../../../../src/types/entries";
+import { EntryTypes } from "../../../../src/types/entries";
 
-import handleGetMoodEntryByDate from '../../../../../src/handlers/entries/mood/getMoodEntryByDate';
-import GetEntryByDateUseCase from '../../../../../src/use cases/getEntryByDate';
-import { validDate } from "../../../../../src/helpers/validateDate";
-import { createEntry } from "../../../../data/helpers/customEntry";
-import { defaultMoodEntry } from "../../../../data/moodEntry";
+import handleGetEntryByDate from '../../../../src/handlers/entries/getEntryByDate';
+import GetEntryByDateUseCase from '../../../../src/use cases/getEntryByDate';
+import { validDate } from "../../../../src/helpers/validateDate";
+import { createEntry } from "../../../data/helpers/customEntry";
+import { defaultMoodEntry } from "../../../data/moodEntry";
 
-jest.mock("../../../../../src/helpers/validateDate");
+jest.mock("../../../../src/helpers/validateDate");
 
 const mockValidDate = validDate as jest.MockedFunction<typeof validDate>;
 
@@ -36,7 +36,7 @@ describe("Get Mood entry  by date helper", () => {
             const executeSpy = jest.spyOn(GetEntryByDateUseCase.prototype, 'execute');
             executeSpy.mockResolvedValue(entry);
             
-            const response = await handleGetMoodEntryByDate(request);
+            const response = await handleGetEntryByDate(request, EntryTypes.MOOD);
             
             expect(executeSpy).toHaveBeenCalledWith(new Date(date));
             expect(response).toEqual(expect.arrayContaining(entry));
@@ -57,7 +57,7 @@ describe("Get Mood entry  by date helper", () => {
         `("should throw and error with when invalid date $date is passed", async ({date}) =>{
             const request = ({body:  {datetime: date}} as any as Request)
             
-            await expect(handleGetMoodEntryByDate(request)).rejects.toThrow(Error);
+            await expect(handleGetEntryByDate(request, EntryTypes.MOOD)).rejects.toThrow(Error);
 
         })
     })

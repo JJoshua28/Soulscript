@@ -1,4 +1,3 @@
-import exp from "constants"
 import mongoose from "mongoose"
 
 export const defaultEntryExpectation = {
