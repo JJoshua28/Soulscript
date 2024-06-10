@@ -179,6 +179,44 @@ describe("Entry", ()=> {
     
             });
         });
+        describe("Journal", () => {
+            it.each`
+            date
+            ${new Date("2020-01-01")}
+            ${new Date("2021-05-06")}
+            ${new Date("2022-08-12")}
+            ${new Date("2021-11-26")}
+            `("should return all entries for date $date", async ({date}: {date: Date}) => {
+                const entry = createEntryDocument(defaultJournalEntry, {datetime: date});
+                mockEntryModel.find = jest.fn().mockResolvedValueOnce([entry]);
+                const mongoService = new MongoDBService(mockEntryModel, EntryTypes.JOURNAL);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toEqual(expect.arrayContaining([expect.objectContaining(defaultEntryExpectation)]));
+                expect(response[0]).toHaveProperty("datetime", date);
+                expect(response[0]).toHaveProperty("type", EntryTypes.JOURNAL);
+        
+            });
+            it("should return an empty array if no entries are found", async () => {
+                mockEntryModel.find = jest.fn().mockResolvedValueOnce([]);
+                const date = new Date();
+                const mongoService = new MongoDBService(mockEntryModel, EntryTypes.JOURNAL);
+        
+                const response =  await mongoService.getEntryByDate(date);
+                
+                expect(response).toStrictEqual([]);
+    
+            });
+            it("should throw an error if something goes wrong", async ()=> {
+                mockEntryModel.find = jest.fn().mockRejectedValueOnce(new Error("something went wrong"));
+
+                const date = new Date();
+                const mongoService = new MongoDBService(mockEntryModel, EntryTypes.JOURNAL);
+                
+                await expect(mongoService.getEntryByDate(date)).rejects.toThrow(Error);
+            });
+        });
     });
     describe("Update Entry", () => {
         describe("Mood", () => {
