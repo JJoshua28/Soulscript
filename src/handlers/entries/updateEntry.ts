@@ -3,13 +3,13 @@ import { Request } from "express";
 import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../../types/entries";
 import CustomMoodErrors from "../../types/error";
 
-import MongoDBService from "../../adapters/mongoDBService";
+import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import { validDate } from "../../helpers/validateDate";
 import UpdateEntryUseCase from "../../use cases/updateEntry";
 import entryModel from "../../services/mongoDB/models/entry";
 
 const handleUpdateEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
-    const entryService = new MongoDBService(entryModel, type);
+    const entryService = new MongoDBEntryService(entryModel, type);
     const updateEntryUseCase = new UpdateEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id || req?.body?.update?.type) throw new Error(CustomMoodErrors.INVALID_REQUEST);

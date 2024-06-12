@@ -1,14 +1,14 @@
 import { Model } from "mongoose";
 
-import { CustomEntry, Entry, EntryTypes, NewEntry } from "../types/entries";
-import CustomMoodErrors from "../types/error";
-import { EntryService } from "../ports/entryService";
-import EntryDocument from "../services/mongoDB/types/document";
+import { CustomEntry, Entry, EntryTypes, NewEntry } from "../../types/entries";
+import CustomMoodErrors from "../../types/error";
+import { EntryService } from "../../ports/entryService";
+import EntryDocument from "../../services/mongoDB/types/document";
 
-import { mapDocumentToEntry, mapDocumentsToEntry } from "../mappers/mongoDB/documents";
-import { getByDateQuery } from "../services/mongoDB/queries/moodEntry";
+import { mapDocumentToEntry, mapDocumentsToEntry } from "../../mappers/mongoDB/documents";
+import { getByDateQuery } from "../../services/mongoDB/queries/moodEntry";
 
-class MongoDBService implements EntryService {
+class MongoDBEntryService implements EntryService {
     private model: Model<EntryDocument>;
     private entryType: EntryTypes;
     constructor(model: Model<EntryDocument>, entryType: EntryTypes) {
@@ -82,4 +82,4 @@ class MongoDBService implements EntryService {
     }
 }
 
-export default MongoDBService;
+export default MongoDBEntryService;

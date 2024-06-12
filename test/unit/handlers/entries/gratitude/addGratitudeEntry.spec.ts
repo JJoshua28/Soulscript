@@ -85,8 +85,7 @@ describe("Add Gratitude entry helper", () => {
         ${{content: ["test"], datetime: new Date("3030").toString()}}
         ${{tags: []}}
         `("should throw an error because request body $requestBody is not valid", async ({requestBody})=>{
-            {} 
-    
+   
             const request = { body: requestBody } as Request
 
             await expect(handleAddGratitudeEntry(request)).rejects.toThrow(Error);

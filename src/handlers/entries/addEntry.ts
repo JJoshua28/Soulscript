@@ -5,14 +5,14 @@ import CustomErrors from "../../types/error";
 import { Entry, EntryTypes } from "../../types/entries";
 
 import { validDate } from "../../helpers/validateDate";
-import MongoDBService from "../../adapters/mongoDBService";
+import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import AddEntryUseCase from "../../use cases/addEntry";
 import entryModel from "../../services/mongoDB/models/entry";
 import mapNewEntry from "../../mappers/newEntry";
 
 const handleAddEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
     if(!req.body?.content || typeof req.body?.content != "string" || req?.body?.content === " ") throw new Error(CustomErrors.INVALID_REQUEST);
-    const entryService = new MongoDBService(entryModel, type);
+    const entryService = new MongoDBEntryService(entryModel, type);
     const addEntryUseCase = new AddEntryUseCase(entryService);
 
     const {datetime} = (req.body as { datetime?: string });

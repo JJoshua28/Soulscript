@@ -9,7 +9,7 @@ import EntryDocument from "../../../src/services/mongoDB/types/document";
 
 import AddEntryUseCase from "../../../src/use cases/addEntry"
 import { defaultMoodEntry } from "../../data/moodEntry";
-import MongoDBService from "../../../src/adapters/mongoDBService";
+import MongoDBEntryService from "../../../src/adapters/mongoDB/entryService";
 import { createNewEntry } from "../../data/helpers/customEntry";
 import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
 import mongooseMemoryDB from "../../services/mongoDB/config";
@@ -39,7 +39,7 @@ describe("Mood Entry", () => {
                 ${Date()}                 | ${"mood entry with todays date"}
             `("should add a $message", async ({date}) => {
                 const entry = createNewEntry(defaultMoodEntry, {datetime: date})
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.addEntry(entry);
                        
                 expect(response).toEqual(expect.objectContaining(defaultEntryExpectation));
@@ -60,7 +60,7 @@ describe("Mood Entry", () => {
                 ${"type"}
                 ${"tags"}
             `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
-                const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const entryService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
                 delete entry[propertyToDelete];
@@ -84,13 +84,13 @@ describe("Mood Entry", () => {
                 ${new Date("2015-05-15")}   | ${1}        
                 ${new Date("2018-01-01")}   | ${0}      
             `("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.getEntryByDate(date);
                        
                 expect(response).toHaveLength(arrayLength);             
             });
             it("should return a mood entry document", async ()=>{
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
                 const {datetime} = response;
 
@@ -98,7 +98,7 @@ describe("Mood Entry", () => {
                 expect(datetime).toEqual(currentDate);            
             })
             it("should return an empty array if no entries exist for that date", async ()=>{
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.getEntryByDate(new Date("2000-05-30"));
 
                 expect(response).toStrictEqual(expect.arrayContaining([]))
@@ -121,7 +121,7 @@ describe("Mood Entry", () => {
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
                 
                 const {_id: id} = document
-                const mongoService =  new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService =  new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.updateEntry((id.toString()), updates);
                         
                 expect(response.id).toEqual(document._id.toString());
@@ -136,7 +136,7 @@ describe("Mood Entry", () => {
             it("should throw an error if no documents exists for that ID", async ()=> {
                 const id = new mongoose.Types.ObjectId();
                 const update = {quote: " "};
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
             })
             
@@ -150,8 +150,8 @@ describe("Mood Entry", () => {
                 const documents =  await entryModel.find<EntryDocument>({});
                 const [document] = documents; 
     
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const response  = await mongoDBService.deleteEntry(document._id.toString());
+                const mongoDBEntryService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
+                const response  = await mongoDBEntryService.deleteEntry(document._id.toString());
                 
                 expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
@@ -173,10 +173,10 @@ describe("Mood Entry", () => {
         describe("Negative Tests", ()=> {
 
             it("should throw and error if no documents exists with that ID", async () => {
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoDBEntryService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const id = new mongoose.Types.ObjectId();
                 
-                await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
+                await expect(mongoDBEntryService.deleteEntry(id.toString())).rejects.toThrow(Error);
             })
         })
     });
@@ -198,7 +198,7 @@ describe("Gratitude Entry", () => {
                 ${new Date(moment().format("YYYY-MM-DD HH:MM:ss"))} | ${"today's date"}
             `("should add a gratitude entry with $message", async ({date}) => {
                 const entry = createNewEntry (defaultGratitudeEntry, {datetime: date})
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.addEntry(entry);
                        
                 expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
@@ -219,7 +219,7 @@ describe("Gratitude Entry", () => {
                 ${"type"}
                 ${"tags"}
             `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
-                const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const entryService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
                 delete entry[propertyToDelete];
@@ -237,13 +237,13 @@ describe("Gratitude Entry", () => {
                 ${new Date("2015-05-15")}                                       | ${1}        
                 ${new Date("2018-01-01")}                                       | ${0}      
             `("should find $arrayLength gratitude entries with date add a $message", async ({date, arrayLength}) => {
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.getEntryByDate(date);
                        
                 expect(response).toHaveLength(arrayLength);             
             });
             it("should return a gratitude entry document", async ()=>{
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const [response] = await mongoService.getEntryByDate(new Date("2020-10-25"));
                 const {datetime} = response;
 
@@ -251,7 +251,7 @@ describe("Gratitude Entry", () => {
                 expect(datetime).toEqual(new Date("2020-10-25"));            
             })
             it("should return an empty array if no entries exist for that date", async ()=>{
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.getEntryByDate(new Date("2000-05-30"));
 
                 expect(response).toStrictEqual(expect.arrayContaining([]))
@@ -273,7 +273,7 @@ describe("Gratitude Entry", () => {
 
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
     
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.updateEntry(document._id.toString(), updates);
                         
                 expect(response.id).toEqual(document._id.toString());
@@ -288,7 +288,7 @@ describe("Gratitude Entry", () => {
             it("should throw an error if no documents exists for that ID", async ()=> {
                 const id = new mongoose.Types.ObjectId();
                 const update = {quote: " "};
-                const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
             })
             
@@ -302,8 +302,8 @@ describe("Gratitude Entry", () => {
                 const documents =  await entryModel.find<EntryDocument>({});
                 const [document] = documents; 
     
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
-                const response  = await mongoDBService.deleteEntry(document._id.toString());
+                const mongoDBEntryService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
+                const response  = await mongoDBEntryService.deleteEntry(document._id.toString());
                 
                 expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
@@ -325,10 +325,10 @@ describe("Gratitude Entry", () => {
         describe("Negative Tests", ()=> {
 
             it("should throw and error if no documents exists with that ID", async () => {
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
+                const mongoDBEntryService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
                 const id = new mongoose.Types.ObjectId();
                 
-                await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
+                await expect(mongoDBEntryService.deleteEntry(id.toString())).rejects.toThrow(Error);
             })
         })
     });
@@ -356,7 +356,7 @@ describe("Journal Entry", () => {
                 ${new Date()}             | ${"today's date"}
             `("should add a journal entry with $message", async ({ date }) => {
                 const entry = { ...defaultJournalEntry, datetime: date };
-                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 
                 const response = await mongoService.addEntry(entry);
 
@@ -382,7 +382,7 @@ describe("Journal Entry", () => {
                 ${"type"}
                 ${"tags"}
             `("should throw an error if a journal entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
-                const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const entryService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
                 delete entry[propertyToDelete];
@@ -406,13 +406,13 @@ describe("Journal Entry", () => {
                 ${new Date("2015-05-15")}                                       | ${1}        
                 ${new Date("2018-01-01")}                                       | ${0}      
             `("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
-                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 const response = await mongoService.getEntryByDate(date);
                        
                 expect(response).toHaveLength(arrayLength);             
             });
             it("should return a journal entry document", async () => {
-                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
               
                 expect(response).toHaveProperty("id", expect.any(String));
@@ -427,7 +427,7 @@ describe("Journal Entry", () => {
             });
             
             it("should return an empty array if no entries exist for that date", async ()=>{
-                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 const response = await mongoService.getEntryByDate(new Date("2000-05-30"));
 
                 expect(response).toStrictEqual(expect.arrayContaining([]))
@@ -450,7 +450,7 @@ describe("Journal Entry", () => {
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
                 
                 const {_id: id} = document
-                const mongoService =  new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService =  new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 const response = await mongoService.updateEntry((id.toString()), updates);
                         
                 expect(response.id).toEqual(document._id.toString());
@@ -465,7 +465,7 @@ describe("Journal Entry", () => {
             it("should throw an error if no documents exists for that ID", async ()=> {
                 const id = new mongoose.Types.ObjectId();
                 const update = {quote: " "};
-                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const mongoService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
                 await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error);
             });
             
@@ -477,8 +477,8 @@ describe("Journal Entry", () => {
                 const documents =  await entryModel.find<EntryDocument>({type: EntryTypes.JOURNAL});
                 const [document] = documents; 
     
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
-                const response  = await mongoDBService.deleteEntry(document._id.toString());
+                const entryService = new MongoDBEntryService(entryModel, EntryTypes.JOURNAL);
+                const response  = await entryService.deleteEntry(document._id.toString());
                 
                 expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
@@ -500,7 +500,7 @@ describe("Journal Entry", () => {
         describe("Negative Tests", ()=> {
 
             it("should throw and error if no documents exists with that ID", async () => {
-                const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const mongoDBService = new MongoDBEntryService(entryModel, EntryTypes.MOOD);
                 const id = new mongoose.Types.ObjectId();
                 
                 await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
