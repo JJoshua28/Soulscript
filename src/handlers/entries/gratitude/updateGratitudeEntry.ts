@@ -1,5 +1,4 @@
 import { Request } from "express";
-
 import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../../../types/entries";
 import CustomMoodErrors from "../../../types/error";
 
@@ -25,7 +24,6 @@ const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
 
     if(update?.datetime) update = {
         ...update,
-        datetime: new Date(update?.datetime)
     } as CustomEntry;
 
     const entryUpdate:CustomEntry = {...update  as CustomEntry} 

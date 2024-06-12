@@ -1,10 +1,10 @@
 import express, {Express, Router, Request, Response} from "express";
 
 import handleErrorMapper from "../../mappers/handleErrors";
-
-import handleAddJournalEntry from "../../handlers/entries/journal/addJournalEntry";
-import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
 import { EntryTypes } from "../../types/entries";
+
+import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
+import handleAddEntry from "../../handlers/entries/addEntry";
 
 const app:Express = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ app.use(express.json());
 const journalRouter: Router = express.Router();
 
 journalRouter.post("/add-entry", (req: Request, res: Response) => {
-    handleAddJournalEntry(req)
+    handleAddEntry(req, EntryTypes.JOURNAL)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
