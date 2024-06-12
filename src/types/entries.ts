@@ -1,14 +1,12 @@
-import mongoose from "mongoose";
-
 export enum EntryTypes {
   MOOD = "mood",
   JOURNAL = "journal",
   GRATITUDE = "gratitude",
- };
+ }
 
 export interface NewEntryRequest {
   content: string | string[];
-  sharedID?: mongoose.Types.ObjectId;
+  sharedID?: string;
   subject?: string;
   quote?: string;
   tags?: string[];
@@ -17,7 +15,7 @@ export interface NewEntryRequest {
 
 export interface NewEntry {
     type: EntryTypes;
-    sharedID: mongoose.Types.ObjectId | null;
+    sharedID: string | null;
     subject: string | null;
     quote: string | null;
     tags: string[];
@@ -26,15 +24,15 @@ export interface NewEntry {
 }
 
 export interface Entry extends NewEntry {
-  id: mongoose.Types.ObjectId,
+  id: string,
 }
 
 export interface NewCustomEntry {
-  sharedID?: mongoose.Types.ObjectId | null,
+  sharedID?: string | null,
   subject?: string | null,
   quote?: string | null,
   tags?: string[],
-  datetime?: Date
+  datetime?: Date,
   content?: string | string[],
 }
 

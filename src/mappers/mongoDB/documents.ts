@@ -3,7 +3,6 @@ import { Entry } from "../../types/entries";
 
 export const mapDocumentToEntry = (document: EntryDocument):Entry => {
     const {
-        _id:id,
         sharedID, 
         type, 
         subject, 
@@ -12,6 +11,8 @@ export const mapDocumentToEntry = (document: EntryDocument):Entry => {
         datetime, 
         content 
     } = document
+
+    const id = document._id.toString();
     const mappedEntry: Entry = {
         id,
         sharedID,
@@ -28,7 +29,6 @@ export const mapDocumentToEntry = (document: EntryDocument):Entry => {
 export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
     const mappedMoodEntries = document.map(document => {
         const {
-            _id:id, 
             type,
             sharedID, 
             subject, 
@@ -37,6 +37,8 @@ export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
             content, 
             datetime 
         } = document
+
+        const id = document._id.toString();
         const mappedMoodEntry: Entry = {
             id,
             sharedID,

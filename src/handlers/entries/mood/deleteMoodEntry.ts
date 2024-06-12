@@ -1,5 +1,4 @@
 import { Request } from "express";
-import mongoose from "mongoose";
 
 import { Entry, EntryTypes } from "../../../types/entries";
 import CustomMoodErrors from "../../../types/error";
@@ -14,12 +13,9 @@ const handleDeleteMoodEntry = async (req: Request): Promise<Entry> => {
     const deleteMoodUseCase = new DeleteEntryUseCase(entryService);
     
     if(!req.body.id) throw  new Error(CustomMoodErrors.INVALID_REQUEST)
-    let {id} 
-        : {
-            id: mongoose.Types.ObjectId,
-        } = (req.body as {
-        id: mongoose.Types.ObjectId, 
-    }) 
+    const {id} = (req.body as {
+        id: string, 
+    })  
     return await deleteMoodUseCase.execute(id);
 }
 

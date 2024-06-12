@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Request } from "express";
 
-import CustomErrors from '../../../types/error';
+import CustomErrors from "../../../types/error";
 import { Entry, EntryTypes } from "../../../types/entries";
 
 import MongoDBService from "../../../adapters/mongoDBService";

@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "test": "jest ./test/*",
     "start": "tsc && mongod --port 27017 & node dist/index.js",
     "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & killall mongod & killall jest",
@@ -17,6 +18,7 @@
   "author": "Joshua",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^8.56.0",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
@@ -26,11 +28,19 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20.12.7",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
+    "globals": "^15.4.0",
     "mockingoose": "^2.16.2",
     "mongodb-memory-server": "^9.2.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.0",
+    "uuid": "^10.0.0",
     "wait-for-expect": "^3.0.2"
   },
   "dependencies": {

@@ -249,7 +249,7 @@ describe("Entry", ()=> {
                     mockEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
                     const mongoService = new MongoDBService(mockEntryModel, EntryTypes.MOOD);
                     
-                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
+                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId().toString(), update)).rejects.toThrow(Error);
                     
                 } )
     
@@ -272,12 +272,12 @@ describe("Entry", ()=> {
                     mockEntryModel.findByIdAndUpdate = jest.fn().mockResolvedValue(entry);
                     const mongoService = new MongoDBService(mockEntryModel, EntryTypes.GRATITUDE);
                     
-                    const response =  await mongoService.updateEntry(entry._id, update);
+                    const response =  await mongoService.updateEntry(entry._id.toString(), update);
                     
                     expect(response).toEqual(expect.objectContaining(gratitudeEntryExpectation));
         
                     expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
-                    expect(response).toHaveProperty("id", entry._id);
+                    expect(response).toHaveProperty("id", entry._id.toString());
 
                 });
             })
@@ -287,7 +287,7 @@ describe("Entry", ()=> {
                     mockEntryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error());
                     const mongoService = new MongoDBService(mockEntryModel, EntryTypes.GRATITUDE);
                     
-                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId(), update)).rejects.toThrow(Error);
+                    await expect(mongoService.updateEntry(new mongoose.Types.ObjectId().toString(), update)).rejects.toThrow(Error);
                     
                 } )
     
@@ -297,11 +297,11 @@ describe("Entry", ()=> {
     describe("Delete entry", () => {
         jest.mock("../../../src/services/mongoDB/models/entry");
         const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+        const mongooseID = new mongoose.Types.ObjectId().toString();
         describe("Mood", () => {    
             describe("Positive Tests", ()=> {
                 it("should remove a mood entry and return it",  async () => {
                     const document =  createEntryDocument(defaultMoodEntry);
-                    const mongooseID = new mongoose.Types.ObjectId();
                     
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(document);
         
@@ -314,8 +314,6 @@ describe("Entry", ()=> {
             })
             describe("Negative Tests", () => {
                 it("should throw a error if no document exists with that ID", async () => {
-                    const mongooseID = new mongoose.Types.ObjectId();
-                    
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(null);
             
                     const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.MOOD);
@@ -324,8 +322,6 @@ describe("Entry", ()=> {
                     expect(mockGratitudeEntryModel.findByIdAndDelete).toHaveBeenCalledWith(mongooseID);
                 })
                 it("should throw and error if something goes wrong when trying to delete a document", async () => {
-                    const mongooseID = new mongoose.Types.ObjectId();
-                    
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockRejectedValue(new Error());
         
                     const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.MOOD);
@@ -340,7 +336,6 @@ describe("Entry", ()=> {
             describe("Positive Tests", ()=> {
                 it("should remove a gratitude entry and return it",  async () => {
                     const document =  createEntryDocument(defaultGratitudeEntry);
-                    const mongooseID = new mongoose.Types.ObjectId();
                     
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(document);
     
@@ -352,9 +347,7 @@ describe("Entry", ()=> {
                 });
             })
             describe("Negative Tests", () => {
-                it("should throw a error if no document exists with that ID", async () => {
-                    const mongooseID = new mongoose.Types.ObjectId();
-                    
+                it("should throw a error if no document exists with that ID", async () => {                 
                     jest.spyOn(mockGratitudeEntryModel, "findByIdAndDelete").mockResolvedValue(null);
             
                     const entryService  = new MongoDBService(mockGratitudeEntryModel, EntryTypes.GRATITUDE);

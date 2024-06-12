@@ -1,12 +1,12 @@
-import express, {Express, Request, Response, Router} from 'express';
+import express, {Express, Request, Response, Router} from "express";
 
-import { EntryTypes } from '../../types/entries';
-import handleErrorMapper from '../../mappers/handleErrors';
+import { EntryTypes } from "../../types/entries";
+import handleErrorMapper from "../../mappers/handleErrors";
 
-import handleAddMoodEntry from '../../handlers/entries/mood/addMoodEntry';
-import handleGetEntryByDate from '../../handlers/entries/getEntryByDate';
-import handleUpdateMoodEntry from '../../handlers/entries/mood/updateMoodEntry';
-import handleDeleteMoodEntry from '../../handlers/entries/mood/deleteMoodEntry';
+import handleAddMoodEntry from "../../handlers/entries/mood/addMoodEntry";
+import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
+import handleUpdateMoodEntry from "../../handlers/entries/mood/updateMoodEntry";
+import handleDeleteMoodEntry from "../../handlers/entries/mood/deleteMoodEntry";
 
 const app:Express = express();
 app.use(express.json());

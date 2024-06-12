@@ -1,5 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
+
 
 import { EntryTypes, NewEntry } from "../../../src/types/entries";
 
@@ -8,7 +10,7 @@ import EntryDocument from "../../../src/services/mongoDB/types/document";
 export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>) => {
     const gratitudeEntry:NewEntry = {
         type: EntryTypes.GRATITUDE,
-        sharedID: new mongoose.Types.ObjectId(),
+        sharedID: uuidv4(),
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         tags: ["test"],
@@ -37,7 +39,7 @@ export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>) =>
 
 export const seedMoodEntryTestData = async (model: Model<EntryDocument>) => {
     const defaultMoodEntry:NewEntry = {
-        sharedID: new mongoose.Types.ObjectId(),
+        sharedID: uuidv4(),
         type: EntryTypes.MOOD,
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -56,7 +58,7 @@ export const seedMoodEntryTestData = async (model: Model<EntryDocument>) => {
 
 export const seedJournalEntryTestData = async (model: Model<EntryDocument>) => {
     const defaultJournalEntry:NewEntry = {
-        sharedID: new mongoose.Types.ObjectId(),
+        sharedID: uuidv4(),
         type: EntryTypes.JOURNAL,
         subject: "test data",
         quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
