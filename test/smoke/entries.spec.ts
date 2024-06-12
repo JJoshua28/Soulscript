@@ -373,7 +373,7 @@ describe("Entry smoke tests", () => {
         describe("DEL /api/gratitude/remove-entry", () => {
             const url = "/api/gratitude/remove-entry";
             describe("Positive Tests", () => {
-                it("should remove the mood entry by id", async () => {
+                it("should remove the gratitude entry by id", async () => {
         
                     const response = await request(app)
                     .del(url)
@@ -577,6 +577,54 @@ describe("Entry smoke tests", () => {
                 })
             })
     
+        });
+        describe("DEL /api/journal/remove-entry", () => {
+            const url = "/api/journal/remove-entry";
+            describe("Positive Tests", () => {
+                it("should remove the journal entry by id", async () => {
+                    const {id} = journalEntry;
+        
+                    const response = await request(app)
+                    .del(url)
+                    .send({id})
+                    .expect(200);
+        
+                    expect(response.body.id).toEqual(id);
+                    expect(response.body.datetime).toEqual(journalEntry.datetime);
+        
+                    
+                    expect(response.body).toHaveProperty("datetime", expect.any(String));
+                    expect(response.body.quote).toEqual(expect.any(String));
+                    expect(response.body.subject).toEqual(expect.any(String));
+                    expect(response.body.sharedID).toEqual(null);
+                    expect(response.body.tags).toEqual(expect.arrayContaining([expect.any(String)]));
+                    expect(response.body.id).toEqual(expect.any(String));
+                    expect(response.body.type).toEqual(EntryTypes.JOURNAL);
+        
+                    await waitForExpect(async () => {
+                        await request(app)
+                        .get("/api/journal/get-entry-by-date")
+                        .send({datetime: journalEntry.datetime})
+                        .expect(204)
+                    });
+        
+        
+        
+                });
+            });
+            describe("Negative Tests", () => {
+                it("should throw 404 when attempting a valid delete an entry with an ID that does not exist", async () => {
+                    const deleteRequest = {
+                        id: new mongoose.Types.ObjectId(),
+                    };
+                    const response = await request(app)
+                        .del(url)
+                        .send(deleteRequest)
+                        .expect(HttpErrorCode.NOT_FOUND);
+        
+                    expect(response).toHaveProperty("text", expect.any(String))
+                });
+            })
         });
 
         afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );

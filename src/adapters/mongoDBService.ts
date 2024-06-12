@@ -36,19 +36,23 @@ class MongoDBService implements EntryService {
     }
     async updateEntry(id: string, update: CustomEntry): Promise<Entry> {
         try {
+            const entryToUpdate = await this.model.findById(id);
+            if(!entryToUpdate) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(entryToUpdate.type != this.entryType) throw new Error(CustomMoodErrors.INVALID_ENTRY_TYPE);
+
             const options = {
                 new: true,
                 runValidators: true,
                 returnDocument: "after" as const
             }
             const response = await this.model.findByIdAndUpdate(id, update, options);
-            if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if(!response) throw new Error();
+           
             const mappedMoodEntry = mapDocumentToEntry((response));
             return mappedMoodEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message);
+                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID || error.message === CustomMoodErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error.message}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);
@@ -57,15 +61,18 @@ class MongoDBService implements EntryService {
     }
     async deleteEntry(id: string): Promise<Entry>  {
         try {
+            const entryToDelete = await this.model.findById(id);
+            if(!entryToDelete) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
+            if(entryToDelete.type != this.entryType) throw new Error(CustomMoodErrors.INVALID_ENTRY_TYPE);
+
             const response = await this.model.findByIdAndDelete(id);
 
-            if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if (!response) throw new Error();
 
             return response && mapDocumentToEntry(response);
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message);
+                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID || error.message === CustomMoodErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to remove a document with ID: ${id}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);

@@ -2,7 +2,7 @@ import { Request } from "express";
 import CustomMoodErrors, { StructureErrorResponse, HttpErrorCode } from "../types/error";
 
 const handleErrorMapper = (message: CustomMoodErrors | string, req: Request): StructureErrorResponse => {
-    if(message === CustomMoodErrors.INVALID_DATE || message === CustomMoodErrors.INVALID_REQUEST) return {
+    if(message === CustomMoodErrors.INVALID_DATE || message === CustomMoodErrors.INVALID_REQUEST || message === CustomMoodErrors.INVALID_ENTRY_TYPE) return {
         message: `${message}: ${JSON.stringify(req.body)}`,
         statusCode: HttpErrorCode.BAD_REQUEST
     }
@@ -10,6 +10,8 @@ const handleErrorMapper = (message: CustomMoodErrors | string, req: Request): St
         message: `${message}: ${JSON.stringify(req.body)}`,
         statusCode: HttpErrorCode.NOT_FOUND
     }
+    
+
     return {
         message,
         statusCode: HttpErrorCode.INTERNAL_ERROR
