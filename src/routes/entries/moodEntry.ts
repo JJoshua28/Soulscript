@@ -6,7 +6,7 @@ import handleErrorMapper from "../../mappers/handleErrors";
 import handleAddEntry from "../../handlers/entries/addEntry";
 import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
 import handleUpdateEntry from "../../handlers/entries/updateEntry";
-import handleDeleteMoodEntry from "../../handlers/entries/mood/deleteMoodEntry";
+import handleDeleteEntry from "../../handlers/entries/deleteEntry";
 
 const app:Express = express();
 app.use(express.json());
@@ -42,16 +42,16 @@ moodRouter.put("/update-entry", (req: Request, res: Response) => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
-})
+});
 
 moodRouter.delete("/remove-entry", (req: Request, res: Response) => {
-    handleDeleteMoodEntry(req)
+    handleDeleteEntry(req, EntryTypes.MOOD)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
-})
+});
 
 
 export default moodRouter;

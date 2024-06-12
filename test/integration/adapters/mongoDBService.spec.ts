@@ -18,7 +18,7 @@ import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
 import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../data/helpers/addTestEntries";
 import { defaultJournalEntry } from "../../data/journalEntry";
 
-describe("Mood Entry", ()=>{
+describe("Mood Entry", () => {
     beforeAll(async ()=> {
         await mongooseMemoryDB.setupTestEnvironment();
     });
@@ -151,7 +151,7 @@ describe("Mood Entry", ()=>{
                 const [document] = documents; 
     
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const response  = await mongoDBService.deleteEntry(document._id.toString()) as EntryDocument;
+                const response  = await mongoDBService.deleteEntry(document._id.toString());
                 
                 expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
@@ -303,7 +303,7 @@ describe("Gratitude Entry", () => {
                 const [document] = documents; 
     
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
-                const response  = await mongoDBService.deleteEntry(document._id.toString()) as EntryDocument;
+                const response  = await mongoDBService.deleteEntry(document._id.toString());
                 
                 expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
@@ -470,5 +470,41 @@ describe("Journal Entry", () => {
             });
             
         });
+    });
+    describe("DELETE /api/journal/remove-entry", () => {
+        describe("Positive Tests", ()=> {
+            it("should delete a document with the specified ID and return that document", async () => {
+                const documents =  await entryModel.find<EntryDocument>({type: EntryTypes.JOURNAL});
+                const [document] = documents; 
+    
+                const mongoDBService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const response  = await mongoDBService.deleteEntry(document._id.toString());
+                
+                expect(response.id).toEqual(document._id.toString());
+                expect(response).toEqual(expect.objectContaining({
+                    type: document.type,
+                    subject: document.subject,
+                    quote: document.quote,
+                    tags: document.tags,
+                    content: document.content,
+                    datetime: document.datetime 
+                }));
+                await waitForExpect(async () => {
+                    const foundDocument = await entryModel.findById(document._id);
+                    expect(foundDocument).toBeNull();
+                });
+
+
+            });
+        })
+        describe("Negative Tests", ()=> {
+
+            it("should throw and error if no documents exists with that ID", async () => {
+                const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
+                const id = new mongoose.Types.ObjectId();
+                
+                await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
+            })
+        })
     });
 });

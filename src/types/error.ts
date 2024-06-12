@@ -1,7 +1,8 @@
 enum CustomMoodErrors {
     INVALID_DATE = "Invalid date",
     INVALID_REQUEST = "Invalid request",
-    INVALID_ENTRY_ID = "No entry exists with ID"
+    INVALID_ENTRY_ID = "No entry exists with ID",
+    INVALID_ENTRY_TYPE = "The request entry type does not match the received entry type"
 }
 
 export enum HttpErrorCode  {
