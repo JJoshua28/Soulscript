@@ -5,6 +5,7 @@ import { EntryTypes } from "../../types/entries";
 
 import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
 import handleAddEntry from "../../handlers/entries/addEntry";
+import handleUpdateEntry from "../../handlers/entries/updateEntry";
 
 const app:Express = express();
 app.use(express.json());
@@ -31,6 +32,15 @@ journalRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
 });
+
+journalRouter.put("/update-entry", (req: Request, res: Response) => {
+    handleUpdateEntry(req, EntryTypes.JOURNAL)
+    .then(response => res.status(200).send(response))
+    .catch(error => {
+        const errorResponse = handleErrorMapper(error.message, req);
+        res.status(errorResponse.statusCode).send(errorResponse.message)
+    });
+})
 
 
 export default journalRouter;

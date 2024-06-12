@@ -5,7 +5,7 @@ import handleErrorMapper from "../../mappers/handleErrors";
 
 import handleAddEntry from "../../handlers/entries/addEntry";
 import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
-import handleUpdateEntry from "../../handlers/entries/mood/updateMoodEntry";
+import handleUpdateEntry from "../../handlers/entries/updateEntry";
 import handleDeleteMoodEntry from "../../handlers/entries/mood/deleteMoodEntry";
 
 const app:Express = express();
@@ -36,7 +36,7 @@ moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
 });
 
 moodRouter.put("/update-entry", (req: Request, res: Response) => {
-    handleUpdateEntry(req)
+    handleUpdateEntry(req, EntryTypes.MOOD)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);
