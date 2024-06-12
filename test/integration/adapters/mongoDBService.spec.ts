@@ -1,9 +1,9 @@
 import { Request } from "express";
 import mongoose from "mongoose";
-import waitForExpect from 'wait-for-expect';
+import waitForExpect from "wait-for-expect";
 import moment from "moment";
 
-import { EntryTypes, NewEntry } from "../../../src/types/entries";
+import { EntryTypes } from "../../../src/types/entries";
 import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../assertions/entries" 
 import EntryDocument from "../../../src/services/mongoDB/types/document";
 
@@ -37,8 +37,7 @@ describe("Mood Entry", ()=>{
                 ${new Date("2020")}       | ${"mood entry with a previous custom date in 2020"}
                 ${new Date("2022-03-22")} | ${"mood entry with a previous custom date in 2022"}
                 ${Date()}                 | ${"mood entry with todays date"}
-            `
-            ("should add a $message", async ({date}) => {
+            `("should add a $message", async ({date}) => {
                 const entry = createNewEntry(defaultMoodEntry, {datetime: date})
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.addEntry(entry);
@@ -60,8 +59,7 @@ describe("Mood Entry", ()=>{
                 ${"subject"}
                 ${"type"}
                 ${"tags"}
-            `
-            ("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
+            `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                 const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
@@ -85,8 +83,7 @@ describe("Mood Entry", ()=>{
                 ${new Date(new Date(moment().startOf("day").toISOString()))}                   | ${2}        
                 ${new Date("2015-05-15")}   | ${1}        
                 ${new Date("2018-01-01")}   | ${0}      
-            `
-            ("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
+            `("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const response = await mongoService.getEntryByDate(date);
                        
@@ -120,12 +117,7 @@ describe("Mood Entry", ()=>{
                 ${{datetime: new Date("2015-05-15"), content: "depressed"}}               | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
             `("should update a mood entry with data $updates", async ({findQuery, updates}) => {
         
-                let document = await entryModel.findOne(findQuery);
-                const options = {
-                    new: true,
-                    runValidators: true,
-                    returnDocument: "after" as "after"
-                }
+                const document = await entryModel.findOne(findQuery);
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
                 
                 const {_id: id} = document
@@ -204,8 +196,7 @@ describe("Gratitude Entry", () => {
                 date                                                | message
                 ${new Date("2020")}                                 | ${"a previous custom date in 2020"}
                 ${new Date(moment().format("YYYY-MM-DD HH:MM:ss"))} | ${"today's date"}
-            `
-            ("should add a gratitude entry with $message", async ({date}) => {
+            `("should add a gratitude entry with $message", async ({date}) => {
                 const entry = createNewEntry (defaultGratitudeEntry, {datetime: date})
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.addEntry(entry);
@@ -227,8 +218,7 @@ describe("Gratitude Entry", () => {
                 ${"subject"}
                 ${"type"}
                 ${"tags"}
-            `
-            ("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
+            `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                 const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
@@ -246,8 +236,7 @@ describe("Gratitude Entry", () => {
                 ${new Date(new Date(moment().startOf("day").toISOString()))}    | ${3}        
                 ${new Date("2015-05-15")}                                       | ${1}        
                 ${new Date("2018-01-01")}                                       | ${0}      
-            `
-            ("should find $arrayLength gratitude entries with date add a $message", async ({date, arrayLength}) => {
+            `("should find $arrayLength gratitude entries with date add a $message", async ({date, arrayLength}) => {
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
                 const response = await mongoService.getEntryByDate(date);
                        
@@ -280,13 +269,8 @@ describe("Gratitude Entry", () => {
                 ${{datetime: new Date("2020-10-25"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."] }}                                            | ${{content: ["I'm grateful because I see ghosts!"], quote: "I am the stone that the builder refused"}}
                 ${{datetime: new Date("2015-05-15"), content: ["sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."] }}                                                         | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
             `("should update a mood entry with data $updates", async ({findQuery, updates}) => {
-        
-                let document = await entryModel.findOne(findQuery);
-                const options = {
-                    new: true,
-                    runValidators: true,
-                    returnDocument: "after" as "after"
-                }
+                const document = await entryModel.findOne(findQuery);
+
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
     
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
@@ -370,8 +354,7 @@ describe("Journal Entry", () => {
                 ${new Date("2020")}       | ${"a previous custom date in 2020"}
                 ${new Date("2022-03-22")} | ${"a previous custom date in 2022"}
                 ${new Date()}             | ${"today's date"}
-            `
-            ("should add a journal entry with $message", async ({ date }) => {
+            `("should add a journal entry with $message", async ({ date }) => {
                 const entry = { ...defaultJournalEntry, datetime: date };
                 const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
                 
@@ -398,8 +381,7 @@ describe("Journal Entry", () => {
                 ${"subject"}
                 ${"type"}
                 ${"tags"}
-            `
-            ("should throw an error if a journal entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
+            `("should throw an error if a journal entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                 const entryService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = Object.create(defaultMoodEntry);
@@ -413,7 +395,6 @@ describe("Journal Entry", () => {
 
     describe("GET /api/journal/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
-            const currentDate = new Date(new Date(moment().startOf("day").toISOString()));
             beforeAll(async ()=>{
                 await mongooseMemoryDB.tearDownTestEnvironment();
                 await mongooseMemoryDB.setupTestEnvironment();
@@ -424,8 +405,7 @@ describe("Journal Entry", () => {
                 ${new Date(new Date(moment().startOf("day").toISOString()))}    | ${2}        
                 ${new Date("2015-05-15")}                                       | ${1}        
                 ${new Date("2018-01-01")}                                       | ${0}      
-            `
-            ("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
+            `("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
                 const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
                 const response = await mongoService.getEntryByDate(date);
                        
@@ -454,5 +434,41 @@ describe("Journal Entry", () => {
                 expect(response.length).toStrictEqual(0);
             })
         })
+    });
+    describe("PUT /api/journal/update-entry", ()=> {
+        describe("Positive tests", ()=> {
+            seedMoodEntryTestData(entryModel);
+            it.each`
+                findQuery                                                                                               | updates
+                ${ {...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.JOURNAL) }} | ${{subject: "Moon River", datetime: new Date("2018-04-09"), tags: ["Lorum Ipsem"], content: "Which way do I go?" }}
+                ${{...getByDateQuery(new Date(new Date(moment().startOf("day").toISOString())), EntryTypes.JOURNAL) }}  | ${{quote: " "}}
+                ${{datetime: new Date("2020-10-25") }}                                                                  | ${{content: "Testin wide awake, I'm wide awake", quote: "I am the stone that the builder refused"}}
+                ${{datetime: new Date("2015-05-15") }}                                                                  | ${{quote: "I am the stone that the builder refused", tags: ["music"], subject: "Lorum Ipsem"}}
+            `("should update a journal entry with data $updates", async ({findQuery, updates}) => {
+        
+                const document = await entryModel.findOne(findQuery);
+                if(!document) throw new Error(`no document exist with query: ${findQuery}`);
+                
+                const {_id: id} = document
+                const mongoService =  new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                const response = await mongoService.updateEntry((id.toString()), updates);
+                        
+                expect(response.id).toEqual(document._id.toString());
+                expect(response).toMatchObject({
+                    ...updates,
+                    type: EntryTypes.JOURNAL
+                });
+                expect(response).not.toEqual(document);
+            })
+        })
+        describe("Negative Tests", () => {
+            it("should throw an error if no documents exists for that ID", async ()=> {
+                const id = new mongoose.Types.ObjectId();
+                const update = {quote: " "};
+                const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
+                await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error);
+            });
+            
+        });
     });
 });

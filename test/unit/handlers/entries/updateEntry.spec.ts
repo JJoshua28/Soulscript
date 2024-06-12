@@ -1,7 +1,8 @@
 import { Request } from "express"
 import mongoose from "mongoose"
 
-import handleUpdateMoodEntry from '../../../../../src/handlers/entries/mood/updateMoodEntry';
+import handleUpdateEntry from "../../../../src/handlers/entries/updateEntry";
+import { EntryTypes } from "../../../../src/types/entries";
 
 describe("Update mood entry", () => {
     it.each`
@@ -12,7 +13,7 @@ describe("Update mood entry", () => {
     ${{}}                           | ${""}
     `("should throw an error but $update and or $id are passed as arguments", async ({id, update})=> {
         const request = ({body:  {update, id}} as Request)
-        await expect(handleUpdateMoodEntry(request)).rejects.toThrow(Error);
+        await expect(handleUpdateEntry(request, EntryTypes.JOURNAL)).rejects.toThrow(Error);
     }, 12000)
 
 })
