@@ -1,3 +1,4 @@
+import mongoose, { Mongoose } from "mongoose";
 import EntryDocument from "../../../src/services/mongoDB/types/document";
 import {  Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
 
@@ -61,7 +62,7 @@ const createEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => {
     } = defaultDocument;
 
     return {
-        _id: id,
+        _id: mongoose.Types.ObjectId.createFromHexString(id),
         type,
         sharedID,
         subject,

@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import { Entry } from "../types/entries";
 import { EntryService } from "../ports/entryService";
 
@@ -8,7 +6,7 @@ class DeleteEntryUseCase {
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
     }
-    async execute (id: mongoose.Types.ObjectId): Promise<Entry> {
+    async execute (id: string): Promise<Entry> {
         return await this.entryService.deleteEntry(id);
     }
 }

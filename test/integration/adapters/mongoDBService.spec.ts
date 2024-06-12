@@ -127,11 +127,12 @@ describe("Mood Entry", ()=>{
                     returnDocument: "after" as "after"
                 }
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
-    
-                const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const response = await mongoService.updateEntry(document._id, updates);
+                
+                const {_id: id} = document
+                const mongoService =  new MongoDBService(entryModel, EntryTypes.MOOD);
+                const response = await mongoService.updateEntry((id.toString()), updates);
                         
-                expect(response.id).toEqual(document._id);
+                expect(response.id).toEqual(document._id.toString());
                 expect(response).toMatchObject({
                     ...updates,
                     type: EntryTypes.MOOD
@@ -144,7 +145,7 @@ describe("Mood Entry", ()=>{
                 const id = new mongoose.Types.ObjectId();
                 const update = {quote: " "};
                 const mongoService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                await expect(mongoService.updateEntry(id, update)).rejects.toThrow(Error)
+                await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
             })
             
         })
@@ -158,9 +159,9 @@ describe("Mood Entry", ()=>{
                 const [document] = documents; 
     
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
-                const response  = await mongoDBService.deleteEntry(document._id) as EntryDocument;
+                const response  = await mongoDBService.deleteEntry(document._id.toString()) as EntryDocument;
                 
-                expect(response.id).toEqual(document._id);
+                expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
                     type: document.type,
                     subject: document.subject,
@@ -183,7 +184,7 @@ describe("Mood Entry", ()=>{
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.MOOD);
                 const id = new mongoose.Types.ObjectId();
                 
-                await expect(mongoDBService.deleteEntry(id)).rejects.toThrow(Error);
+                await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
             })
         })
     });
@@ -200,8 +201,8 @@ describe("Gratitude Entry", () => {
     describe("POST /api/gratitude/add-entry", () => {
         describe("Positive Tests", () => {
             it.each`
-                date                      | message
-                ${new Date("2020")}       | ${"a previous custom date in 2020"}
+                date                                                | message
+                ${new Date("2020")}                                 | ${"a previous custom date in 2020"}
                 ${new Date(moment().format("YYYY-MM-DD HH:MM:ss"))} | ${"today's date"}
             `
             ("should add a gratitude entry with $message", async ({date}) => {
@@ -289,9 +290,9 @@ describe("Gratitude Entry", () => {
                 if(!document) throw new Error(`no document exist with query: ${findQuery}`);
     
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
-                const response = await mongoService.updateEntry(document._id, updates);
+                const response = await mongoService.updateEntry(document._id.toString(), updates);
                         
-                expect(response.id).toEqual(document._id);
+                expect(response.id).toEqual(document._id.toString());
                 expect(response).toMatchObject({
                     ...updates,
                     type: EntryTypes.GRATITUDE
@@ -304,7 +305,7 @@ describe("Gratitude Entry", () => {
                 const id = new mongoose.Types.ObjectId();
                 const update = {quote: " "};
                 const mongoService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
-                await expect(mongoService.updateEntry(id, update)).rejects.toThrow(Error)
+                await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
             })
             
         })
@@ -318,9 +319,9 @@ describe("Gratitude Entry", () => {
                 const [document] = documents; 
     
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
-                const response  = await mongoDBService.deleteEntry(document._id) as EntryDocument;
+                const response  = await mongoDBService.deleteEntry(document._id.toString()) as EntryDocument;
                 
-                expect(response.id).toEqual(document._id);
+                expect(response.id).toEqual(document._id.toString());
                 expect(response).toEqual(expect.objectContaining({
                     type: document.type,
                     subject: document.subject,
@@ -343,7 +344,7 @@ describe("Gratitude Entry", () => {
                 const mongoDBService = new MongoDBService(entryModel, EntryTypes.GRATITUDE);
                 const id = new mongoose.Types.ObjectId();
                 
-                await expect(mongoDBService.deleteEntry(id)).rejects.toThrow(Error);
+                await expect(mongoDBService.deleteEntry(id.toString())).rejects.toThrow(Error);
             })
         })
     });
@@ -434,7 +435,7 @@ describe("Journal Entry", () => {
                 const mongoService = new MongoDBService(entryModel, EntryTypes.JOURNAL);
                 const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
               
-                expect(response).toHaveProperty("id", expect.any(mongoose.Types.ObjectId));
+                expect(response).toHaveProperty("id", expect.any(String));
                 expect(response).toHaveProperty("type", EntryTypes.JOURNAL);
                 expect(response).toHaveProperty("content", expect.any(String));
                 expect(response).toHaveProperty("datetime", expect.any(Date));

@@ -1,12 +1,12 @@
-import express, {Express, Request, Response, Router} from 'express';
+import express, {Express, Request, Response, Router} from "express";
 
-import { EntryTypes } from '../../types/entries';
-import handleErrorMapper from '../../mappers/handleErrors';
+import { EntryTypes } from "../../types/entries";
+import handleErrorMapper from "../../mappers/handleErrors";
 
-import handleAddGratitudeEntry from '../../handlers/entries/gratitude/addGratitudeEntry';
-import handleUpdateGratitudeEntry from '../../handlers/entries/gratitude/updateGratitudeEntry';
-import handleDeleteGratitudeEntry from '../../handlers/entries/gratitude/deleteGratitudeEntry.ts';
-import handleGetEntryByDate from '../../handlers/entries/getEntryByDate';
+import handleAddGratitudeEntry from "../../handlers/entries/gratitude/addGratitudeEntry";
+import handleUpdateGratitudeEntry from "../../handlers/entries/gratitude/updateGratitudeEntry";
+import handleDeleteGratitudeEntry from "../../handlers/entries/gratitude/deleteGratitudeEntry.ts";
+import handleGetEntryByDate from "../../handlers/entries/getEntryByDate";
 
 const app:Express = express();
 app.use(express.json());

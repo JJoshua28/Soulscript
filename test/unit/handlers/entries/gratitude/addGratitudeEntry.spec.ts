@@ -1,13 +1,15 @@
-import {Request} from 'express';
-import mongoose from 'mongoose';
+import {Request} from "express";
+import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
-import { EntryTypes, NewEntryRequest } from '../../../../../src/types/entries';
 
-import AddEntryUseCase from '../../../../../src/use cases/addEntry';
-import mapNewEntry from '../../../../../src/mappers/newEntry';
+import { EntryTypes } from "../../../../../src/types/entries";
+
+import AddEntryUseCase from "../../../../../src/use cases/addEntry";
+import mapNewEntry from "../../../../../src/mappers/newEntry";
 import handleAddGratitudeEntry from "../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
-import { createEntry, createNewEntry } from '../../../../data/helpers/customEntry';
-import { defaultGratitudeEntry } from '../../../../data/gratitudeEntry';
+import { createEntry, createNewEntry } from "../../../../data/helpers/customEntry";
+import { defaultGratitudeEntry } from "../../../../data/gratitudeEntry";
 
 describe("Add Gratitude entry helper", () => {
     afterEach( async()=>{
@@ -22,14 +24,14 @@ describe("Add Gratitude entry helper", () => {
         ${{ tags: ["Lorem Ipsum", "Ipsum Lorem"], content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         ${{ quote: "Always knew we would get our revenge", content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         ${{ subject: "Testing", content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
-        ${{ sharedID: new mongoose.Types.ObjectId(), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
+        ${{ sharedID: uuidv4(), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         `("should create an entry with date $date", async ({entry})=> {
             
             const request = { body: entry } as Request;
             const newEntry = mapNewEntry(entry, {type: EntryTypes.GRATITUDE, datetime: entry.datetime || new Date()})
             const entryExpectation = createEntry(defaultGratitudeEntry, newEntry)
     
-            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, "execute");
             executeSpy.mockResolvedValue(entryExpectation);
     
             const response = await handleAddGratitudeEntry(request);
@@ -45,7 +47,7 @@ describe("Add Gratitude entry helper", () => {
         });
         it("should create an entry when a request does not have a datetime", async()=>{
             const {datetime, ...newEntryRequest} = createNewEntry(defaultGratitudeEntry);
-            const id = new mongoose.Types.ObjectId(); 
+            const id = new mongoose.Types.ObjectId().toString(); 
             const entry = createEntry({
                 datetime,
                 id, 
@@ -55,7 +57,7 @@ describe("Add Gratitude entry helper", () => {
             const request = { body: newEntryRequest } as Request
             
         
-            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, 'execute');
+            const executeSpy = jest.spyOn(AddEntryUseCase.prototype, "execute");
             executeSpy.mockResolvedValue({...entry, id});
     
             const response = await handleAddGratitudeEntry(request);

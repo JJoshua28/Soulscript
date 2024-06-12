@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import { Model } from "mongoose";
 
 import { CustomEntry, Entry, EntryTypes, NewEntry } from "../types/entries";
 import CustomMoodErrors from "../types/error";
@@ -34,24 +34,28 @@ class MongoDBService implements EntryService {
         }
         
     }
-    async updateEntry(id: mongoose.Types.ObjectId, update: CustomEntry): Promise<Entry> {
+    async updateEntry(id: string, update: CustomEntry): Promise<Entry> {
         try {
             const options = {
                 new: true,
                 runValidators: true,
-                returnDocument: "after" as "after"
+                returnDocument: "after" as const
             }
             const response = await this.model.findByIdAndUpdate(id, update, options);
             if(!response && !await this.model.findById(id)) throw new Error(CustomMoodErrors.INVALID_ENTRY_ID);
             if(!response) throw new Error();
             const mappedMoodEntry = mapDocumentToEntry((response));
             return mappedMoodEntry;
-        } catch (error: any) {
-            if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
-            throw Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error}`)
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message);
+                throw new Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error.message}`);
+            } else {
+                throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);
+            }
         }
     }
-    async deleteEntry(id: mongoose.Types.ObjectId): Promise<Entry>  {
+    async deleteEntry(id: string): Promise<Entry>  {
         try {
             const response = await this.model.findByIdAndDelete(id);
 
@@ -59,9 +63,13 @@ class MongoDBService implements EntryService {
             if (!response) throw new Error();
 
             return response && mapDocumentToEntry(response);
-        } catch (error: any){
-            if(error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message)
-            throw new Error(`Something went wrong trying to remove a document with ID: ${id}`)
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === CustomMoodErrors.INVALID_ENTRY_ID) throw new Error(error.message);
+                throw new Error(`Something went wrong trying to remove a document with ID: ${id}`);
+            } else {
+                throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);
+            } 
         }
         
     }

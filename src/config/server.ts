@@ -1,8 +1,8 @@
-import express, {Express} from 'express';
+import express, {Express} from "express";
 
-import moodRouter from '../routes/entries/moodEntry';
-import gratitudeRouter from '../routes/entries/gratitudeEntry';
-import journalRouter from '../routes/entries/journalEntry';
+import moodRouter from "../routes/entries/moodEntry";
+import gratitudeRouter from "../routes/entries/gratitudeEntry";
+import journalRouter from "../routes/entries/journalEntry";
 
 const app: Express = express();
 

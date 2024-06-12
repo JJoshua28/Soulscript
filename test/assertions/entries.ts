@@ -1,8 +1,8 @@
 import mongoose from "mongoose"
 
 export const defaultEntryExpectation = {
-    id: expect.any(mongoose.Types.ObjectId),
-    sharedID: expect.any(mongoose.Types.ObjectId), 
+    id: expect.any(String),
+    sharedID: expect.any(String), 
     type: expect.any(String),
     subject: expect.any(String),
     quote: expect.any(String),
@@ -18,7 +18,7 @@ export const gratitudeEntryExpectation = {
 
 export const entryDocumentExpectation = {
     _id: expect.any(mongoose.Types.ObjectId),
-    sharedID: expect.any(mongoose.Types.ObjectId), 
+    sharedID: expect.any(String), 
     type: expect.any(String),
     subject: expect.any(String),
     quote: expect.any(String),
