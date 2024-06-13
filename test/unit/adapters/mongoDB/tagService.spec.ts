@@ -26,8 +26,6 @@ describe("Tag", () => {
                 expect(response).toEqual(expect.objectContaining(tagExpectation));
     
             });
-        });
-        describe("Negative Tests", () => { 
             it("should throw an error if the tag name already exists", async () => {
                 jest.spyOn(MongoDBTagService.prototype, "isTagNameTaken").mockResolvedValueOnce(true);
                 
@@ -35,6 +33,8 @@ describe("Tag", () => {
                 await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
         
             });
+        });
+        describe("Negative Tests", () => { 
             it("should throw an error if a tag is not created and returned by MongoDB", async () => {
                 jest.spyOn(MongoDBTagService.prototype, "isTagNameTaken").mockResolvedValueOnce(false);
                 mockTagModel.create = jest.fn().mockResolvedValueOnce(null);

@@ -3,20 +3,20 @@ import mongoose from "mongoose";
 import waitForExpect from "wait-for-expect";
 import moment from "moment";
 
-import { EntryTypes } from "../../../src/types/entries";
-import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../assertions/entries" 
-import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
+import { EntryTypes } from "../../../../src/types/entries";
+import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../../assertions/entries" 
+import {  EntryDocument }  from "../../../../src/services/mongoDB/types/document";
 
-import AddEntryUseCase from "../../../src/use cases/addEntry"
-import { defaultMoodEntry } from "../../data/moodEntry";
-import MongoDBEntryService from "../../../src/adapters/mongoDB/entryService";
-import { createNewEntry } from "../../data/helpers/customEntry";
-import { getByDateQuery } from "../../../src/services/mongoDB/queries/moodEntry";
-import mongooseMemoryDB from "../../services/mongoDB/config";
-import entryModel from "../../../src/services/mongoDB/models/entry";
-import { defaultGratitudeEntry } from "../../data/gratitudeEntry";
-import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../data/helpers/addTestEntries";
-import { defaultJournalEntry } from "../../data/journalEntry";
+import AddEntryUseCase from "../../../../src/use cases/addEntry"
+import { defaultMoodEntry } from "../../../data/moodEntry";
+import MongoDBEntryService from "../../../../src/adapters/mongoDB/entryService";
+import { createNewEntry } from "../../../data/helpers/customEntry";
+import { getByDateQuery } from "../../../../src/services/mongoDB/queries/moodEntry";
+import mongooseMemoryDB from "../../../services/mongoDB/config";
+import entryModel from "../../../../src/services/mongoDB/models/entry";
+import { defaultGratitudeEntry } from "../../../data/gratitudeEntry";
+import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../../data/helpers/addTestEntries";
+import { defaultJournalEntry } from "../../../data/journalEntry";
 
 describe("Mood Entry", () => {
     beforeAll(async ()=> {
@@ -27,10 +27,6 @@ describe("Mood Entry", () => {
     });
 
     describe("POST /api/mood/add-entry", () => {
-        const request = {body: ""} as Request;
-        afterEach(async () => {
-            request.body = "";
-        })
         describe("Positive Tests", () => {
             it.each`
                 date                      | message

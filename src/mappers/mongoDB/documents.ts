@@ -61,7 +61,7 @@ export const mapDocumentToTag = (document: TagDocument):Tag => {
     const mappedTag: Tag = {
         id,
         name,
-        description,
+        description: description || "",
         createdAt
     };
     return mappedTag;

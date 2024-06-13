@@ -3,8 +3,8 @@ import { TagDocument } from "../types/document";
 
 
 const tagSchemaType = {
-    type: { type: String, required: true},
-    description: { type: String, required: true},
+    name: { type: String, required: true},
+    description: { type: String},
     createdAt: { type: Date, required: true},
 };
 

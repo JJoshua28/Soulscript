@@ -6,5 +6,4 @@ export interface NewTag {
 
 export interface Tag extends NewTag {
     id: string
-    createdAt: Date
 }
