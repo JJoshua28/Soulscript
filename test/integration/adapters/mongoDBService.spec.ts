@@ -5,7 +5,7 @@ import moment from "moment";
 
 import { EntryTypes } from "../../../src/types/entries";
 import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../assertions/entries" 
-import EntryDocument from "../../../src/services/mongoDB/types/document";
+import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
 
 import AddEntryUseCase from "../../../src/use cases/addEntry"
 import { defaultMoodEntry } from "../../data/moodEntry";

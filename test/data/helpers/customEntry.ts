@@ -1,5 +1,5 @@
 import mongoose, { Mongoose } from "mongoose";
-import EntryDocument from "../../../src/services/mongoDB/types/document";
+import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
 import {  Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
 
 const createNewEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {

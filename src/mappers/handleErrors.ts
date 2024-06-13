@@ -1,20 +1,26 @@
 import { Request } from "express";
-import CustomMoodErrors, { StructureErrorResponse, HttpErrorCode } from "../types/error";
+import CustomErrors, { StructureErrorResponse, HttpErrorCode } from "../types/error";
 
-const handleErrorMapper = (message: CustomMoodErrors | string, req: Request): StructureErrorResponse => {
-    if(message === CustomMoodErrors.INVALID_DATE || message === CustomMoodErrors.INVALID_REQUEST || message === CustomMoodErrors.INVALID_ENTRY_TYPE) return {
-        message: `${message}: ${JSON.stringify(req.body)}`,
-        statusCode: HttpErrorCode.BAD_REQUEST
-    }
-    if(message === CustomMoodErrors.INVALID_ENTRY_ID) return {
-        message: `${message}: ${JSON.stringify(req.body)}`,
-        statusCode: HttpErrorCode.NOT_FOUND
-    }
-    
-
-    return {
-        message,
-        statusCode: HttpErrorCode.INTERNAL_ERROR
+const handleErrorMapper = (message: CustomErrors | string, req: Request): StructureErrorResponse => {
+    switch(message) {
+        case CustomErrors.INVALID_DATE:
+        case CustomErrors.INVALID_REQUEST:
+        case CustomErrors.INVALID_ENTRY_TYPE:
+        case CustomErrors.INVALID_TAG_NAME:
+            return {
+                message: `${message}: ${JSON.stringify(req.body)}`,
+                statusCode: HttpErrorCode.BAD_REQUEST
+            }
+        case CustomErrors.INVALID_ENTRY_ID:
+            return {
+                message: `${message}: ${JSON.stringify(req.body)}`,
+                statusCode: HttpErrorCode.NOT_FOUND
+            }
+        default:
+            return {
+                message,
+                statusCode: HttpErrorCode.INTERNAL_ERROR
+            }
     }
 }
 

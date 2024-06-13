@@ -1,18 +1,18 @@
 import mongoose, { Model } from "mongoose";
 import moment from "moment";
 
-import { EntryTypes, NewEntry } from "../../../src/types/entries";
-import EntryDocument from "../../../src/services/mongoDB/types/document";
-import { defaultEntryExpectation, gratitudeEntryExpectation } from "../../assertions/entries";
+import { EntryTypes, NewEntry } from "../../../../src/types/entries";
+import {  EntryDocument }  from "../../../../src/services/mongoDB/types/document";
+import { defaultEntryExpectation, gratitudeEntryExpectation } from "../../../assertions/entries";
 
-import { defaultMoodEntry, mockMoodEntryDocument } from "../../data/moodEntry";
-import MongoDBEntryService from "../../../src/adapters/mongoDB/entryService";
-import { createEntryDocument, createNewEntry } from "../../data/helpers/customEntry";
-import entryModel from "../../../src/services/mongoDB/models/entry";
-import { defaultGratitudeEntry, mockGratitudeEntryDocument } from "../../data/gratitudeEntry";
-import { defaultJournalEntry } from "../../data/journalEntry";
+import { defaultMoodEntry, mockMoodEntryDocument } from "../../../data/moodEntry";
+import MongoDBEntryService from "../../../../src/adapters/mongoDB/entryService";
+import { createEntryDocument, createNewEntry } from "../../../data/helpers/customEntry";
+import entryModel from "../../../../src/services/mongoDB/models/entry";
+import { defaultGratitudeEntry, mockGratitudeEntryDocument } from "../../../data/gratitudeEntry";
+import { defaultJournalEntry } from "../../../data/journalEntry";
 
-jest.mock("../../../src/services/mongoDB/models/entry");
+jest.mock("../../../../src/services/mongoDB/models/entry");
 const mockEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
 
 
@@ -59,7 +59,6 @@ describe("Entry", ()=> {
             });
             
             it("should throw an error if unable to create", async () => {
-                jest.mock("../../../src/services/mongoDB/models/entry");
                 const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
                 mockGratitudeEntryModel.create = jest.fn().mockRejectedValueOnce(new Error());
                 
@@ -298,7 +297,6 @@ describe("Entry", ()=> {
         });
     })
     describe("Delete entry", () => {
-        jest.mock("../../../src/services/mongoDB/models/entry");
         const mockGratitudeEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
         const mongooseID = new mongoose.Types.ObjectId().toString();
         describe("Mood", () => {    

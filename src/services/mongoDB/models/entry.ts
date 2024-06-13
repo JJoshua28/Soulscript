@@ -1,6 +1,6 @@
 import { Model, model } from "mongoose";
 
-import EntryDocument from "../types/document";
+import {  EntryDocument }  from "../types/document";
 import entrySchema from "../schemas/entries";
 
 /*MongoDB converts the collection name into lowercase and pluralizes it.

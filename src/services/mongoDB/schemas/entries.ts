@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-import EntryDocument from "../types/document";
+import { EntryDocument } from "../types/document";
 
 const entrySchemaTypes = {
     type: { type: String, required: true},

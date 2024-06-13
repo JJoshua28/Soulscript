@@ -1,7 +1,7 @@
 import { Request } from "express";
 
 import { Entry, EntryTypes } from "../../types/entries";
-import CustomMoodErrors from "../../types/error";
+import CustomErrors from "../../types/error";
 
 import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import { validDate } from "../../helpers/validateDate";
@@ -12,12 +12,12 @@ const handleGetEntryByDate = async (req: Request, type: EntryTypes): Promise<Ent
     const entryService = new MongoDBEntryService(entryModel, type);
     const getMoodEntryUseCase = new GetEntryByDateUseCase(entryService);
     
-    if (!req?.body?.datetime) throw new Error(CustomMoodErrors.INVALID_REQUEST)
+    if (!req?.body?.datetime) throw new Error(CustomErrors.INVALID_REQUEST)
     const {datetime} = (req.body as { datetime
 : string })
     
     
-    if (!validDate(datetime)) throw new Error(CustomMoodErrors.INVALID_DATE);
+    if (!validDate(datetime)) throw new Error(CustomErrors.INVALID_DATE);
 
     return await getMoodEntryUseCase.execute(new Date(datetime));
 }
