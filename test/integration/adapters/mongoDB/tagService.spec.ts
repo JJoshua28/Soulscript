@@ -27,10 +27,12 @@ describe("Tag Service", () => {
                 expect(findResponse).toEqual(expect.objectContaining(tagExpectation));
                 expect(findResponse._id.toString()).toEqual(response.id);
             });
+        });
+        describe("Negative Tests", () => {
             it("should throw an error if a tag already exists with the same name", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
                 await expect(tagSerivce.addTag(mockNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
-            })
+            });
         });
     });
     describe("isTagNameTaken", () => {

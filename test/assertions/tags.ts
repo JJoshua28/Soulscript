@@ -3,3 +3,9 @@ export const tagExpectation = {
     description: expect.any(String),
     createdAt: expect.any(Date)
 }
+
+export const existingTagExpectation = {
+    ...tagExpectation,
+    id: expect.any(String),
+    createdAt: expect.any(String)
+}
