@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 import mongoose from "mongoose";
 import waitForExpect from "wait-for-expect";
 import moment from "moment";
@@ -26,7 +26,7 @@ describe("Mood Entry", () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
 
-    describe("POST /api/mood/add-entry", () => {
+    describe("POST /api/entries/mood/add", () => {
         describe("Positive Tests", () => {
             it.each`
                 date                      | message
@@ -66,7 +66,7 @@ describe("Mood Entry", () => {
             })
         })
     });
-    describe("GET /api/mood/get-entry-by-date", ()=>{
+    describe("GET /api/entries/mood/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             const currentDate = new Date(new Date(moment().startOf("day").toISOString()));
             beforeAll(async ()=>{
@@ -102,7 +102,7 @@ describe("Mood Entry", () => {
             })
         })
     });
-    describe("PUT /api/mood/update-entry", ()=> {
+    describe("PUT /api/entries/mood/update", ()=> {
         describe("Positive tests", ()=> {
             seedMoodEntryTestData(entryModel);
             it.each`
@@ -140,7 +140,7 @@ describe("Mood Entry", () => {
 
 
     });
-    describe("DELETE /api/mood/remove-entry", () => {
+    describe("DELETE /api/entries/mood/remove", () => {
         describe("Positive Tests", ()=> {
             it("should delete a document with the specified ID and return that document", async () => {
                 const documents =  await entryModel.find<EntryDocument>({});
@@ -186,7 +186,7 @@ describe("Gratitude Entry", () => {
     afterEach(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
-    describe("POST /api/gratitude/add-entry", () => {
+    describe("POST /api/entries/gratitude/add", () => {
         describe("Positive Tests", () => {
             it.each`
                 date                                                | message
@@ -225,7 +225,7 @@ describe("Gratitude Entry", () => {
             })
         })
     });
-    describe("GET /api/gratitude/get-entry-by-date", ()=>{
+    describe("GET /api/entries/gratitude/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             it.each`
                 date                                                            | arrayLength 
@@ -255,7 +255,7 @@ describe("Gratitude Entry", () => {
             })
         })
     });
-    describe("PUT /api/gratitude/update-entry", ()=> {
+    describe("PUT /api/entries/gratitude/update", ()=> {
         describe("Positive tests", ()=> {
             seedGratitudeEntryTestData(entryModel);
             it.each`
@@ -292,7 +292,7 @@ describe("Gratitude Entry", () => {
 
 
     });
-    describe("DELETE /api/gratitude/remove-entry", () => {
+    describe("DELETE /api/entries/gratitude/remove", () => {
         describe("Positive Tests", ()=> {
             it("should delete a document with the specified ID and return that document", async () => {
                 const documents =  await entryModel.find<EntryDocument>({});
@@ -338,7 +338,7 @@ describe("Journal Entry", () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
 
-    describe("POST /api/journal/add-entry", () => {
+    describe("POST /api/entries/journal/add", () => {
         const request = {body: ""} as Request;
         afterEach(async () => {
             request.body = "";
@@ -389,7 +389,7 @@ describe("Journal Entry", () => {
         })
     });
 
-    describe("GET /api/journal/get-entry-by-date", ()=>{
+    describe("GET /api/entries/journal/get-entry-by-date", ()=>{
         describe("Positive Tests", () => {
             beforeAll(async ()=>{
                 await mongooseMemoryDB.tearDownTestEnvironment();
@@ -431,7 +431,7 @@ describe("Journal Entry", () => {
             })
         })
     });
-    describe("PUT /api/journal/update-entry", ()=> {
+    describe("PUT /api/entries/journal/update", ()=> {
         describe("Positive tests", ()=> {
             seedMoodEntryTestData(entryModel);
             it.each`
@@ -467,7 +467,7 @@ describe("Journal Entry", () => {
             
         });
     });
-    describe("DELETE /api/journal/remove-entry", () => {
+    describe("DELETE /api/entries/journal/remove", () => {
         describe("Positive Tests", ()=> {
             it("should delete a document with the specified ID and return that document", async () => {
                 const documents =  await entryModel.find<EntryDocument>({type: EntryTypes.JOURNAL});

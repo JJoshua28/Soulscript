@@ -13,7 +13,7 @@ app.use(express.json());
 
 const gratitudeRouter: Router = express.Router();
 
-gratitudeRouter.post("/add-entry", (req: Request, res: Response) => {
+gratitudeRouter.post("/add", (req: Request, res: Response) => {
     handleAddGratitudeEntry(req)
     .then(response => res.status(200).send(response))
     .catch(error => {
@@ -32,7 +32,7 @@ gratitudeRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
         res.status(errorResponse.statusCode).send(errorResponse.message)
     });
 });
-gratitudeRouter.put("/update-entry", (req: Request, res: Response) => {
+gratitudeRouter.put("/update", (req: Request, res: Response) => {
     handleUpdateGratitudeEntry(req)
     .then(response => res.status(200).send(response))
     .catch(error => {
@@ -40,7 +40,7 @@ gratitudeRouter.put("/update-entry", (req: Request, res: Response) => {
         res.status(errorResponse.statusCode).send(errorResponse.message);
     });
 });
-gratitudeRouter.delete("/remove-entry", (req: Request, res: Response) => {
+gratitudeRouter.delete("/remove", (req: Request, res: Response) => {
     handleDeleteEntry(req, EntryTypes.GRATITUDE)
     .then(response => res.status(200).send(response))
     .catch(error => {

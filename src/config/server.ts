@@ -9,9 +9,9 @@ const app: Express = express();
 
 app.use(express.json());
 
-app.use("/api/mood", moodRouter);
-app.use("/api/gratitude", gratitudeRouter)
-app.use("/api/journal", journalRouter);
+app.use("/api/entries/mood", moodRouter);
+app.use("/api/entries/gratitude", gratitudeRouter)
+app.use("/api/entries/journal", journalRouter);
 
 app.use("/api/tag", tagRouter);
 

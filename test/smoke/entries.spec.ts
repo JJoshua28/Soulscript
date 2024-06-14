@@ -20,8 +20,8 @@ describe("Entry smoke tests", () => {
     describe("Mood", () => {
         beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
         let moodEntry: Entry;
-        describe("POST /api/mood/add-entry", () => {
-            const url = "/api/mood/add-entry"
+        describe("POST /api/entries/mood/add", () => {
+            const url = "/api/entries/mood/add"
             describe("Positive Tests", () => {
                 it("should add a mood entry", async () => {
                     const entry: NewEntry = createNewEntry(defaultMoodEntry);
@@ -49,8 +49,8 @@ describe("Entry smoke tests", () => {
                 });
             })
         });
-        describe("GET /api/mood/get-entry-by-date", () => {
-            const url = "/api/mood/get-entry-by-date"
+        describe("GET /api/entries/mood/get-entry-by-date", () => {
+            const url = "/api/entries/mood/get-entry-by-date"
             describe("Positive Tests", () => {
                 it("should retrieve a mood entry with today's date", async () => {
                     const date = (new Date(moment().startOf("day").toISOString())).toISOString()
@@ -93,8 +93,8 @@ describe("Entry smoke tests", () => {
             })
     
         });
-        describe("PUT api/mood/update-entry", () => {
-            const url = "/api/mood/update-entry";
+        describe("PUT api/entries/mood/update", () => {
+            const url = "/api/entries/mood/update";
             describe("Positive Tests", () => {
                 it(`should update the mood entry with by ID`, async () => {
                 const {id} = moodEntry
@@ -151,8 +151,8 @@ describe("Entry smoke tests", () => {
             })
     
         }); 
-        describe("DEL /api/mood/remove-entry", () => {
-            const url = "/api/mood/remove-entry";
+        describe("DEL /api/entries/mood/remove", () => {
+            const url = "/api/entries/mood/remove";
             describe("Positive Tests", () => {
                 it("should remove the mood entry by id", async () => {
                     const {id} = moodEntry;
@@ -169,7 +169,7 @@ describe("Entry smoke tests", () => {
         
                     await waitForExpect(async () => {
                         await request(app)
-                        .get("/api/mood/get-entry-by-date")
+                        .get("/api/entries/mood/get-entry-by-date")
                         .send({datetime: moodEntry.datetime})
                         .expect(204)
                     });
@@ -200,8 +200,8 @@ describe("Entry smoke tests", () => {
             await seedGratitudeEntryTestData(entryModel);
         });
         let gratitudeEntry: Entry; 
-        describe("POST /api/gratitude/add-entry", () => {
-            const url = "/api/gratitude/add-entry"
+        describe("POST /api/entries/gratitude/add", () => {
+            const url = "/api/entries/gratitude/add"
             describe("Positive Tests", () => {
                 it("should add a basic gratitude entry ", async () => {
                     const entry: NewEntryRequest = {
@@ -255,8 +255,8 @@ describe("Entry smoke tests", () => {
                 });
             })
         });
-        describe("GET /api/gratitude/get-entry-by-date", () => {
-            const url = "/api/gratitude/get-entry-by-date"
+        describe("GET /api/entries/gratitude/get-entry-by-date", () => {
+            const url = "/api/entries/gratitude/get-entry-by-date"
             describe("Positive Tests", () => {
                 it("should retrieve a gratitude entry with today's date", async () => {
                     const response = await request(app)
@@ -305,8 +305,8 @@ describe("Entry smoke tests", () => {
             })
     
         });
-        describe("PUT api/gratitude/update-entry", () => {
-            const url = "/api/gratitude/update-entry";
+        describe("PUT api/entries/gratitude/update", () => {
+            const url = "/api/entries/gratitude/update";
             describe("Positive Tests", () => {
                 it(`should update a gratitude entry with by ID`, async () => {
                     const {id} = gratitudeEntry
@@ -370,8 +370,8 @@ describe("Entry smoke tests", () => {
                 })
             })
         });
-        describe("DEL /api/gratitude/remove-entry", () => {
-            const url = "/api/gratitude/remove-entry";
+        describe("DEL /api/entries/gratitude/remove", () => {
+            const url = "/api/entries/gratitude/remove";
             describe("Positive Tests", () => {
                 it("should remove the gratitude entry by id", async () => {
         
@@ -394,7 +394,7 @@ describe("Entry smoke tests", () => {
                    async () => await setTimeout(async() =>{
                         await waitForExpect(async () => {
                             await request(app)
-                            .get("/api/gratitude/get-entry-by-date")
+                            .get("/api/entries/gratitude/get-entry-by-date")
                             .send({datetime: gratitudeEntry.datetime})
                             .expect(204)
                         });
@@ -425,8 +425,8 @@ describe("Entry smoke tests", () => {
         beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
         let journalEntry: Entry;
         
-        describe("POST /api/journal/add-entry", () => {
-            const url = "/api/journal/add-entry"
+        describe("POST /api/entries/journal/add", () => {
+            const url = "/api/entries/journal/add"
             describe("Positive Tests", () => {
                 it("should add a jounral entry", async () => {
                     const {content } = defaultJournalEntry;
@@ -465,8 +465,8 @@ describe("Entry smoke tests", () => {
             })
         });
         
-        describe("GET /api/journal/get-entry-by-date", () => {
-            const url = "/api/journal/get-entry-by-date"
+        describe("GET /api/entries/journal/get-entry-by-date", () => {
+            const url = "/api/entries/journal/get-entry-by-date"
             describe("Positive Tests", () => {
                 it("should retrieve a journal entry with today's date", async () => {
                     const date = (new Date()).toISOString()
@@ -511,8 +511,8 @@ describe("Entry smoke tests", () => {
     
         });
         
-        describe("PUT api/journal/update-entry", () => {
-            const url = "/api/journal/update-entry";
+        describe("PUT /api/entries/journal/update", () => {
+            const url = "/api/entries/journal/update";
             describe("Positive Tests", () => {
                 it(`should update the journal entry with by ID`, async () => {
                     const {id} = journalEntry
@@ -578,8 +578,8 @@ describe("Entry smoke tests", () => {
             })
     
         });
-        describe("DEL /api/journal/remove-entry", () => {
-            const url = "/api/journal/remove-entry";
+        describe("DEL /api/entries/journal/remove", () => {
+            const url = "/api/entries/journal/remove";
             describe("Positive Tests", () => {
                 it("should remove the journal entry by id", async () => {
                     const {id} = journalEntry;
@@ -603,7 +603,7 @@ describe("Entry smoke tests", () => {
         
                     await waitForExpect(async () => {
                         await request(app)
-                        .get("/api/journal/get-entry-by-date")
+                        .get("/api/entries/journal/get-entry-by-date")
                         .send({datetime: journalEntry.datetime})
                         .expect(204)
                     });

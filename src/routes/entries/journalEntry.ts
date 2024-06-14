@@ -13,7 +13,7 @@ app.use(express.json());
 
 const journalRouter: Router = express.Router();
 
-journalRouter.post("/add-entry", (req: Request, res: Response) => {
+journalRouter.post("/add", (req: Request, res: Response) => {
     handleAddEntry(req, EntryTypes.JOURNAL)
     .then(response => res.status(200).send(response))
     .catch(error => {
@@ -34,7 +34,7 @@ journalRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
     });
 });
 
-journalRouter.put("/update-entry", (req: Request, res: Response) => {
+journalRouter.put("/update", (req: Request, res: Response) => {
     handleUpdateEntry(req, EntryTypes.JOURNAL)
     .then(response => res.status(200).send(response))
     .catch(error => {
@@ -43,7 +43,7 @@ journalRouter.put("/update-entry", (req: Request, res: Response) => {
     });
 })
 
-journalRouter.delete("/remove-entry", (req: Request, res: Response) => {
+journalRouter.delete("/remove", (req: Request, res: Response) => {
     handleDeleteEntry(req, EntryTypes.JOURNAL)
     .then(response => res.status(200).send(response))
     .catch(error => {

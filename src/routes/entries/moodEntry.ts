@@ -13,7 +13,7 @@ app.use(express.json());
 
 const moodRouter: Router = express.Router();
 
-moodRouter.post("/add-entry", (req: Request, res: Response) => {
+moodRouter.post("/add", (req: Request, res: Response) => {
     
     handleAddEntry(req, EntryTypes.MOOD)
     .then(response => res.status(200).send(response))
@@ -35,7 +35,7 @@ moodRouter.get("/get-entry-by-date", (req: Request, res: Response) => {
     });
 });
 
-moodRouter.put("/update-entry", (req: Request, res: Response) => {
+moodRouter.put("/update", (req: Request, res: Response) => {
     handleUpdateEntry(req, EntryTypes.MOOD)
     .then(response => res.status(200).send(response))
     .catch(error => {
@@ -44,7 +44,7 @@ moodRouter.put("/update-entry", (req: Request, res: Response) => {
     });
 });
 
-moodRouter.delete("/remove-entry", (req: Request, res: Response) => {
+moodRouter.delete("/remove", (req: Request, res: Response) => {
     handleDeleteEntry(req, EntryTypes.MOOD)
     .then(response => res.status(200).send(response))
     .catch(error => {
