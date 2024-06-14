@@ -1,5 +1,5 @@
-import { CustomEntry, Entry } from "../types/entries";
-import { EntryService } from "../ports/entryService";
+import { CustomEntry, Entry } from "../../types/entries";
+import { EntryService } from "../../ports/entryService";
 
 class UpdateEntryUseCase {
     private entryService: EntryService;

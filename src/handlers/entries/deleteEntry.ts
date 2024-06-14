@@ -3,7 +3,7 @@ import { Request } from "express";
 import { Entry, EntryTypes } from "../../types/entries";
 import CustomErrors from "../../types/error";
 
-import DeleteEntryUseCase from "../../use cases/deleteEntry";
+import DeleteEntryUseCase from "../../use cases/entries/deleteEntry";
 import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import entryModel from "../../services/mongoDB/models/entry";
 

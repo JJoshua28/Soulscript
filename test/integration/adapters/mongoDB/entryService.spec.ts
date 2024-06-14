@@ -7,7 +7,7 @@ import { EntryTypes } from "../../../../src/types/entries";
 import { defaultEntryExpectation, entryDocumentExpectation, gratitudeEntryDocumentExpectation, gratitudeEntryExpectation, } from "../../../assertions/entries" 
 import {  EntryDocument }  from "../../../../src/services/mongoDB/types/document";
 
-import AddEntryUseCase from "../../../../src/use cases/addEntry"
+import AddEntryUseCase from "../../../../src/use cases/entries/addEntry"
 import { defaultMoodEntry } from "../../../data/moodEntry";
 import MongoDBEntryService from "../../../../src/adapters/mongoDB/entryService";
 import { createNewEntry } from "../../../data/helpers/customEntry";

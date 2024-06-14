@@ -5,7 +5,7 @@ import CustomErrors from "../../types/error";
 
 import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import { validDate } from "../../helpers/validateDate";
-import GetEntryByDateUseCase from "../../use cases/getEntryByDate";
+import GetEntryByDateUseCase from "../../use cases/entries/getEntryByDate";
 import entryModel from "../../services/mongoDB/models/entry";
 
 const handleGetEntryByDate = async (req: Request, type: EntryTypes): Promise<Entry[] | []> => {

@@ -6,7 +6,7 @@ import { Entry, EntryTypes } from "../../types/entries";
 
 import { validDate } from "../../helpers/validateDate";
 import MongoDBEntryService from "../../adapters/mongoDB/entryService";
-import AddEntryUseCase from "../../use cases/addEntry";
+import AddEntryUseCase from "../../use cases/entries/addEntry";
 import entryModel from "../../services/mongoDB/models/entry";
 import mapNewEntry from "../../mappers/newEntry";
 

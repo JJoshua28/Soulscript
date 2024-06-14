@@ -4,7 +4,7 @@ import CustomErrors from "../../../types/error";
 
 import MongoDBEntryService from "../../../adapters/mongoDB/entryService";
 import { validDate } from "../../../helpers/validateDate";
-import UpdateEntryUseCase from "../../../use cases/updateEntry";
+import UpdateEntryUseCase from "../../../use cases/entries/updateEntry";
 import entryModel from "../../../services/mongoDB/models/entry";
 
 const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
