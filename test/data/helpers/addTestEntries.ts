@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { EntryTypes, NewEntry } from "../../../src/types/entries";
 
-import EntryDocument from "../../../src/services/mongoDB/types/document";
+import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
 
 export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>) => {
     const gratitudeEntry:NewEntry = {

@@ -1,14 +1,14 @@
 import {Request} from "express";
 import moment from "moment";
 
-import { EntryTypes, NewEntryRequest } from "../../../../src/types/entries";
+import { EntryTypes, NewEntryRequest } from "../../../../../src/types/entries";
 
-import { defaultMoodEntry } from "../../../data/moodEntry"
-import handleAddEntry from "../../../../src/handlers/entries/addEntry"
-import AddEntryUseCase from "../../../../src/use cases/addEntry";
-import { createEntry, createNewEntry } from "../../../data/helpers/customEntry";
-import mapNewEntry from "../../../../src/mappers/newEntry";
-import { defaultJournalEntry } from "../../../data/journalEntry";
+import { defaultMoodEntry } from "../../../../data/moodEntry"
+import handleAddEntry from "../../../../../src/handlers/entries/addEntry"
+import AddEntryUseCase from "../../../../../src/use cases/entries/addEntry";
+import { createEntry, createNewEntry } from "../../../../data/helpers/customEntry";
+import mapNewEntry from "../../../../../src/mappers/newEntry";
+import { defaultJournalEntry } from "../../../../data/journalEntry";
 describe("Add Entry", () => {
     describe("Mood", () => {
         afterEach( async()=>{

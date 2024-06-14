@@ -1,8 +1,8 @@
 import { Request } from "express"
 import mongoose from "mongoose"
 
-import handleUpdateEntry from "../../../../src/handlers/entries/updateEntry";
-import { EntryTypes } from "../../../../src/types/entries";
+import handleUpdateEntry from "../../../../../src/handlers/entries/updateEntry";
+import { EntryTypes } from "../../../../../src/types/entries";
 
 describe("Update mood entry", () => {
     it.each`

@@ -1,5 +1,5 @@
-import { EntryService } from "../ports/entryService";
-import { Entry } from "../types/entries";
+import { EntryService } from "../../ports/entryService";
+import { Entry } from "../../types/entries";
 
 class GetEntryByDateUseCase {
     private entryService: EntryService;

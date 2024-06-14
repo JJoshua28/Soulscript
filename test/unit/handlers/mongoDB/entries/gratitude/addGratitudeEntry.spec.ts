@@ -3,13 +3,13 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 
-import { EntryTypes } from "../../../../../src/types/entries";
+import { EntryTypes } from "../../../../../../src/types/entries";
 
-import AddEntryUseCase from "../../../../../src/use cases/addEntry";
-import mapNewEntry from "../../../../../src/mappers/newEntry";
-import handleAddGratitudeEntry from "../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
-import { createEntry, createNewEntry } from "../../../../data/helpers/customEntry";
-import { defaultGratitudeEntry } from "../../../../data/gratitudeEntry";
+import AddEntryUseCase from "../../../../../../src/use cases/entries/addEntry";
+import mapNewEntry from "../../../../../../src/mappers/newEntry";
+import handleAddGratitudeEntry from "../../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
+import { createEntry, createNewEntry } from "../../../../../data/helpers/customEntry";
+import { defaultGratitudeEntry } from "../../../../../data/gratitudeEntry";
 
 describe("Add Gratitude entry helper", () => {
     afterEach( async()=>{
@@ -85,8 +85,7 @@ describe("Add Gratitude entry helper", () => {
         ${{content: ["test"], datetime: new Date("3030").toString()}}
         ${{tags: []}}
         `("should throw an error because request body $requestBody is not valid", async ({requestBody})=>{
-            {} 
-    
+   
             const request = { body: requestBody } as Request
 
             await expect(handleAddGratitudeEntry(request)).rejects.toThrow(Error);

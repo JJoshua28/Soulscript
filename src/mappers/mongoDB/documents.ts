@@ -1,5 +1,6 @@
-import EntryDocument from "../../services/mongoDB/types/document";
+import {  EntryDocument, TagDocument }  from "../../services/mongoDB/types/document";
 import { Entry } from "../../types/entries";
+import { Tag } from "../../types/tags";
 
 export const mapDocumentToEntry = (document: EntryDocument):Entry => {
     const {
@@ -52,4 +53,16 @@ export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
         return mappedMoodEntry;
     })
     return mappedMoodEntries;
+}
+
+export const mapDocumentToTag = (document: TagDocument):Tag => {
+    const id = document._id.toString();
+    const { name, description, createdAt } = document;
+    const mappedTag: Tag = {
+        id,
+        name,
+        description: description || "",
+        createdAt
+    };
+    return mappedTag;
 }

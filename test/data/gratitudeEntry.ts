@@ -3,7 +3,7 @@ import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 
 import { Entry, EntryTypes } from "../../src/types/entries";
-import EntryDocument from "../../src/services/mongoDB/types/document";
+import {  EntryDocument }  from "../../src/services/mongoDB/types/document";
 
 const defaultGratitudeEntry:Entry = {
     id: new mongoose.Types.ObjectId().toString(),
