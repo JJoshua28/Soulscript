@@ -3,7 +3,8 @@ enum CustomErrors {
     INVALID_REQUEST = "Invalid request",
     INVALID_ENTRY_ID = "No entry exists with ID",
     INVALID_ENTRY_TYPE = "The request entry type does not match the received entry type",
-    INVALID_TAG_NAME = "Tag name already exists" 
+    INVALID_TAG_NAME = "Tag name already exists",
+    VOID_TAG_SERVICE = "Tag service not found"
 }
 
 export enum HttpErrorCode  {

@@ -9,7 +9,7 @@ import UpdateEntryUseCase from "../../use cases/entries/updateEntry";
 import entryModel from "../../services/mongoDB/models/entry";
 
 const handleUpdateEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
-    const entryService = new MongoDBEntryService(entryModel, type);
+    const entryService = new MongoDBEntryService( { entryModel }, type);
     const updateEntryUseCase = new UpdateEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id || req?.body?.update?.type) throw new Error(CustomErrors.INVALID_REQUEST);

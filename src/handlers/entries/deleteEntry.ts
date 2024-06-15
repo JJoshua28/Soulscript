@@ -9,7 +9,7 @@ import entryModel from "../../services/mongoDB/models/entry";
 
 
 const handleDeleteEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
-    const entryService = new MongoDBEntryService(entryModel, type);
+    const entryService = new MongoDBEntryService( { entryModel }, type);
     const deleteEntryUseCase = new DeleteEntryUseCase(entryService);
     
     if(!req.body.id) throw  new Error(CustomErrors.INVALID_REQUEST)

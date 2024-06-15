@@ -22,7 +22,7 @@ const handleAddTag = async (req: Request): Promise<Tag> => {
 
     const tag: NewTag = {
         name: req.body.name,
-        description: req.body.description,
+        description: req?.body?.description,
         createdAt: new Date(formatedDate),
     }
     

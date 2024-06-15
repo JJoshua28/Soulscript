@@ -14,7 +14,8 @@ class MongoDBTagService implements TagService {
     }
     async addTag(tag: NewTag): Promise<Tag> {
         try {
-            const isTagNameUsed = await this.isTagNameTaken(tag.name);
+            const isTagNameUsed = !!await this.model.exists({name: tag.name});
+
             if (isTagNameUsed) throw new Error(CustomErrors.INVALID_TAG_NAME);
    
             const response = await this.model.create({...tag});
@@ -30,12 +31,12 @@ class MongoDBTagService implements TagService {
             throw Error(`Something went wrong trying to create this tag.\n Entry: ${JSON.stringify(tag)}\nError: ${error}`)
         }
     }
-    async isTagNameTaken ( name: string ): Promise<boolean> {
-        try {
-            return !!await this.model.exists({name});
-        } catch (error) {
-            throw new Error(`Something went wrong trying to check if this Tag name is taken.\nTag Name: ${name}\nError: ${error}`);
+    async doAllTagsExist(tagNames: string[]): Promise<boolean> {
+        for (const name of tagNames) {
+            const result = !!await this.model.exists({name});
+            if (!result) return false;
         }
+        return true;
     }
         
 }
