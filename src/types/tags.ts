@@ -1,6 +1,6 @@
 export interface NewTag {
     name: string,
-    description: string,
+    description?: string,
     createdAt: Date,
 }
 

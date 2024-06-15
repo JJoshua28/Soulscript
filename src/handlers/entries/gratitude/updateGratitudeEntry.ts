@@ -8,7 +8,7 @@ import UpdateEntryUseCase from "../../../use cases/entries/updateEntry";
 import entryModel from "../../../services/mongoDB/models/entry";
 
 const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
-    const entryService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
+    const entryService = new MongoDBEntryService( { entryModel }, EntryTypes.GRATITUDE);
     const updateGratitudeUseCase = new UpdateEntryUseCase(entryService);
     
     if(!req?.body?.update || Object.keys(req?.body?.update).length === 0|| !req?.body?.id || req?.body?.update?.type) throw new Error(CustomErrors.INVALID_REQUEST);

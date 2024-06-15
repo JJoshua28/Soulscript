@@ -17,7 +17,7 @@ describe("Tag", () => {
     describe("Add", () => {
         describe("Positive Tests", () => {
             it("should return a new tag", async () => {
-                jest.spyOn(MongoDBTagService.prototype, "isTagNameTaken").mockResolvedValueOnce(false);
+                mockTagModel.exists = jest.fn().mockResolvedValue(false);
                 mockTagModel.create = jest.fn().mockResolvedValueOnce(createTagDocument(mockDefaultNewTag));
                
                 const tagService = new MongoDBTagService(mockTagModel);
@@ -29,28 +29,29 @@ describe("Tag", () => {
         });
         describe("Negative Tests", () => { 
             it("should throw an error if the tag name already exists", async () => {
-                jest.spyOn(MongoDBTagService.prototype, "isTagNameTaken").mockResolvedValueOnce(true);
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
                 await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
         
             });
             it("should throw an error if a tag is not created and returned by MongoDB", async () => {
-                jest.spyOn(MongoDBTagService.prototype, "isTagNameTaken").mockResolvedValueOnce(false);
                 mockTagModel.create = jest.fn().mockResolvedValueOnce(null);
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
                 await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(Error);
             });
         });
     });
-    describe("isTagNameTaken", () => {
+    describe("doAllTagsExist", () => {
         describe("Positive Tests", () => {
-            it("should return true if the tag name is taken", async () => {
-                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+            it("should return true if all tag names are taken", async () => {
+                mockTagModel.exists = jest.fn().mockResolvedValue(true);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                const response = await tagService.isTagNameTaken(mockDefaultNewTag.name);
+                const response = await tagService.doAllTagsExist(["tag1", "tag2", "tag3"]);
+                
                 
                 expect(response).toBeTruthy();
             });
@@ -58,7 +59,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                const response = await tagService.isTagNameTaken(mockDefaultNewTag.name);
+                const response = await tagService.doAllTagsExist(["tag3", "tag4", "tag5"]);
                 
                 expect(response).toBeFalsy();
             });
@@ -69,7 +70,7 @@ describe("Tag", () => {
                     mockTagModel.exists = jest.fn().mockRejectedValueOnce(new Error());
                     
                     const tagService = new MongoDBTagService(mockTagModel);
-                    await expect(tagService.isTagNameTaken(mockDefaultNewTag.name)).rejects.toThrow(Error);
+                    await expect(tagService.doAllTagsExist(["tag1", "tag2", "tag3"])).rejects.toThrow(Error);
                 });
             });
         });

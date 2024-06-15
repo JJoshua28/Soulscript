@@ -12,7 +12,7 @@ import mapNewEntry from "../../../mappers/newEntry";
 
 const handleAddGratitudeEntry = async (req: Request): Promise<Entry> => {
     if(!req.body?.content || !Array.isArray(req.body?.content) || req.body?.content.length < 1) throw new Error(CustomErrors.INVALID_REQUEST)
-    const entryService = new MongoDBEntryService(entryModel, EntryTypes.GRATITUDE);
+    const entryService = new MongoDBEntryService( { entryModel }, EntryTypes.GRATITUDE);
     const addGratitudeUseCase = new AddEntryUseCase(entryService);
 
     const {datetime} = (req.body as { datetime?: string })

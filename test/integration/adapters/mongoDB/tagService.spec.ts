@@ -35,11 +35,11 @@ describe("Tag Service", () => {
             });
         });
     });
-    describe("isTagNameTaken", () => {
+    describe("doAllTagsExist", () => {
         describe("Positive Tests", () => {
             it("should return true if the tag name is taken", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
-                const response = await tagSerivce.isTagNameTaken(mockNewTag.name);
+                const response = await tagSerivce.doAllTagsExist([mockNewTag.name]);
                 
                 expect(response).toBeTruthy();
             });
@@ -50,7 +50,7 @@ describe("Tag Service", () => {
                     createdAt: new Date()
                 }
                 const tagSerivce = new MongoDBTagService(tagModel);
-                const response = await tagSerivce.isTagNameTaken(newTag.name);
+                const response = await tagSerivce.doAllTagsExist([newTag.name]);
                 
                 expect(response).toBeFalsy();
             })

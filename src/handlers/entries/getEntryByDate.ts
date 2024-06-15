@@ -9,7 +9,7 @@ import GetEntryByDateUseCase from "../../use cases/entries/getEntryByDate";
 import entryModel from "../../services/mongoDB/models/entry";
 
 const handleGetEntryByDate = async (req: Request, type: EntryTypes): Promise<Entry[] | []> => {
-    const entryService = new MongoDBEntryService(entryModel, type);
+    const entryService = new MongoDBEntryService( { entryModel }, type);
     const getMoodEntryUseCase = new GetEntryByDateUseCase(entryService);
     
     if (!req?.body?.datetime) throw new Error(CustomErrors.INVALID_REQUEST)
