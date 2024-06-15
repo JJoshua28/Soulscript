@@ -209,11 +209,9 @@ describe("Entry smoke tests", () => {
                     expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
         
                     await waitForExpect(async () => {
-                        await request(app)
-                        .get("/api/entries/mood/get-entry-by-date")
-                        .send({datetime: moodEntry.datetime})
-                        .expect(204)
-                    });
+                        const finalResponse = await entryModel.findById(id);
+                        expect(finalResponse).toBeFalsy();
+                    }, 10000, 500); 
         
         
         
@@ -456,18 +454,10 @@ describe("Entry smoke tests", () => {
                     expect(response.body).toHaveProperty("sharedID", expect.any(String));
                     expect(response.body).toHaveProperty("id", expect.any(String));
                     
-                   async () => await setTimeout(async() =>{
-                        await waitForExpect(async () => {
-                            await request(app)
-                            .get("/api/entries/gratitude/get-entry-by-date")
-                            .send({datetime: gratitudeEntry.datetime})
-                            .expect(204)
-                        });
-    
-                    },2000);
-        
-        
-        
+                    await waitForExpect(async () => {
+                        const finalResponse = await entryModel.findById(gratitudeEntry.id);
+                        expect(finalResponse).toBeFalsy();
+                    }, 10000, 500); 
                 });
             });
             describe("Negative Tests", () => {
