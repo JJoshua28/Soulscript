@@ -15,10 +15,16 @@ import { defaultMoodEntry } from "../data/moodEntry";
 import { httpEntryExpectation } from "../assertions/entries";
 import { defaultJournalEntry } from "../data/journalEntry";
 import entryModel from "../../src/services/mongoDB/models/entry";
+import { seedTagData } from "../data/helpers/seedTagData";
+import tagModel from "../../src/services/mongoDB/models/tag";
+
 
 describe("Entry smoke tests", () => {
     describe("Mood", () => {
-        beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
+        beforeAll ( async () => {
+            await mongooseMemoryDB.setupTestEnvironment();
+            seedTagData(tagModel, defaultMoodEntry.tags[0])
+        });
         let moodEntry: Entry;
         describe("POST /api/entries/mood/add", () => {
             const url = "/api/entries/mood/add"
@@ -33,6 +39,32 @@ describe("Entry smoke tests", () => {
                     expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
                     moodEntry = response.body;
                 });
+                it("should add a mood entry with a specific date", async () => {
+                    const {content } = defaultJournalEntry;
+                    const datetime = moment("2020-05-05 15:00:00").format("YYYY-MM-DD HH:mm:ss");
+                    const response = await request(app)
+                        .post(url)
+                        .send({content, datetime})
+                        .expect(200);
+
+                        expect(response.body).toHaveProperty("datetime", `${new Date(datetime).toISOString()}`)
+                        expect(response.body).toHaveProperty("content", expect.any(String));
+                        expect(response.body).toHaveProperty("type", EntryTypes.MOOD);
+                        expect(response.body).toHaveProperty("id", expect.any(String));
+                });
+                it("should add a basic mood entry without a tag", async () => {
+                    const entry = {
+                        content: "happy"
+                    };
+                    const response = await request(app)
+                        .post(url)
+                        .send(entry)
+                        .expect(200);
+        
+                    expect(response.body).toHaveProperty("content", "happy");
+                    expect(response.body).toHaveProperty("datetime", expect.any(String));
+                    expect(response.body).toHaveProperty("type", "mood");
+                });
             });
             describe("Negative Tests", () => {
                 it.each`
@@ -45,7 +77,16 @@ describe("Entry smoke tests", () => {
                         .send(requestData)
                         .expect(HttpErrorCode.BAD_REQUEST);
         
-                    expect(response).toHaveProperty("text", expect.any(String))
+                    expect(response).toHaveProperty("text", expect.any(String));
+                });
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = createNewEntry(defaultMoodEntry, {tags: ["InvalidTag"]})
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                    expect(response).toHaveProperty("text", expect.any(String));
                 });
             })
         });
@@ -197,7 +238,9 @@ describe("Entry smoke tests", () => {
     describe("Gratitude", () => {
         beforeAll ( async () => {
             await mongooseMemoryDB.setupTestEnvironment();
+            seedTagData(tagModel, defaultGratitudeEntry.tags[0])
             await seedGratitudeEntryTestData(entryModel);
+
         });
         let gratitudeEntry: Entry; 
         describe("POST /api/entries/gratitude/add", () => {
@@ -221,6 +264,19 @@ describe("Entry smoke tests", () => {
                     expect(response.body.type).toEqual(EntryTypes.GRATITUDE);
     
                     gratitudeEntry = response.body;
+                });
+                it("should add a gratitude entry with a specific date", async () => {
+                    const {content } = defaultGratitudeEntry;
+                    const datetime = moment("2015-10-05 15:00:00").format("YYYY-MM-DD HH:mm:ss");
+                    const response = await request(app)
+                        .post(url)
+                        .send({content, datetime})
+                        .expect(200);
+
+                        expect(response.body).toHaveProperty("datetime", `${new Date(datetime).toISOString()}`)
+                        expect(response.body).toHaveProperty("content", expect.arrayContaining([expect.any(String)]));
+                        expect(response.body).toHaveProperty("type", EntryTypes.GRATITUDE);
+                        expect(response.body).toHaveProperty("id", expect.any(String));
                 });
                 it("should add a complete gratitude entry", async () => {
                     const {datetime, type, ...entry} = createNewEntry(defaultGratitudeEntry);
@@ -252,6 +308,15 @@ describe("Entry smoke tests", () => {
                         .expect(HttpErrorCode.BAD_REQUEST);
         
                     expect(response).toHaveProperty("text", expect.any(String))
+                });
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = createNewEntry(defaultGratitudeEntry, {tags: ["InvalidTag"]})
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                    expect(response).toHaveProperty("text", expect.any(String));
                 });
             })
         });
@@ -422,13 +487,15 @@ describe("Entry smoke tests", () => {
         afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
     });
     describe("Journal", () => {
-        beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
+        beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment());
+        seedTagData(tagModel, defaultJournalEntry.tags[0])
+
         let journalEntry: Entry;
         
         describe("POST /api/entries/journal/add", () => {
             const url = "/api/entries/journal/add"
             describe("Positive Tests", () => {
-                it("should add a jounral entry", async () => {
+                it("should add a journal entry", async () => {
                     const {content } = defaultJournalEntry;
                     const response = await request(app)
                         .post(url)
@@ -448,6 +515,33 @@ describe("Entry smoke tests", () => {
                         
                     journalEntry = response.body;
                 });
+                it("should add a journal entry with a specific date", async () => {
+                    const {content } = defaultJournalEntry;
+                    const datetime = moment("2020-05-05 15:00:00").format("YYYY-MM-DD HH:mm:ss");
+                    const response = await request(app)
+                        .post(url)
+                        .send({content, datetime})
+                        .expect(200);
+
+                        expect(response.body).toHaveProperty("datetime", `${new Date(datetime).toISOString()}`)
+                        expect(response.body).toHaveProperty("content", expect.any(String));
+                        expect(response.body).toHaveProperty("type", EntryTypes.JOURNAL);
+                        expect(response.body).toHaveProperty("id", expect.any(String));
+                });
+                it("should add a basic journal entry without a tag", async () => {
+                    const entry = {
+                        content: defaultJournalEntry.content
+                    };
+
+                    const response = await request(app)
+                        .post(url)
+                        .send(entry)
+                        .expect(200);
+        
+                    expect(response.body).toHaveProperty("content");
+                    expect(response.body).toHaveProperty("datetime", expect.any(String));
+                    expect(response.body).toHaveProperty("type", "journal");
+                });
             });
             describe("Negative Tests", () => {
                 it.each`
@@ -461,6 +555,15 @@ describe("Entry smoke tests", () => {
                         .expect(HttpErrorCode.BAD_REQUEST);
         
                     expect(response).toHaveProperty("text", expect.any(String))
+                });
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = createNewEntry(defaultJournalEntry, {tags: ["InvalidTag"]})
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                    expect(response).toHaveProperty("text", expect.any(String));
                 });
             })
         });
@@ -600,16 +703,11 @@ describe("Entry smoke tests", () => {
                     expect(response.body.tags).toEqual(expect.arrayContaining([expect.any(String)]));
                     expect(response.body.id).toEqual(expect.any(String));
                     expect(response.body.type).toEqual(EntryTypes.JOURNAL);
-        
+                    
                     await waitForExpect(async () => {
-                        await request(app)
-                        .get("/api/entries/journal/get-entry-by-date")
-                        .send({datetime: journalEntry.datetime})
-                        .expect(204)
-                    });
-        
-        
-        
+                        const finalResponse = await entryModel.findById(id);
+                        expect(finalResponse).toBeFalsy();
+                    }, 10000, 500); 
                 });
             });
             describe("Negative Tests", () => {

@@ -479,7 +479,7 @@ describe("Journal Entry", () => {
                 expect(response).toHaveProperty("content", expect.any(String));
                 expect(response).toHaveProperty("datetime", expect.any(Date));
                 expect(response).toHaveProperty("tags", []);
-            })
+            });
 
         })
         describe("Negative Tests", () => {

@@ -9,10 +9,14 @@ import MongoDBEntryService from "../../adapters/mongoDB/entryService";
 import AddEntryUseCase from "../../use cases/entries/addEntry";
 import entryModel from "../../services/mongoDB/models/entry";
 import mapNewEntry from "../../mappers/newEntry";
+import MongoDBTagService from "../../adapters/mongoDB/tagService";
+import tagModel from "../../services/mongoDB/models/tag";
 
 const handleAddEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
     if(!req.body?.content || typeof req.body?.content != "string" || req?.body?.content === " ") throw new Error(CustomErrors.INVALID_REQUEST);
-    const entryService = new MongoDBEntryService( { entryModel }, type);
+    
+    const tagService = new MongoDBTagService(tagModel);
+    const entryService = new MongoDBEntryService( { entryModel, tagService }, type);
     const addEntryUseCase = new AddEntryUseCase(entryService);
 
     const {datetime} = (req.body as { datetime?: string });
