@@ -4,7 +4,7 @@ import type { TagDocument } from "../../../../src/services/mongoDB/types/documen
 import CustomErrors from "../../../../src/types/error";
 
 import tagModel from "../../../../src/services/mongoDB/models/tag";
-import { mockDefaultNewTag } from "../../../data/tags";
+import { mockDefaultNewTag, mockDefaultTag, mockTag } from "../../../data/tags";
 import { createTagDocument } from "../../../data/helpers/customTags";
 import MongoDBTagService from "../../../../src/adapters/mongoDB/tagService";
 import { tagExpectation } from "../../../assertions/tags";
@@ -74,5 +74,33 @@ describe("Tag", () => {
                 });
             });
         });
-    })
+    });
+    describe("getAllTags", () => {
+        describe("Positive Tests", () => {
+            it("should return all tag entries", async () => {
+                mockTagModel.find = jest.fn().mockResolvedValueOnce([
+                    createTagDocument(mockDefaultTag),
+                    createTagDocument(mockTag)
+                ]);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.getAllTags(); 
+                expect(response).toEqual(expect.arrayContaining([
+                    expect.objectContaining({
+                        id: expect.any(String),
+                        name: expect.any(String),
+                        createdAt: expect.any(Date)
+                    })
+                ]));
+            });
+            it("should return an empty array if no tags documents are found", async () => {
+                mockTagModel.find = jest.fn().mockResolvedValueOnce([]);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.getAllTags(); 
+                expect(response).toEqual(expect.arrayContaining([]));
+            })
+        })
+    });
+
 })

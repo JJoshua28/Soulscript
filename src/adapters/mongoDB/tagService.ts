@@ -5,7 +5,7 @@ import { NewTag, Tag } from "../../types/tags";
 import CustomErrors from "../../types/error";
 import { TagService } from "../../ports/tagService";
 
-import { mapDocumentToTag } from "../../mappers/mongoDB/documents";
+import { mapDocumentToTag, mapDocumentsToTags } from "../../mappers/mongoDB/documents";
 
 class MongoDBTagService implements TagService {
     private model: Model<TagDocument>;
@@ -37,6 +37,15 @@ class MongoDBTagService implements TagService {
             if (!result) return false;
         }
         return true;
+    }
+    async getAllTags(): Promise<Tag[] | []> {
+        try {
+            const tags: TagDocument[] | [] = await this.model.find({});
+            if(tags.length < 1) return [];
+            return mapDocumentsToTags(tags);
+        } catch (error) {
+            throw Error(`Something went wrong trying to retrieve all tags.\nError: ${error}`);
+        }
     }
         
 }

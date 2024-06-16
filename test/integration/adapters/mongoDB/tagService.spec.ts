@@ -55,5 +55,29 @@ describe("Tag Service", () => {
                 expect(response).toBeFalsy();
             })
         })
+    });
+    describe("getAllTags", () => {
+        describe("Positive Tests", () => {
+            it("should return all tag entries", async () => {
+                const tagSerivce = new MongoDBTagService(tagModel);
+                const response = await tagSerivce.getAllTags(); 
+                expect(response).toEqual(expect.arrayContaining([
+                    expect.objectContaining({
+                        id: expect.any(String),
+                        name: expect.any(String),
+                        createdAt: expect.any(Date)
+                    })
+                ]));
+            });
+            it("should return an empty array if no tags documents are found", async () => {
+                await mongooseMemoryDB.tearDownTestEnvironment();
+                await mongooseMemoryDB.setupTestEnvironment();
+                
+                const tagSerivce = new MongoDBTagService(tagModel);
+                const response = await tagSerivce.getAllTags(); 
+                expect(response).toEqual(expect.arrayContaining([]));
+            });
+            
+        })
     })
 })
