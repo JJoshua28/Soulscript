@@ -76,7 +76,7 @@ describe("Entry", ()=> {
                     const mockMoodEntry: NewEntry = createNewEntry(defaultMoodEntry);
                     const mongoService = new MongoDBEntryService( { entryModel: mockEntryModel, tagService: mockTagService }, EntryTypes.MOOD);
                                      
-                    await expect(mongoService.addEntry(mockMoodEntry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                    await expect(mongoService.addEntry(mockMoodEntry)).rejects.toThrow(CustomErrors.INVALID_TAG);
                 });
                 it("should throw when trying to add a mood entry without the tag service", async () => {
                    
@@ -147,7 +147,7 @@ describe("Entry", ()=> {
                     const mockGratitudeEntry: NewEntry = createNewEntry(defaultGratitudeEntry);
                     const mongoService = new MongoDBEntryService( { entryModel: mockEntryModel, tagService: mockTagService }, EntryTypes.GRATITUDE);
                                      
-                    await expect(mongoService.addEntry(mockGratitudeEntry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                    await expect(mongoService.addEntry(mockGratitudeEntry)).rejects.toThrow(CustomErrors.INVALID_TAG);
                 });
                 it("should throw when trying to add an entry without the tag service", async () => {
                    
@@ -217,7 +217,7 @@ describe("Entry", ()=> {
                     const mockJournalEntry: NewEntry = createNewEntry(defaultJournalEntry);
                     const mongoService = new MongoDBEntryService( { entryModel: mockEntryModel, tagService: mockTagService }, EntryTypes.JOURNAL);
                                      
-                    await expect(mongoService.addEntry(mockJournalEntry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                    await expect(mongoService.addEntry(mockJournalEntry)).rejects.toThrow(CustomErrors.INVALID_TAG);
                 });
                 it("should throw when trying to add an entry without the tag service", async () => {
                    

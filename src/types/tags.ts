@@ -10,4 +10,4 @@ export interface Tag extends NewTag {
 export interface TagUpdates {
     name?: string,
     description?: string
-};
+}
