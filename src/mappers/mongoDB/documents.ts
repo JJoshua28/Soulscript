@@ -28,7 +28,7 @@ export const mapDocumentToEntry = (document: EntryDocument):Entry => {
 } 
 
 export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
-    const mappedMoodEntries = document.map(document => {
+    const mappedEntries = document.map(document => {
         const {
             type,
             sharedID, 
@@ -52,7 +52,7 @@ export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
         };
         return mappedMoodEntry;
     })
-    return mappedMoodEntries;
+    return mappedEntries;
 }
 
 export const mapDocumentToTag = (document: TagDocument):Tag => {
@@ -65,4 +65,19 @@ export const mapDocumentToTag = (document: TagDocument):Tag => {
         createdAt
     };
     return mappedTag;
+}
+
+export const mapDocumentsToTags = (document: TagDocument[]):Tag[] => {
+    const mappedEntries = document.map(document => {
+        const id = document._id.toString();
+        const { name, description, createdAt } = document;
+        const mappedTag: Tag = {
+            id,
+            name,
+            description: description || "",
+            createdAt
+        };
+        return mappedTag;
+    })
+    return mappedEntries;
 }

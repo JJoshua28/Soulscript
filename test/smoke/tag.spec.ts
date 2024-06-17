@@ -35,6 +35,25 @@ describe("Tag smoke tests", () => {
             });
         });
 
+    });
+    describe("GET /api/tag/get-all", () => {
+        const url = "/api/tag/get-all";
+        it("should return all tags", async () => {
+
+            const response = await request(app)
+                .get(url)
+                .expect(200);
+            
+            expect(response.body).toEqual(expect.arrayContaining([existingTagExpectation]));
+        });
+        it("should return an empty array if no tags exist", async () => {
+            await mongooseMemoryDB.tearDownTestEnvironment();
+            await mongooseMemoryDB.setupTestEnvironment();
+            const response = await request(app)
+                .get(url)
+                .expect(204);
+            expect(response.body).toEqual(expect.arrayContaining([]));
+        });
     })
     afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment());
 })
