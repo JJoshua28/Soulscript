@@ -56,7 +56,7 @@ describe("Tag Service", () => {
             })
         })
     });
-    describe("getAllTags", () => {
+    describe("GET /api/tag/get-all", () => {
         describe("Positive Tests", () => {
             it("should return all tag entries", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
