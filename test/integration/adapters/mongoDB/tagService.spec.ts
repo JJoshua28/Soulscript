@@ -1,4 +1,6 @@
-import type { NewTag } from "../../../../src/types/tags";
+import mongoose from "mongoose";
+
+import type { NewTag, Tag } from "../../../../src/types/tags";
 import CustomErrors from "../../../../src/types/error";
 
 import MongoDBTagService from "../../../../src/adapters/mongoDB/tagService";
@@ -14,7 +16,7 @@ describe("Tag Service", () => {
     afterAll(async () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
-
+    let globalTag: Tag;
     describe("POST /api/tag/add", () => { 
         describe("Positive Tests", () => {
             it("should add a tag and return a new tag", async () => {
@@ -26,12 +28,13 @@ describe("Tag Service", () => {
                 const [findResponse] = await tagModel.find(mockNewTag);
                 expect(findResponse).toEqual(expect.objectContaining(tagExpectation));
                 expect(findResponse._id.toString()).toEqual(response.id);
+                globalTag = response;
             });
         });
         describe("Negative Tests", () => {
             it("should throw an error if a tag already exists with the same name", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
-                await expect(tagSerivce.addTag(mockNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                await expect(tagSerivce.addTag(mockNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
             });
         });
     });
@@ -55,6 +58,72 @@ describe("Tag Service", () => {
                 expect(response).toBeFalsy();
             })
         })
+    });
+    describe("PUT /api/tag/update", () => {
+        describe("Positive Tests", () => {
+            it("should update a tag's name and return the tag", async () => {
+                const updates = {
+                    name: "updatedTag test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                const response = await tagSerivce.updateTag(globalTag.id, updates);
+                
+                expect(response).toStrictEqual(expect.objectContaining({
+                    id: expect.any(String),
+                    ...tagExpectation
+                }));
+                expect(response.name).toEqual(updates.name);
+            });
+            it("should update a tag's description and return the tag", async () => {
+                const updates = {
+                    description: "updatedTagDescription test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                const response = await tagSerivce.updateTag(globalTag.id, updates);
+                
+                expect(response).toStrictEqual(expect.objectContaining({
+                    id: expect.any(String),
+                    ...tagExpectation
+                }));
+                expect(response.description).toEqual(updates.description);
+            })
+            it("should update a tag's name and description and return the tag", async () => {
+                const updates = {
+                    name: "updating tag test",
+                    description: "updatedTagDescription test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                const response = await tagSerivce.updateTag(globalTag.id, updates);
+                
+                expect(response).toEqual(expect.objectContaining({
+                    id: expect.any(String),
+                    ...tagExpectation
+                }));
+                expect(response.name).toEqual(updates.name);
+                expect(response.description).toEqual(updates.description);  
+            })
+        });
+        describe("Negative Tests", () => {
+            it("should throw if no tags exist with that ID", async () => {
+                const updates = {
+                    name: "updatedTag test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                await expect(tagSerivce.updateTag(new mongoose.Types.ObjectId().toString(), updates)).rejects.toThrow(CustomErrors.VOID_TAG);
+            });
+            it("should throw if a tag already exists with the name in the update", async () => {
+                const updates = {
+                    name: "updating tag test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                await expect(tagSerivce.updateTag(globalTag.id, updates)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
+            })
+        });
     });
     describe("GET /api/tag/get-all", () => {
         describe("Positive Tests", () => {

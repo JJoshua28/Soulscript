@@ -94,7 +94,7 @@ describe("Mood Entry", () => {
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = createNewEntry(defaultMoodEntry, {tags: ["invalidTag"]});
     
-                await expect(addMoodUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                await expect(addMoodUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG);
                 
             });
             it("should throw an error if the tag service is missing", async () => {
@@ -300,7 +300,7 @@ describe("Gratitude Entry", () => {
                 const addGratitudeUseCase = new AddEntryUseCase(entryService);
                 const entry = createNewEntry(defaultGratitudeEntry, {tags: ["invalidTag"]});
     
-                await expect(addGratitudeUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                await expect(addGratitudeUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG);
             });
             it("should throw if the tag service is missing", async () => {
                 const entryService = new MongoDBEntryService( { entryModel }, EntryTypes.GRATITUDE);
@@ -507,7 +507,7 @@ describe("Journal Entry", () => {
                 const addMoodUseCase = new AddEntryUseCase(entryService);
                 const entry = { ...defaultJournalEntry, tags: ["InvalidTag"] };
     
-                await expect(addMoodUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                await expect(addMoodUseCase.execute(entry)).rejects.toThrow(CustomErrors.INVALID_TAG);
             });
             it("should throw if the tag service is missing when trying to add journal with a tag", async () => {
                 const entryService = new MongoDBEntryService( { entryModel }, EntryTypes.JOURNAL);

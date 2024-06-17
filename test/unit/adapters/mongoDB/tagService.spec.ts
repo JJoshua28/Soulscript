@@ -32,7 +32,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_NAME);
+                await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
         
             });
             it("should throw an error if a tag is not created and returned by MongoDB", async () => {
@@ -102,5 +102,104 @@ describe("Tag", () => {
             })
         })
     });
+    describe("updateTag", () => {
+        describe("Positive Tests", () => {
+            beforeAll(() => mockTagModel.exists = jest.fn().mockResolvedValue(false));
+            it("should update a tags description", async () => {
+                const { id, ...tagInfo } = mockDefaultTag;
+                const updatedTagDocument = {
+                    _id: id,
+                    ...tagInfo,
+                    description: "updated description"
+                }
 
+                const updates = {
+                    description: "updated description"
+                }
+
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+
+                mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.updateTag(mockDefaultTag.id, updates);
+                
+                expect(response).toEqual(expect.objectContaining({
+                    id: updatedTagDocument._id,
+                    name: updatedTagDocument.name,
+                    description: updatedTagDocument.description,
+                    createdAt: expect.any(Date)
+                }));
+            });
+            it("should update a tags name", async () => {
+                const { id, ...tagInfo } = mockTag;
+                const updatedTagDocument = {
+                    _id: id,
+                    ...tagInfo,
+                    name: "updateTag test"
+                }
+
+                const updates = {
+                    name: "updateTag test"
+                }
+
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+                mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.updateTag(mockTag.id, updates);
+                
+                expect(response).toEqual(expect.objectContaining({
+                    id: updatedTagDocument._id,
+                    name: updatedTagDocument.name,
+                    description: updatedTagDocument.description,
+                    createdAt: expect.any(Date)
+                }));
+            });
+            it("should update a tags name and description", async () => {
+                const { id, ...tagInfo } = mockTag;
+                const updatedTagDocument = {
+                    _id: id,
+                    ...tagInfo,
+                    name: "updateTag test",
+                    descriptiopn: "updated description"
+                }
+
+                const updates = {
+                    name: "updateTag test",
+                    descriptiopn: "updated description"
+                }
+
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+                mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.updateTag(mockTag.id, updates);
+                
+                expect(response).toEqual(expect.objectContaining({
+                    id: updatedTagDocument._id,
+                    name: updatedTagDocument.name,
+                    description: updatedTagDocument.description,
+                    createdAt: expect.any(Date)
+                }));
+            });
+        });
+        describe("Negative Tests", () => {
+            it("should throw if no tag if exist with the provided id", async () => {
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                await expect(tagService.updateTag(mockTag.id, {})).rejects.toThrow(CustomErrors.VOID_TAG);
+            });
+            it("should throw if a tag already exists with the name in the update", async () => {
+                const updates = {
+                    name: "test"
+                }
+                mockTagModel.exists = jest.fn().mockResolvedValue(true);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                await expect(tagService.updateTag(mockTag.id, updates)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
+            });
+        });
+    });
 })

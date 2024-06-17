@@ -27,7 +27,7 @@ class MongoDBEntryService implements EntryService {
         try {
             if(entry.tags.length > 0) {
                 if (!this.tagService) throw new Error(CustomErrors.VOID_TAG_SERVICE);
-                if(!await this.tagService.doAllTagsExist(entry.tags)) throw new Error(CustomErrors.INVALID_TAG_NAME);   
+                if(!await this.tagService.doAllTagsExist(entry.tags)) throw new Error(CustomErrors.INVALID_TAG);   
             }
             if(entry.type !== this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
 
@@ -36,7 +36,7 @@ class MongoDBEntryService implements EntryService {
             return mappedMoodEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_TAG_NAME || error.message === CustomErrors.VOID_TAG_SERVICE || error.message === CustomErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
+                if (error.message === CustomErrors.INVALID_TAG || error.message === CustomErrors.VOID_TAG_SERVICE || error.message === CustomErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to create this Entry.\n Entry: ${entry}\nError: ${error.message}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry Request: ${entry}`);
