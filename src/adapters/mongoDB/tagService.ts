@@ -16,7 +16,7 @@ class MongoDBTagService implements TagService {
         try {
             const isTagNameUsed = !!await this.model.exists({name: tag.name});
 
-            if (isTagNameUsed) throw new Error(CustomErrors.INVALID_TAG);
+            if (isTagNameUsed) throw new Error(CustomErrors.INVALID_TAG_EXISTS);
    
             const response = await this.model.create({...tag});
 
@@ -25,7 +25,7 @@ class MongoDBTagService implements TagService {
             return mappedTagEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_TAG) throw new Error(error.message);
+                if (error.message === CustomErrors.INVALID_TAG_EXISTS) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to create this tag.\n Entry: ${JSON.stringify(tag)}\nError: ${error.message }`)
             }
             throw Error(`Something went wrong trying to create this tag.\n Entry: ${JSON.stringify(tag)}\nError: ${error}`)
@@ -52,6 +52,12 @@ class MongoDBTagService implements TagService {
             const isTagPresentWithID = !! await this.model.exists({_id: tagId});
             if (!isTagPresentWithID) throw new Error(CustomErrors.VOID_TAG);
             
+            const {name} = updates;
+            if (name) {
+                const isTagNameUsed = !!await this.model.exists({name});
+                if (isTagNameUsed) throw new Error(CustomErrors.INVALID_TAG_EXISTS);
+            }
+            
             const response = await this.model.findByIdAndUpdate(tagId, updates, {new: true});
             if(!response) throw new Error();
 
@@ -59,7 +65,7 @@ class MongoDBTagService implements TagService {
             return mappedTagEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.VOID_TAG) throw new Error(error.message);
+                if (error.message === CustomErrors.VOID_TAG || error.message === CustomErrors.INVALID_TAG_EXISTS) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to update this tag.\n Entry: ${JSON.stringify(updates)}\nError: ${error.message }`);
             }
             throw Error("Something went wrong trying to update this tag.\n Entry: ${JSON.stringify(updates)}\nError: ${error}");

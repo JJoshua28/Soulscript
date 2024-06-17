@@ -34,7 +34,7 @@ describe("Tag Service", () => {
         describe("Negative Tests", () => {
             it("should throw an error if a tag already exists with the same name", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
-                await expect(tagSerivce.addTag(mockNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await expect(tagSerivce.addTag(mockNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
             });
         });
     });
@@ -91,7 +91,7 @@ describe("Tag Service", () => {
             })
             it("should update a tag's name and description and return the tag", async () => {
                 const updates = {
-                    name: "updatedTag test",
+                    name: "updating tag test",
                     description: "updatedTagDescription test"
                 }
 
@@ -115,6 +115,14 @@ describe("Tag Service", () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
                 await expect(tagSerivce.updateTag(new mongoose.Types.ObjectId().toString(), updates)).rejects.toThrow(CustomErrors.VOID_TAG);
             });
+            it("should throw if a tag already exists with the name in the update", async () => {
+                const updates = {
+                    name: "updating tag test"
+                }
+
+                const tagSerivce = new MongoDBTagService(tagModel);
+                await expect(tagSerivce.updateTag(globalTag.id, updates)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
+            })
         });
     });
     describe("GET /api/tag/get-all", () => {

@@ -32,7 +32,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
         
             });
             it("should throw an error if a tag is not created and returned by MongoDB", async () => {
@@ -104,6 +104,7 @@ describe("Tag", () => {
     });
     describe("updateTag", () => {
         describe("Positive Tests", () => {
+            beforeAll(() => mockTagModel.exists = jest.fn().mockResolvedValue(false));
             it("should update a tags description", async () => {
                 const { id, ...tagInfo } = mockDefaultTag;
                 const updatedTagDocument = {
@@ -117,6 +118,7 @@ describe("Tag", () => {
                 }
 
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+
                 mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
@@ -188,6 +190,15 @@ describe("Tag", () => {
                 
                 const tagService = new MongoDBTagService(mockTagModel);
                 await expect(tagService.updateTag(mockTag.id, {})).rejects.toThrow(CustomErrors.VOID_TAG);
+            });
+            it("should throw if a tag already exists with the name in the update", async () => {
+                const updates = {
+                    name: "test"
+                }
+                mockTagModel.exists = jest.fn().mockResolvedValue(true);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                await expect(tagService.updateTag(mockTag.id, updates)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
             });
         });
     });

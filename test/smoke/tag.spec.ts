@@ -36,7 +36,7 @@ describe("Tag smoke tests", () => {
                     .post(url)
                     .send(requestBody)
                     .expect(400);
-                expect(response).toHaveProperty("text", expect.any(String))
+                expect(response.text).toContain(CustomErrors.INVALID_TAG_EXISTS);
                 
             });
         });
@@ -89,8 +89,8 @@ describe("Tag smoke tests", () => {
             it("should only return a tag with the expected updated values", async () => {
                 const {id} = globalTag;
                 const requestBody =  {
-                    test: "test",
-                    name: "updateTag name and description test",
+                    test: "testing",
+                    name: "test",
                     description: "test to update a tasgs name and description",
                 };
                 const response  = await request(app)
@@ -117,6 +117,18 @@ describe("Tag smoke tests", () => {
                 .expect(404);
                 
                 expect(response.text).toContain(CustomErrors.VOID_TAG);
+            });
+            it("should throw an error if a tag already exists with the name in the update", async () => {
+                const {id} = globalTag;
+                const requestBody =  {
+                    name: "test",
+                };
+                const response  = await request(app)
+                .put(url)
+                .send({id, updates: requestBody})
+                .expect(400);
+                
+                expect(response.text).toContain(CustomErrors.INVALID_TAG_EXISTS);
             });
         });
     });
