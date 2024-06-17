@@ -50,7 +50,7 @@ class MongoDBTagService implements TagService {
     async updateTag(tagId: string, updates: TagUpdates): Promise<Tag> {
         try {
             const isTagPresentWithID = !! await this.model.exists({_id: tagId});
-            if (!isTagPresentWithID) throw new Error(CustomErrors.INVALID_TAG);
+            if (!isTagPresentWithID) throw new Error(CustomErrors.VOID_TAG);
             
             const response = await this.model.findByIdAndUpdate(tagId, updates, {new: true});
             if(!response) throw new Error();
@@ -59,7 +59,7 @@ class MongoDBTagService implements TagService {
             return mappedTagEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_TAG) throw new Error(error.message);
+                if (error.message === CustomErrors.VOID_TAG) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to update this tag.\n Entry: ${JSON.stringify(updates)}\nError: ${error.message }`);
             }
             throw Error("Something went wrong trying to update this tag.\n Entry: ${JSON.stringify(updates)}\nError: ${error}");

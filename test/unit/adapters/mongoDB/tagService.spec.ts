@@ -187,7 +187,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                await expect(tagService.updateTag(mockTag.id, {})).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await expect(tagService.updateTag(mockTag.id, {})).rejects.toThrow(CustomErrors.VOID_TAG);
             });
         });
     });

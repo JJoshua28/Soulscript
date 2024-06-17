@@ -12,6 +12,7 @@ const handleErrorMapper = (message: CustomErrors | string, req: Request): Struct
                 statusCode: HttpErrorCode.BAD_REQUEST
             }
         case CustomErrors.INVALID_ENTRY_ID:
+        case CustomErrors.VOID_TAG:
             return {
                 message: `${message}: ${JSON.stringify(req.body)}`,
                 statusCode: HttpErrorCode.NOT_FOUND

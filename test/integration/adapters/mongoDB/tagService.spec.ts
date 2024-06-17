@@ -69,7 +69,7 @@ describe("Tag Service", () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
                 const response = await tagSerivce.updateTag(globalTag.id, updates);
                 
-                expect(response).toEqual(expect.objectContaining({
+                expect(response).toStrictEqual(expect.objectContaining({
                     id: expect.any(String),
                     ...tagExpectation
                 }));
@@ -83,7 +83,7 @@ describe("Tag Service", () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
                 const response = await tagSerivce.updateTag(globalTag.id, updates);
                 
-                expect(response).toEqual(expect.objectContaining({
+                expect(response).toStrictEqual(expect.objectContaining({
                     id: expect.any(String),
                     ...tagExpectation
                 }));
@@ -113,7 +113,7 @@ describe("Tag Service", () => {
                 }
 
                 const tagSerivce = new MongoDBTagService(tagModel);
-                await expect(tagSerivce.updateTag(new mongoose.Types.ObjectId().toString(), updates)).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await expect(tagSerivce.updateTag(new mongoose.Types.ObjectId().toString(), updates)).rejects.toThrow(CustomErrors.VOID_TAG);
             });
         });
     });
