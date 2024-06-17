@@ -3,7 +3,7 @@ enum CustomErrors {
     INVALID_REQUEST = "Invalid request",
     INVALID_ENTRY_ID = "No entry exists with ID",
     INVALID_ENTRY_TYPE = "The request entry type does not match the received entry type",
-    INVALID_TAG_NAME = "Tag name does not exists",
+    INVALID_TAG = "Tag does not exists with the provided ID or name",
     VOID_TAG_SERVICE = "Tag service not found"
 }
 

@@ -41,6 +41,11 @@
               },
 
               {
+                "selector": "typeAlias",
+                "format": ["PascalCase"]
+              },
+
+              {
                 "selector": "property",
                 "format": ["camelCase"],
                 "leadingUnderscore": "allow"
