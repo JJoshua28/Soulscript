@@ -6,8 +6,8 @@ import tagSchema from "../schemas/tag";
 
 /*MongoDB converts the collection name into lowercase and pluralizes it.
 The collection name will really be "tags". */
-const collectionName = "Tag"
+export const tagCollectionName = "Tag"
 
-const tagModel: Model<TagDocument> = model<TagDocument>(collectionName, tagSchema);
+const tagModel: Model<TagDocument> = model<TagDocument>(tagCollectionName, tagSchema);
 
 export default tagModel;

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
 import {  Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
 
-const createNewEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
+const createNewEntry = (defaultEntry: NewEntry, entry?:NewCustomEntry): NewEntry=> {
     const {
         type,
         sharedID, 

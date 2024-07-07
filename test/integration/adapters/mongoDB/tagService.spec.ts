@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import type { NewTag, Tag } from "../../../../src/types/tags";
+import type { Tag } from "../../../../src/types/tags";
 import CustomErrors from "../../../../src/types/error";
 
 import MongoDBTagService from "../../../../src/adapters/mongoDB/tagService";
@@ -40,21 +40,17 @@ describe("Tag Service", () => {
     });
     describe("doAllTagsExist", () => {
         describe("Positive Tests", () => {
-            it("should return true if the tag name is taken", async () => {
+            it("should return true if the tag is taken", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
-                const response = await tagSerivce.doAllTagsExist([mockNewTag.name]);
+                const response = await tagSerivce.doAllTagsExist([new mongoose.Types.ObjectId(globalTag.id)]);
                 
                 expect(response).toBeTruthy();
             });
-            it("should return false if the tag name is not taken", async () => {
-                const newTag: NewTag = {
-                    name: "newTag",
-                    description: "newTagDescription",
-                    createdAt: new Date()
-                }
+            it("should return false if the tag id does not exist", async () => {
                 const tagSerivce = new MongoDBTagService(tagModel);
-                const response = await tagSerivce.doAllTagsExist([newTag.name]);
+                const response = await tagSerivce.doAllTagsExist([new mongoose.Types.ObjectId()]);
                 
+
                 expect(response).toBeFalsy();
             })
         })

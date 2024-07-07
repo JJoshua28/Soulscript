@@ -11,23 +11,42 @@ import entryModel from "../../services/mongoDB/models/entry";
 import mapNewEntry from "../../mappers/newEntry";
 import MongoDBTagService from "../../adapters/mongoDB/tagService";
 import tagModel from "../../services/mongoDB/models/tag";
+import validObjectID from "../../helpers/mongoDB/validateObjectId";
+import mapStringArrayToObjectIdArray from "../../mappers/mongoDB/stringToObjectID";
 
 const handleAddEntry = async (req: Request, type: EntryTypes): Promise<Entry> => {
-    if(!req.body?.content || typeof req.body?.content != "string" || req?.body?.content === " ") throw new Error(CustomErrors.INVALID_REQUEST);
-    
-    const tagService = new MongoDBTagService(tagModel);
-    const entryService = new MongoDBEntryService( { entryModel, tagService }, type);
-    const addEntryUseCase = new AddEntryUseCase(entryService);
+    const { content, datetime, tags } = req.body;
 
-    const {datetime} = (req.body as { datetime?: string });
-    
+    if (!content || typeof content !== "string" || content.trim() === "") {
+        throw new Error(CustomErrors.INVALID_REQUEST);
+    }
+
     if (datetime && !validDate(datetime)) throw new Error(CustomErrors.INVALID_DATE);
     
-    const formatedDate = datetime? 
-    moment(datetime).format("YYYY-MM-DD HH:mm:ss"): moment().format("YYYY-MM-DD HH:mm:ss");
-    const entry = mapNewEntry({...req.body}, {type, datetime: new Date(formatedDate)})
-    
-    return await addEntryUseCase.execute(entry);
+    if (tags && !Array.isArray(tags) || tags.length > 0 && !validObjectID(tags)) throw new Error(CustomErrors.INVALID_REQUEST);
+
+    const formattedDate = datetime
+        ? moment(datetime).format("YYYY-MM-DD HH:mm:ss")
+        : moment().format("YYYY-MM-DD HH:mm:ss");
+
+    const formattedTags = tags && tags.length > 0 ? 
+        mapStringArrayToObjectIdArray(tags) : [];
+
+    const newEntry = mapNewEntry({
+        sharedID: req.body?.sharedID,
+        datetime: new Date(formattedDate),
+        content,
+        tags: formattedTags,
+        subject: req.body?.subject,
+        quote: req.body?.quote,
+        type,
+    })
+
+    const tagService = new MongoDBTagService(tagModel);
+    const entryService = new MongoDBEntryService({ entryModel, tagService }, type);
+    const addEntryUseCase = new AddEntryUseCase(entryService);
+
+    return await addEntryUseCase.execute(newEntry);
 }
 
 export default handleAddEntry;

@@ -1,12 +1,14 @@
-import { EntryTypes, NewEntry, NewEntryRequest } from "../types/entries"
+import { NewEntry } from "../types/entries"
 
-const mapNewEntry = (entry: NewEntryRequest, {type, datetime}: {type: EntryTypes, datetime: Date}): NewEntry => {
+const mapNewEntry = (entry: NewEntry): NewEntry => {
     const {
         sharedID, 
         subject, 
         quote, 
         tags, 
-        content 
+        content,
+        datetime,
+        type
     } = entry
     const mappedEntry: NewEntry = {
         sharedID: sharedID || null,

@@ -6,7 +6,7 @@ export const defaultEntryExpectation = {
     type: expect.any(String),
     subject: expect.any(String),
     quote: expect.any(String),
-    tags: expect.arrayContaining([expect.any(String)]),
+    tags: expect.arrayContaining([expect.any(Object)]),
     content: expect.any(String),
     datetime: expect.anything() 
 }
@@ -22,7 +22,7 @@ export const entryDocumentExpectation = {
     type: expect.any(String),
     subject: expect.any(String),
     quote: expect.any(String),
-    tags: expect.arrayContaining([expect.any(String)]),
+    tags: expect.arrayContaining([expect.any(Object)]),
     content: expect.any(String),
     datetime: expect.anything() 
 }
