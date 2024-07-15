@@ -509,6 +509,7 @@ describe("Entry", ()=> {
                 it("should remove a gratitude entry and return it",  async () => {
                     const document =  createEntryDocument(defaultGratitudeEntry, {
                         tags: [tagDocument]
+
                     });
                     
                     jest.spyOn(mockEntryModel, "findById").mockResolvedValue(document);

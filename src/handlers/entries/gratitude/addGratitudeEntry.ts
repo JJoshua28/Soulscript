@@ -25,7 +25,11 @@ const handleAddGratitudeEntry = async (req: Request): Promise<Entry> => {
     
     const formatedDate = datetime? 
     moment(datetime).format("YYYY-MM-DD HH:mm:ss"): moment().format("YYYY-MM-DD HH:mm:ss");
-    const entry = mapNewEntry({...req.body}, {type: EntryTypes.GRATITUDE, datetime: new Date(formatedDate)})
+    const entry = mapNewEntry({
+        ...req.body,
+        type: EntryTypes.GRATITUDE,
+        datetime: new Date(formatedDate)
+    })
     
     return await addGratitudeUseCase.execute(entry);
 }

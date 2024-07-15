@@ -1,4 +1,4 @@
-import { CustomEntry, Entry } from "../../types/entries";
+import { Entry, NewCustomEntry } from "../../types/entries";
 import { EntryService } from "../../ports/entryService";
 
 class UpdateEntryUseCase {
@@ -6,7 +6,7 @@ class UpdateEntryUseCase {
         constructor (entryService: EntryService) {
         this.entryService  = entryService;
     }
-    async execute (id: string, update: CustomEntry): Promise<Entry> {
+    async execute (id: string, update: NewCustomEntry): Promise<Entry> {
         return await this.entryService.updateEntry(id, update)
     }
 }

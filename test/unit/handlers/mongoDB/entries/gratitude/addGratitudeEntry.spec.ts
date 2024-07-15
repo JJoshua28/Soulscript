@@ -1,15 +1,13 @@
 import {Request} from "express";
-import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 
 import { EntryTypes } from "../../../../../../src/types/entries";
 
 import AddEntryUseCase from "../../../../../../src/use cases/entries/addEntry";
-import mapNewEntry from "../../../../../../src/mappers/newEntry";
 import handleAddGratitudeEntry from "../../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
-import { createEntry, createNewEntry } from "../../../../../data/helpers/customEntry";
-import { defaultGratitudeEntry } from "../../../../../data/gratitudeEntry";
+import { defaultGratitudeEntry, newGratitudeEntry } from "../../../../../data/gratitudeEntry";
+import { mockDefaultTag } from "../../../../../data/tags";
 
 describe("Add Gratitude entry helper", () => {
     afterEach( async()=>{
@@ -28,53 +26,52 @@ describe("Add Gratitude entry helper", () => {
         `("should create an entry with date $date", async ({entry})=> {
             
             const request = { body: entry } as Request;
-            const newEntry = mapNewEntry(entry, {type: EntryTypes.GRATITUDE, datetime: entry.datetime || new Date()})
-            const entryExpectation = createEntry(defaultGratitudeEntry, newEntry)
+            const entryExpectation = {
+                ...defaultGratitudeEntry,
+                 ...entry
+            };
     
             const executeSpy = jest.spyOn(AddEntryUseCase.prototype, "execute");
             executeSpy.mockResolvedValue(entryExpectation);
     
             const response = await handleAddGratitudeEntry(request);
     
-            expect(response).toHaveProperty("content", entry.content);
+            expect(response).toHaveProperty("content", entryExpectation.content);
             expect(response).toHaveProperty("datetime");
-            expect(response).toHaveProperty("quote", entry.quote || null);
-            expect(response).toHaveProperty("subject", entry.subject || null);
-            expect(response).toHaveProperty("sharedID", entry.sharedID || null);
-            expect(response).toHaveProperty("tags", entry.tags || []);
+            expect(response).toHaveProperty("quote", entryExpectation.quote || null);
+            expect(response).toHaveProperty("subject", entryExpectation.subject || null);
+            expect(response).toHaveProperty("sharedID", entryExpectation.sharedID || null);
+            expect(response).toHaveProperty("tags", entryExpectation.tags || []);
             expect(response).toHaveProperty("id");
             expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
         });
         it("should create an entry when a request does not have a datetime", async()=>{
-            const {datetime, ...newEntryRequest} = createNewEntry(defaultGratitudeEntry);
-            const id = new mongoose.Types.ObjectId().toString(); 
-            const entry = createEntry({
-                datetime,
-                id, 
-                ...newEntryRequest
-            });
+            const entry = {
+                ...defaultGratitudeEntry,
+                ...newGratitudeEntry,
+                tags: [mockDefaultTag]
+            };
            
-            const request = { body: newEntryRequest } as Request
+            const request = { body: newGratitudeEntry } as Request
             
         
             const executeSpy = jest.spyOn(AddEntryUseCase.prototype, "execute");
-            executeSpy.mockResolvedValue({...entry, id});
+            executeSpy.mockResolvedValue(entry);
     
             const response = await handleAddGratitudeEntry(request);
     
-            expect(executeSpy).toHaveBeenCalledWith(expect.objectContaining(newEntryRequest))
+            expect(executeSpy).toHaveBeenCalledWith(expect.objectContaining(newGratitudeEntry))
             expect(response).toHaveProperty("content", entry.content);
             expect(response).toHaveProperty("datetime");
             expect(response).toHaveProperty("quote", entry.quote);
             expect(response).toHaveProperty("subject", entry.subject);
             expect(response).toHaveProperty("sharedID", entry.sharedID);
             expect(response).toHaveProperty("tags", entry.tags);
-            expect(response).toHaveProperty("id", id);
+            expect(response).toHaveProperty("id", entry.id);
             expect(response).toHaveProperty("type", EntryTypes.GRATITUDE);
         });
     })
     describe("Negative Tests", ()=> {
-        
         it.each`
         $requestBody
         ${{content: "happy"}}

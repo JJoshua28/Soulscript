@@ -6,7 +6,6 @@ import { EntryTypes } from "../../../../../src/types/entries";
 import handleGetEntryByDate from "../../../../../src/handlers/entries/getEntryByDate";
 import GetEntryByDateUseCase from "../../../../../src/use cases/entries/getEntryByDate";
 import { validDate } from "../../../../../src/helpers/validateDate";
-import { createEntry } from "../../../../data/helpers/customEntry";
 import { defaultMoodEntry } from "../../../../data/moodEntry";
 
 jest.mock("../../../../../src/helpers/validateDate");
@@ -23,23 +22,28 @@ describe("Get Mood entry  by date helper", () => {
         })
         
         it.each`
-        date            | entry
-        ${"2020-01-01"} | ${[createEntry(defaultMoodEntry, {datetime: new Date("2020-01-01")}), createEntry(defaultMoodEntry, {datetime: new Date("2020-01-01"), subject: "test"})]}
-        ${"2021-05-06"} | ${[createEntry(defaultMoodEntry, {datetime: new Date("2021-05-06")})]}
-        ${"2022-08-12"} | ${[createEntry(defaultMoodEntry, {datetime: new Date("2022-08-12")}), createEntry(defaultMoodEntry, {datetime: new Date("2022-08-12"), quote: "its a test thing"})]}
-        ${"2023-11-26"} | ${[createEntry(defaultMoodEntry, {datetime: new Date("2023-11-26")})]}
-        `("should get a mood entry with date $date", async ({date, entry})=> {
-            
+        date            
+        ${"2020-01-01"} 
+        ${"2021-05-06"} 
+        ${"2022-08-12"} 
+        ${"2023-11-26"} 
+        `("should get a mood entry with date $date", async ({date})=> {
+            const testDate = new Date(date);
+
+            const entries = [{
+                ...defaultMoodEntry,
+                datetime: testDate
+            }];
             const request = ({body:  {datetime: date}} as Request)
             
             
             const executeSpy = jest.spyOn(GetEntryByDateUseCase.prototype, "execute");
-            executeSpy.mockResolvedValue(entry);
+            executeSpy.mockResolvedValue(entries);
             
             const response = await handleGetEntryByDate(request, EntryTypes.MOOD);
             
-            expect(executeSpy).toHaveBeenCalledWith(new Date(date));
-            expect(response).toEqual(expect.arrayContaining(entry));
+            expect(executeSpy).toHaveBeenCalledWith(testDate);
+            expect(response).toEqual(expect.arrayContaining(entries));
             expect(response[0]).toHaveProperty("datetime", new Date(date));
             expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
         });

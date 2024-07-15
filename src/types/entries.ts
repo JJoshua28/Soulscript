@@ -42,11 +42,6 @@ export interface NewCustomEntry {
   content?: string | string[],
 }
 
-export interface CustomEntry extends Omit<NewCustomEntry, "datetime" | "tags"> {
-  datetime?: Date,
-  tags?: Tag[]
-}
-
-export interface CustomEntryDocument extends Omit<CustomEntry, "tags"> {
+export interface CustomEntryDocument extends Omit<NewCustomEntry, "tags"> {
   tags?: TagDocument[]
 }

@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { CustomEntry, Entry, EntryTypes, NewCustomEntry } from "../../../types/entries";
+import { Entry, EntryTypes, NewCustomEntry } from "../../../types/entries";
 import CustomErrors from "../../../types/error";
 
 import MongoDBEntryService from "../../../adapters/mongoDB/entryService";
@@ -24,9 +24,9 @@ const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
 
     if(update?.datetime) update = {
         ...update,
-    } as CustomEntry;
+    }
 
-    const entryUpdate:CustomEntry = {...update  as CustomEntry} 
+    const entryUpdate = {...update  as NewCustomEntry} 
     return await updateGratitudeUseCase.execute(id, entryUpdate);
 }
 
