@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 import type { TagDocument } from "../../../../src/services/mongoDB/types/document";
 import CustomErrors from "../../../../src/types/error";
@@ -46,20 +46,24 @@ describe("Tag", () => {
     });
     describe("doAllTagsExist", () => {
         describe("Positive Tests", () => {
-            it("should return true if all tag names are taken", async () => {
+            it("should return true if a document with that tag id exist", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValue(true);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                const response = await tagService.doAllTagsExist(["tag1", "tag2", "tag3"]);
+                const response = await tagService.doAllTagsExist([
+                    new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                ]);
                 
                 
                 expect(response).toBeTruthy();
             });
-            it("should return false if the tag name is not taken", async () => {
+            it("should return false if no document exists with that tag id", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
                 const tagService = new MongoDBTagService(mockTagModel);
-                const response = await tagService.doAllTagsExist(["tag3", "tag4", "tag5"]);
+                const response = await tagService.doAllTagsExist([
+                    new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                ]);
                 
                 expect(response).toBeFalsy();
             });
@@ -70,7 +74,9 @@ describe("Tag", () => {
                     mockTagModel.exists = jest.fn().mockRejectedValueOnce(new Error());
                     
                     const tagService = new MongoDBTagService(mockTagModel);
-                    await expect(tagService.doAllTagsExist(["tag1", "tag2", "tag3"])).rejects.toThrow(Error);
+                    await expect(tagService.doAllTagsExist([
+                        new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                    ])).rejects.toThrow(Error);
                 });
             });
         });

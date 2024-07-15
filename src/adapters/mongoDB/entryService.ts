@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import mongoose, { Model } from "mongoose";
 
-import type { CustomEntry, Entry, EntryTypes, NewEntry } from "../../types/entries";
+import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
 import CustomErrors from "../../types/error";
 import type { EntryService } from "../../ports/entryService";
 import type { EntryDocument, TagDocument } from "../../services/mongoDB/types/document";
@@ -54,9 +54,11 @@ class MongoDBEntryService implements EntryService {
     
             const response:EntryDocument[] = await this.entryServiceModel.find(dateQuery).populate<{ tags: TagDocument[] }>("tags");
 
-            await response.forEach(async entry => {
-                if(!await entry.populated("tags")) throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
-            });
+            for (const entry of response) {
+                if (!await entry.populated("tags")) {
+                    throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
+                }
+            }
 
             const mappedEntries = mapDocumentsToEntry(response);
 
@@ -66,7 +68,7 @@ class MongoDBEntryService implements EntryService {
         }
     }
 
-    async updateEntry(id: string, update: CustomEntry): Promise<Entry> {
+    async updateEntry(id: string, update: NewCustomEntry): Promise<Entry> {
         try {
             const entryToUpdate = await this.entryServiceModel.findById(id);
             if (!entryToUpdate) throw new Error(CustomErrors.INVALID_ENTRY_ID);

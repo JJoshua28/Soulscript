@@ -1,6 +1,7 @@
 import type { Types } from "mongoose";
 
 import type { Tag } from "./tags";
+import { TagDocument } from "../services/mongoDB/types/document";
 
 export enum EntryTypes {
   MOOD = "mood",
@@ -41,6 +42,11 @@ export interface NewCustomEntry {
   content?: string | string[],
 }
 
-export interface CustomEntry extends Omit<NewCustomEntry, "datetime"> {
+export interface CustomEntry extends Omit<NewCustomEntry, "datetime" | "tags"> {
   datetime?: Date,
+  tags?: Tag[]
+}
+
+export interface CustomEntryDocument extends Omit<CustomEntry, "tags"> {
+  tags?: TagDocument[]
 }
