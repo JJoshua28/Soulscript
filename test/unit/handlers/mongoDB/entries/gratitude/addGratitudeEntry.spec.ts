@@ -51,8 +51,10 @@ describe("Add Gratitude entry helper", () => {
                 ...newGratitudeEntry,
                 tags: [mockDefaultTag]
             };
+
+            const {datetime, ...requestBody } = newGratitudeEntry;
            
-            const request = { body: newGratitudeEntry } as Request
+            const request = { body: requestBody } as Request
             
         
             const executeSpy = jest.spyOn(AddEntryUseCase.prototype, "execute");
@@ -60,7 +62,7 @@ describe("Add Gratitude entry helper", () => {
     
             const response = await handleAddGratitudeEntry(request);
     
-            expect(executeSpy).toHaveBeenCalledWith(expect.objectContaining(newGratitudeEntry))
+            expect(executeSpy).toHaveBeenCalledWith(expect.objectContaining(requestBody));
             expect(response).toHaveProperty("content", entry.content);
             expect(response).toHaveProperty("datetime");
             expect(response).toHaveProperty("quote", entry.quote);

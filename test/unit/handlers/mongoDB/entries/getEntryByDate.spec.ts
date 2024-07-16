@@ -47,7 +47,7 @@ describe("Get Mood entry  by date helper", () => {
             expect(response[0]).toHaveProperty("datetime", new Date(date));
             expect(response[0]).toHaveProperty("type", EntryTypes.MOOD);
         });
-    })
+    });
     describe("Negative Tests", ()=> {
         beforeAll(()=>{
             mockValidDate.mockReturnValue(false);
