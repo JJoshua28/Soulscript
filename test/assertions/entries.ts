@@ -39,7 +39,7 @@ export const httpEntryExpectation = {
     content: expect.any(String),
     quote: expect.any(String),
     subject: expect.any(String),
-    tags: expect.arrayContaining([expect.any(String)]),
+    tags: expect.arrayContaining([expect.any(Object)]),
     type: expect.any(String)
 }
 

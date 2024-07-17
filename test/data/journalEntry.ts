@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 import { Entry, EntryTypes, NewEntry } from "../../src/types/entries";
+import offsetDateByHours from "../../src/helpers/offsetDate";
 
-const datetime = new Date();
-datetime.setUTCHours(15,0,0,0)
+const datetime = offsetDateByHours(2)
 
 
 export const defaultJournalEntry: Entry = {

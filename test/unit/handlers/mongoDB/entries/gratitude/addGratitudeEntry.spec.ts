@@ -8,6 +8,7 @@ import AddEntryUseCase from "../../../../../../src/use cases/entries/addEntry";
 import handleAddGratitudeEntry from "../../../../../../src/handlers/entries/gratitude/addGratitudeEntry"
 import { defaultGratitudeEntry, newGratitudeEntry } from "../../../../../data/gratitudeEntry";
 import { mockDefaultTag } from "../../../../../data/tags";
+import mongoose from "mongoose";
 
 describe("Add Gratitude entry helper", () => {
     afterEach( async()=>{
@@ -19,7 +20,7 @@ describe("Add Gratitude entry helper", () => {
         entry
         ${{ content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}}
         ${{ datetime: new Date("2020"), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
-        ${{ tags: ["Lorem Ipsum", "Ipsum Lorem"], content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
+        ${{ tags: [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()], content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         ${{ quote: "Always knew we would get our revenge", content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         ${{ subject: "Testing", content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}
         ${{ sharedID: uuidv4(), content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}})}

@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Entry, EntryTypes, NewEntry } from "../../src/types/entries";
 import {  EntryDocument }  from "../../src/services/mongoDB/types/document";
+import offsetDateByHours from "../../src/helpers/offsetDate";
 
-const datetime = new Date();
-datetime.setUTCHours(15,0,0,0)
+const datetime = offsetDateByHours(2)
 
 
 const defaultGratitudeEntry:Entry = {

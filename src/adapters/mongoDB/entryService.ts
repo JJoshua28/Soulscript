@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import mongoose, { Model } from "mongoose";
 
 import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
@@ -28,7 +27,8 @@ class MongoDBEntryService implements EntryService {
         try {
             if(entry.tags.length > 0) {
                 if (!this.tagService) throw new Error(CustomErrors.VOID_TAG_SERVICE);
-                if(!await this.tagService.doAllTagsExist(entry.tags)) throw new Error(CustomErrors.INVALID_TAG); 
+                const doAllTagsExist = await this.tagService.doAllTagsExist(entry.tags);
+                if(!doAllTagsExist) throw new Error(CustomErrors.INVALID_TAG); 
             }
             if(entry.type !== this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
 
@@ -73,10 +73,13 @@ class MongoDBEntryService implements EntryService {
             const entryToUpdate = await this.entryServiceModel.findById(id);
             if (!entryToUpdate) throw new Error(CustomErrors.INVALID_ENTRY_ID);
             if (entryToUpdate.type != this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
+            
+            const {tags} = update;
+            if(tags && tags?.length > 0) {
 
-            if(update?.tags && update?.tags?.length > 0) {
                 if (!this.tagService) throw new Error(CustomErrors.VOID_TAG_SERVICE);
-                if(!await this.tagService.doAllTagsExist(update.tags)) throw new Error(CustomErrors.INVALID_TAG);   
+                
+                if(!await this.tagService.doAllTagsExist(tags)) throw new Error(CustomErrors.INVALID_TAG);   
             }
 
             const options = {
@@ -94,7 +97,10 @@ class MongoDBEntryService implements EntryService {
             return mappedMoodEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_ENTRY_ID || error.message === CustomErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
+                if (error.message === CustomErrors.INVALID_ENTRY_ID || 
+                    error.message === CustomErrors.INVALID_ENTRY_TYPE ||
+                    error.message === CustomErrors.INVALID_TAG
+                ) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error.message}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);
