@@ -19,6 +19,7 @@ import { newGratitudeEntry } from "../../../data/gratitudeEntry";
 import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../../data/helpers/addTestEntries";
 import { newJournalEntry } from "../../../data/journalEntry";
 import { seedTagData } from "../../../data/helpers/seedTagData";
+import offsetDateByHours from "../../../../src/helpers/offsetDate";
 
 describe("Entries", () => {
     const tagUpdateIds:Types.ObjectId[] = [];   
@@ -26,8 +27,7 @@ describe("Entries", () => {
     let globalGratitudeEntry: Entry;
     let globalJournalEntry: Entry;
 
-    const todaysDate = new Date();
-    todaysDate.setUTCHours(15,0,0,0);
+    const todaysDate = offsetDateByHours(2);
 
     beforeAll(async () => {
         await mongooseMemoryDB.setupTestEnvironment();
@@ -322,7 +322,7 @@ describe("Entries", () => {
                     date                                                | message
                     ${new Date("2020")}                                 | ${"a previous custom date in 2020"}
                     ${new Date("2022-03-22")}                           | ${"a previous custom date in 2022"}
-                    ${todaysDate} | ${"today's date"}
+                    ${todaysDate}                                       | ${"today's date"}
                 `("should add a gratitude entry containing a tag with $message", async ({date}) => {
                     const tagService = new MongoDBTagService(tagModel);
                     

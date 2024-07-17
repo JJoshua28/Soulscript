@@ -7,9 +7,9 @@ import { Entry, EntryTypes, NewEntry } from "../../../src/types/entries";
 
 import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
 import { mapDocumentsToEntry } from "../../../src/mappers/mongoDB/documents";
+import offsetDateByHours from "../../../src/helpers/offsetDate";
 
-const datetime = new Date();
-datetime.setUTCHours(15,0,0,0)
+const datetime = offsetDateByHours(2);
 
 export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
     const gratitudeEntry:NewEntry = {
