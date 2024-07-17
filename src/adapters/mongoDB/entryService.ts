@@ -1,9 +1,9 @@
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
-import type { CustomEntry, Entry, EntryTypes, NewEntry } from "../../types/entries";
+import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
 import CustomErrors from "../../types/error";
 import type { EntryService } from "../../ports/entryService";
-import type { EntryDocument } from "../../services/mongoDB/types/document";
+import type { EntryDocument, TagDocument } from "../../services/mongoDB/types/document";
 import { TagService } from "../../ports/tagService";
 
 import { mapDocumentToEntry, mapDocumentsToEntry } from "../../mappers/mongoDB/documents";
@@ -12,10 +12,10 @@ import { getByDateQuery } from "../../services/mongoDB/queries/moodEntry";
 class MongoDBEntryService implements EntryService {
     private entryServiceModel: Model<EntryDocument>;
     private entryType: EntryTypes;
-    private tagService?: TagService;
+    private tagService?: TagService<mongoose.Types.ObjectId>;
 
     constructor(
-        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService; },
+        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService<mongoose.Types.ObjectId>; },
         entryType: EntryTypes
     ) {
         this.entryServiceModel = entryModel;
@@ -27,12 +27,17 @@ class MongoDBEntryService implements EntryService {
         try {
             if(entry.tags.length > 0) {
                 if (!this.tagService) throw new Error(CustomErrors.VOID_TAG_SERVICE);
-                if(!await this.tagService.doAllTagsExist(entry.tags)) throw new Error(CustomErrors.INVALID_TAG);   
+                const doAllTagsExist = await this.tagService.doAllTagsExist(entry.tags);
+                if(!doAllTagsExist) throw new Error(CustomErrors.INVALID_TAG); 
             }
             if(entry.type !== this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
 
-            const response = await this.entryServiceModel.create({ ...entry });
-            const mappedMoodEntry = mapDocumentToEntry(response);
+            const response = await this.entryServiceModel.create(entry);
+            const populatedResponse:EntryDocument = await response.populate<{ tags: TagDocument[] }>("tags");
+            
+            if(!response.populated("tags")) throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
+            
+            const mappedMoodEntry = mapDocumentToEntry(populatedResponse);
             return mappedMoodEntry;
         } catch (error) {
             if (error instanceof Error) {
@@ -46,32 +51,56 @@ class MongoDBEntryService implements EntryService {
     async getEntryByDate(date: Date): Promise<Entry[] | []> {
         try {
             const dateQuery = getByDateQuery(date, this.entryType);
-            const response = await this.entryServiceModel.find(dateQuery);
-            return mapDocumentsToEntry(response);
+    
+            const response:EntryDocument[] = await this.entryServiceModel.find(dateQuery).populate<{ tags: TagDocument[] }>("tags");
+
+            for (const entry of response) {
+                if (!await entry.populated("tags")) {
+                    throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
+                }
+            }
+
+            const mappedEntries = mapDocumentsToEntry(response);
+
+            return mappedEntries;
         } catch (error) {
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`);
         }
     }
 
-    async updateEntry(id: string, update: CustomEntry): Promise<Entry> {
+    async updateEntry(id: string, update: NewCustomEntry): Promise<Entry> {
         try {
             const entryToUpdate = await this.entryServiceModel.findById(id);
             if (!entryToUpdate) throw new Error(CustomErrors.INVALID_ENTRY_ID);
             if (entryToUpdate.type != this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
+            
+            const {tags} = update;
+            if(tags && tags?.length > 0) {
+
+                if (!this.tagService) throw new Error(CustomErrors.VOID_TAG_SERVICE);
+                
+                if(!await this.tagService.doAllTagsExist(tags)) throw new Error(CustomErrors.INVALID_TAG);   
+            }
 
             const options = {
                 new: true,
                 runValidators: true,
                 returnDocument: "after" as const
             };
-            const response = await this.entryServiceModel.findByIdAndUpdate(id, update, options);
-            if (!response) throw new Error();
+            const response = await this.entryServiceModel.findByIdAndUpdate(id, update, options).populate<{ tags: TagDocument[] }>("tags").orFail();
+            
+            if(!response) throw new Error();
+
+            if(!response.populated("tags")) throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
 
             const mappedMoodEntry = mapDocumentToEntry(response);
             return mappedMoodEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_ENTRY_ID || error.message === CustomErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
+                if (error.message === CustomErrors.INVALID_ENTRY_ID || 
+                    error.message === CustomErrors.INVALID_ENTRY_TYPE ||
+                    error.message === CustomErrors.INVALID_TAG
+                ) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to update this Entry.\n Entry ID: ${id}\nError: ${error.message}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);
@@ -85,13 +114,15 @@ class MongoDBEntryService implements EntryService {
             if (!entryToDelete) throw new Error(CustomErrors.INVALID_ENTRY_ID);
             if (entryToDelete.type != this.entryType) throw new Error(CustomErrors.INVALID_ENTRY_TYPE);
 
-            const response = await this.entryServiceModel.findByIdAndDelete(id);
+            const response = await this.entryServiceModel.findByIdAndDelete(id).populate<{ tags: TagDocument[] }>("tags").orFail();
             if (!response) throw new Error();
+
+            if(!response.populated("tags")) throw new Error(CustomErrors.INTERNAL_TAG_REF_ERROR);
 
             return mapDocumentToEntry(response);
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_ENTRY_ID || error.message === CustomErrors.INVALID_ENTRY_TYPE) throw new Error(error.message);
+                if (error.message === CustomErrors.INVALID_ENTRY_ID || error.message === CustomErrors.INVALID_ENTRY_TYPE, CustomErrors.INTERNAL_TAG_REF_ERROR) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to remove a document with ID: ${id}`);
             } else {
                 throw new Error(`An unknown error occurred.\n Entry ID: ${id}`);

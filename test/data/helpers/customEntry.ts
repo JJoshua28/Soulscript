@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+
 import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
-import {  Entry, NewEntry, CustomEntry, NewCustomEntry } from "../../../src/types/entries";
+import {  Entry, NewEntry,NewCustomEntry, CustomEntryDocument } from "../../../src/types/entries";
 
-const createNewEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): NewEntry=> {
+const createNewEntry = (defaultEntry: NewEntry, entry?:NewCustomEntry): NewEntry=> {
     const {
         type,
         sharedID, 
@@ -25,31 +26,7 @@ const createNewEntry = (defaultEntry: NewEntry | Entry, entry?:NewCustomEntry): 
     }
 }
 
-const createEntry = (defaultEntry: Entry, entry?:CustomEntry): Entry=> {
-    const {
-        id,
-        type,
-        sharedID, 
-        subject, 
-        quote, 
-        tags, 
-        datetime, 
-        content 
-    } = defaultEntry;
-    return {
-        id,
-        type,
-        sharedID,
-        subject,
-        quote,
-        tags,
-        datetime,
-        content,
-        ...entry
-    }
-}
-
-const createEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => {
+const createEntryDocument = (defaultDocument: Entry, entry?:CustomEntryDocument) => {
     const {
         id,
         type,
@@ -75,5 +52,5 @@ const createEntryDocument = (defaultDocument: Entry, entry?:CustomEntry) => {
 }
 
 
-export { createNewEntry, createEntry, 
+export { createNewEntry, 
     createEntryDocument }

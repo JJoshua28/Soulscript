@@ -1,3 +1,8 @@
+import type { Types } from "mongoose";
+
+import type { Tag } from "./tags";
+import { TagDocument } from "../services/mongoDB/types/document";
+
 export enum EntryTypes {
   MOOD = "mood",
   JOURNAL = "journal",
@@ -9,7 +14,7 @@ export interface NewEntryRequest {
   sharedID?: string;
   subject?: string;
   quote?: string;
-  tags?: string[];
+  tags?: Types.ObjectId[];
   datetime?: string;
 }
 
@@ -18,24 +23,25 @@ export interface NewEntry {
     sharedID: string | null;
     subject: string | null;
     quote: string | null;
-    tags: string[];
+    tags: Types.ObjectId[];
     datetime: Date ;
     content: string | string[];
 }
 
-export interface Entry extends NewEntry {
+export interface Entry extends Omit<NewEntry, "tags"> {
   id: string,
+  tags: Tag[],
 }
 
 export interface NewCustomEntry {
   sharedID?: string | null,
   subject?: string | null,
   quote?: string | null,
-  tags?: string[],
+  tags?: Types.ObjectId[],
   datetime?: Date,
   content?: string | string[],
 }
 
-export interface CustomEntry extends Omit<NewCustomEntry, "datetime"> {
-  datetime?: Date,
+export interface CustomEntryDocument extends Omit<NewCustomEntry, "tags"> {
+  tags?: TagDocument[]
 }

@@ -1,11 +1,15 @@
 import { Model } from "mongoose";
 
-import { TagDocument } from "../../../src/services/mongoDB/types/document";
+import type { TagDocument } from "../../../src/services/mongoDB/types/document";
+import type { Tag } from "../../../src/types/tags";
 
-export const seedTagData = async (model: Model<TagDocument>, name: string) => {
+import { mapDocumentToTag } from "../../../src/mappers/mongoDB/documents";
+
+export const seedTagData = async (model: Model<TagDocument>, name: string): Promise<Tag> => {
     const tag = {
         name,
         createdAt: new Date()
     };
-    await model.create(tag);
+   const response = await model.create(tag);
+   return mapDocumentToTag(response);
 }

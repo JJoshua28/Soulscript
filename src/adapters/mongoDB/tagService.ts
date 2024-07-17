@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 import { TagDocument } from "../../services/mongoDB/types/document";
 import { NewTag, Tag, TagUpdates } from "../../types/tags";
@@ -7,7 +7,7 @@ import { TagService } from "../../ports/tagService";
 
 import { mapDocumentToTag, mapDocumentsToTags } from "../../mappers/mongoDB/documents";
 
-class MongoDBTagService implements TagService {
+class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
     private model: Model<TagDocument>;
     constructor(model: Model<TagDocument>) {
         this.model = model;
@@ -31,9 +31,9 @@ class MongoDBTagService implements TagService {
             throw Error(`Something went wrong trying to create this tag.\n Entry: ${JSON.stringify(tag)}\nError: ${error}`)
         }
     }
-    async doAllTagsExist(tagNames: string[]): Promise<boolean> {
-        for (const name of tagNames) {
-            const result = !!await this.model.exists({name});
+    async doAllTagsExist(tagIDs: mongoose.Types.ObjectId[]): Promise<boolean> {
+        for (const id of tagIDs) {
+            const result = !!await this.model.exists({_id: id});
             if (!result) return false;
         }
         return true;
@@ -72,7 +72,6 @@ class MongoDBTagService implements TagService {
         }
         
     }
-        
 }
 
 export default MongoDBTagService;

@@ -1,11 +1,12 @@
 import { Schema } from "mongoose";
 
 import { EntryDocument } from "../types/document";
+import { tagCollectionName } from "../models/tag";
 
 const entrySchemaTypes = {
     type: { type: String, required: true},
     sharedID: { type: String, default: null},
-    tags: { type: [String], required: true},
+    tags: [{ type: Schema.Types.ObjectId, ref: tagCollectionName, required: true }],
     subject: {type: String,  default: null},
     quote: { type: String,  default: null},
     content: { 

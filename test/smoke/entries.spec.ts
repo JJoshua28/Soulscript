@@ -2,35 +2,59 @@ import moment from "moment";
 import request from "supertest"
 import mongoose from "mongoose";
 import waitForExpect from "wait-for-expect";
+import { v4 as uuidv4 } from "uuid";
 
-import { Entry, EntryTypes, NewEntry, NewEntryRequest } from "../../src/types/entries";
-import { HttpErrorCode } from "../../src/types/error";
+import type { TagResponse } from "../../src/types/tags";
+import { Entry, EntryTypes, NewEntryRequest } from "../../src/types/entries";
+import CustomErrors, { HttpErrorCode } from "../../src/types/error";
 
 import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
-import { defaultGratitudeEntry } from "../data/gratitudeEntry";
-import { createNewEntry } from "../data/helpers/customEntry";
+import { defaultGratitudeEntry, newGratitudeEntry } from "../data/gratitudeEntry";
 import { seedGratitudeEntryTestData } from "../data/helpers/addTestEntries";
-import { defaultMoodEntry } from "../data/moodEntry";
+import { newMoodEntry } from "../data/moodEntry";
 import { httpEntryExpectation } from "../assertions/entries";
-import { defaultJournalEntry } from "../data/journalEntry";
+import { defaultJournalEntry, newJournalEntry } from "../data/journalEntry";
 import entryModel from "../../src/services/mongoDB/models/entry";
 import { seedTagData } from "../data/helpers/seedTagData";
 import tagModel from "../../src/services/mongoDB/models/tag";
 
-
+ 
 describe("Entry smoke tests", () => {
-    describe("Mood", () => {
-        beforeAll ( async () => {
-            await mongooseMemoryDB.setupTestEnvironment();
-            seedTagData(tagModel, defaultMoodEntry.tags[0])
+    const tagIds: mongoose.Types.ObjectId[] = [];
+    const globalTags: TagResponse[] = [];
+    beforeAll ( async () => {
+        await mongooseMemoryDB.setupTestEnvironment();
+        const tag1 = await seedTagData(tagModel, "test");
+        const tag2 = await seedTagData(tagModel, "Update test");
+
+        tagIds.push(
+            new mongoose.Types.ObjectId(tag1.id),
+            new mongoose.Types.ObjectId(tag2.id)
+        );
+
+        globalTags.push({
+            ...tag1,
+            createdAt: tag1.createdAt.toISOString()
+        }, {
+            ...tag2,
+            createdAt: tag2.createdAt.toISOString()
         });
+        await seedGratitudeEntryTestData(entryModel, [tagIds[0]]);
+        
+
+    });
+    describe("Mood", () => {
         let moodEntry: Entry;
         describe("POST /api/entries/mood/add", () => {
             const url = "/api/entries/mood/add"
             describe("Positive Tests", () => {
                 it("should add a mood entry", async () => {
-                    const entry: NewEntry = createNewEntry(defaultMoodEntry);
+                    const {datetime, ...moodEntryRequest} = newMoodEntry;
+                    const entry = {
+                        ...moodEntryRequest,
+                        tags: [tagIds[0]]
+                    };
                     const response = await request(app)
                         .post(url)
                         .send(entry)
@@ -40,7 +64,7 @@ describe("Entry smoke tests", () => {
                     moodEntry = response.body;
                 });
                 it("should add a mood entry with a specific date", async () => {
-                    const {content } = defaultJournalEntry;
+                    const {content } = newMoodEntry;
                     const datetime = moment("2020-05-05 15:00:00").format("YYYY-MM-DD HH:mm:ss");
                     const response = await request(app)
                         .post(url)
@@ -79,14 +103,33 @@ describe("Entry smoke tests", () => {
         
                     expect(response).toHaveProperty("text", expect.any(String));
                 });
-                it("should throw when trying to create an entry with a tag that does not exist", async () => {
-                    const requestData = createNewEntry(defaultMoodEntry, {tags: ["InvalidTag"]})
+                it("should throw when trying to create an entry with an invalid tag", async () => {
+                    const requestData = {
+                        ...newMoodEntry, 
+                        tags: ["InvalidTag"]
+                    };
+
                     const response = await request(app)
                         .post(url)
                         .send(requestData)
                         .expect(HttpErrorCode.BAD_REQUEST);
         
-                    expect(response).toHaveProperty("text", expect.any(String));
+                    expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+
+                });
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = {
+                        ...newMoodEntry, 
+                        tags: [new mongoose.Types.ObjectId()]
+                    };
+
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                    expect(response.text).toContain(CustomErrors.INVALID_TAG);
+
                 });
             })
         });
@@ -94,7 +137,7 @@ describe("Entry smoke tests", () => {
             const url = "/api/entries/mood/get-entry-by-date"
             describe("Positive Tests", () => {
                 it("should retrieve a mood entry with today's date", async () => {
-                    const date = (new Date(moment().startOf("day").toISOString())).toISOString()
+                    const date = new Date()
                     const response = await request(app)
                     .get(url)
                     .send({
@@ -137,23 +180,44 @@ describe("Entry smoke tests", () => {
         describe("PUT api/entries/mood/update", () => {
             const url = "/api/entries/mood/update";
             describe("Positive Tests", () => {
-                it(`should update the mood entry with by ID`, async () => {
+                it(`should update the mood entry by ID`, async () => {
                 const {id} = moodEntry
              
-                const tags = ["life, philosophy"];
+                const subject = "Updating entry test"
                 const content = "unsure" 
                 const response  = await request(app)
                 .put(url)
                 .send({id, update: {
-                    tags,
+                    subject,
                     content
                 }})
                 .expect(200);
     
-                expect(response.body.id).toEqual(id);
-                expect(response.body.tags).toEqual(tags);
-                expect(response.body.content).toEqual(content);
-                expect(response.body).toEqual(expect.objectContaining(httpEntryExpectation));
+                expect(response.body).toStrictEqual({
+                    ...moodEntry,
+                    subject,
+                    content,
+                });
+                moodEntry = {
+                    ...response.body,
+                }
+                });
+                it(`should update the mood entry with new tags by ID`, async () => {
+                    const {id} = moodEntry                 
+                    const content = "unsure" 
+                    const response  = await request(app)
+                    .put(url)
+                    .send({id, update: {
+                        tags: tagIds,
+                        content
+                    }})
+                    .expect(200);
+        
+                    expect(response.body).toStrictEqual({
+                        ...moodEntry,
+                        tags: globalTags,
+                        content,
+                    });
                 });
             });
             describe("Negative Tests", () => {
@@ -188,7 +252,38 @@ describe("Entry smoke tests", () => {
                         .expect(HttpErrorCode.NOT_FOUND);
         
                     expect(response).toHaveProperty("text", expect.any(String))
-                })
+                });
+                it("should throw when trying to update an entry with an invalid tag", async () => {
+                    const {id} = moodEntry;
+
+                    const tags = ["InvalidTag"];
+                    const response = await request(app)
+                        .put(url)
+                        .send({
+                            id, 
+                            update: {
+                                tags
+                            }
+                        })
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+
+    
+                        expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+    
+                });
+                it("should throw when trying to update an entry with a tag that does not exist", async () => {
+                    const {id} = moodEntry;
+
+                    const tags = [new mongoose.Types.ObjectId()];
+                    const response = await request(app)
+                        .put(url)
+                        .send({id, update: {tags}})
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                        expect(response.text).toContain(CustomErrors.INVALID_TAG);
+    
+                });
             })
     
         }); 
@@ -231,15 +326,8 @@ describe("Entry smoke tests", () => {
                 });
             })
         });
-        afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
     })
     describe("Gratitude", () => {
-        beforeAll ( async () => {
-            await mongooseMemoryDB.setupTestEnvironment();
-            seedTagData(tagModel, defaultGratitudeEntry.tags[0])
-            await seedGratitudeEntryTestData(entryModel);
-
-        });
         let gratitudeEntry: Entry; 
         describe("POST /api/entries/gratitude/add", () => {
             const url = "/api/entries/gratitude/add"
@@ -277,20 +365,23 @@ describe("Entry smoke tests", () => {
                         expect(response.body).toHaveProperty("id", expect.any(String));
                 });
                 it("should add a complete gratitude entry", async () => {
-                    const {datetime, type, ...entry} = createNewEntry(defaultGratitudeEntry);
+                    const entry = {
+                        ...newGratitudeEntry,
+                        tags: [tagIds[0]]
+                    }
+                    
                     const response = await request(app)
                         .post(url)
                         .send(entry)
                         .expect(200);
                     
-                    expect(response.body).toHaveProperty("datetime", expect.any(String));
-                    expect(response.body.quote).toEqual(expect.any(String));
-                    expect(response.body.subject).toEqual(expect.any(String));
-                    expect(response.body.sharedID).toEqual(expect.any(String));
-                    expect(response.body.tags).toEqual(expect.arrayContaining([expect.any(String)]));
+                    expect(response.body).toEqual(expect.objectContaining({
+                        ...entry,
+                        type: EntryTypes.GRATITUDE,
+                        tags: [globalTags[0]],
+                        datetime: entry.datetime.toJSON()
+                    }));
                     expect(response.body.id).toEqual(expect.any(String));
-                    expect(response.body.type).toEqual(EntryTypes.GRATITUDE);
-                    
                 });
             });
             describe("Negative Tests", () => {
@@ -307,16 +398,37 @@ describe("Entry smoke tests", () => {
         
                     expect(response).toHaveProperty("text", expect.any(String))
                 });
-                it("should throw when trying to create an entry with a tag that does not exist", async () => {
-                    const requestData = createNewEntry(defaultGratitudeEntry, {tags: ["InvalidTag"]})
+                it("should throw when trying to create an entry with an invalid tag", async () => {
+                    const requestData = {
+                        ...newGratitudeEntry,
+                        tags: ["InvalidTag"]
+                    }
                     const response = await request(app)
                         .post(url)
                         .send(requestData)
                         .expect(HttpErrorCode.BAD_REQUEST);
         
-                    expect(response).toHaveProperty("text", expect.any(String));
+
+    
+                        expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+    
                 });
-            })
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = {
+                        ...newGratitudeEntry,
+                        tags: [new mongoose.Types.ObjectId()]
+                    }
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+
+    
+                        expect(response.text).toContain(CustomErrors.INVALID_TAG);
+    
+                });
+            });
         });
         describe("GET /api/entries/gratitude/get-entry-by-date", () => {
             const url = "/api/entries/gratitude/get-entry-by-date"
@@ -371,12 +483,32 @@ describe("Entry smoke tests", () => {
         describe("PUT api/entries/gratitude/update", () => {
             const url = "/api/entries/gratitude/update";
             describe("Positive Tests", () => {
-                it(`should update a gratitude entry with by ID`, async () => {
+                it(`should update a gratitude entry by ID`, async () => {
                     const {id} = gratitudeEntry
                 
-                    const tags = ["life, philosophy"];
+                    const subject = "Updating a gratitude entry's subject";
                     const content = ["I'm grateful because I see ghosts!", "I'm grateful to test my code!"]; 
-                    const sharedID = new mongoose.Types.ObjectId();
+                    const response  = await request(app)
+                    .put(url)
+                    .send({id, update: {
+                        subject,
+                        content,
+                    }})
+                    .expect(200);
+    
+                    expect(response.body).toStrictEqual({
+                        ...gratitudeEntry,
+                        subject,
+                        content,
+                    });
+                    gratitudeEntry = response.body;
+                });
+                it(`should update a gratitude entry with a tag by ID`, async () => {
+                    const {id} = gratitudeEntry
+                
+                    const tags = tagIds;
+                    const content = ["I'm grateful because I see ghosts!", "I'm grateful to test my code!"]; 
+                    const sharedID = uuidv4();
                     const response  = await request(app)
                     .put(url)
                     .send({id, update: {
@@ -386,14 +518,14 @@ describe("Entry smoke tests", () => {
                     }})
                     .expect(200);
     
-                    expect(response.body.id).toEqual(id);
-                    expect(response.body.tags).toEqual(tags);
-                    expect(response.body.content).toEqual(content);
-                    expect(response.body).toHaveProperty("datetime", expect.any(String));
-                    expect(response.body.quote).toEqual(null);
-                    expect(response.body.subject).toEqual(null);
-                    expect(response.body.sharedID).toEqual(expect.any(String));
-                    expect(response.body.type).toEqual(EntryTypes.GRATITUDE);            
+                    expect(response.body).toStrictEqual({
+                        ...gratitudeEntry,
+                        tags: globalTags,
+                        content,
+                        sharedID,
+                    });           
+
+                    gratitudeEntry = response.body;
                 });
             });
             describe("Negative Tests", () => {
@@ -430,8 +562,39 @@ describe("Entry smoke tests", () => {
                         .expect(HttpErrorCode.NOT_FOUND);
         
                     expect(response).toHaveProperty("text", expect.any(String))
-                })
-            })
+                });
+                it("should throw when trying to update an entry with an invalid tag", async () => {
+                    const {id} = gratitudeEntry
+
+                    const tags = ["InvalidTag"];
+                    const response = await request(app)
+                        .put(url)
+                        .send({
+                            id, 
+                            update: {
+                                tags
+                            }
+                        })
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+
+    
+                        expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+    
+                });
+                it("should throw when trying to update an entry with a tag that does not exist", async () => {
+                    const {id} = gratitudeEntry
+
+                    const tags = [new mongoose.Types.ObjectId()];
+                    const response = await request(app)
+                        .put(url)
+                        .send({id, update: {tags}})
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                        expect(response.text).toContain(CustomErrors.INVALID_TAG);
+    
+                });
+            });
         });
         describe("DEL /api/entries/gratitude/remove", () => {
             const url = "/api/entries/gratitude/remove";
@@ -443,16 +606,7 @@ describe("Entry smoke tests", () => {
                     .send({id: gratitudeEntry.id})
                     .expect(200);
         
-                    expect(response.body.id).toEqual(gratitudeEntry.id);
-                    expect(response.body.tags).not.toEqual(gratitudeEntry.tags);
-                    expect(response.body.content).not.toEqual(gratitudeEntry.content);
-                    expect(response.body.sharedID).not.toEqual(gratitudeEntry.sharedID);
-                        
-                    expect(response.body).toHaveProperty("datetime", expect.any(String));
-                    expect(response.body).toHaveProperty("content", expect.arrayContaining([expect.any(String)]));
-                    expect(response.body).toHaveProperty("tags", expect.arrayContaining([expect.any(String)]));
-                    expect(response.body).toHaveProperty("sharedID", expect.any(String));
-                    expect(response.body).toHaveProperty("id", expect.any(String));
+                    expect(response.body).toStrictEqual(gratitudeEntry);
                     
                     await waitForExpect(async () => {
                         const finalResponse = await entryModel.findById(gratitudeEntry.id);
@@ -474,11 +628,8 @@ describe("Entry smoke tests", () => {
                 });
             })
         });
-        afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
     });
     describe("Journal", () => {
-        beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment());
-        seedTagData(tagModel, defaultJournalEntry.tags[0])
 
         let journalEntry: Entry;
         
@@ -546,14 +697,29 @@ describe("Entry smoke tests", () => {
         
                     expect(response).toHaveProperty("text", expect.any(String))
                 });
-                it("should throw when trying to create an entry with a tag that does not exist", async () => {
-                    const requestData = createNewEntry(defaultJournalEntry, {tags: ["InvalidTag"]})
+                it("should throw when trying to create an entry with an Invalid tag", async () => {
+                    const requestData = {
+                        ...newJournalEntry,
+                        tags: ["1nvali3d2t4a5genvalidfag"]
+                    };
                     const response = await request(app)
                         .post(url)
                         .send(requestData)
                         .expect(HttpErrorCode.BAD_REQUEST);
         
-                    expect(response).toHaveProperty("text", expect.any(String));
+                        expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+                });
+                it("should throw when trying to create an entry with a tag that does not exist", async () => {
+                    const requestData = {
+                        ...newJournalEntry,
+                        tags: [new mongoose.Types.ObjectId()]
+                    };
+                    const response = await request(app)
+                        .post(url)
+                        .send(requestData)
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                        expect(response.text).toContain(CustomErrors.INVALID_TAG);
                 });
             })
         });
@@ -607,31 +773,42 @@ describe("Entry smoke tests", () => {
         describe("PUT /api/entries/journal/update", () => {
             const url = "/api/entries/journal/update";
             describe("Positive Tests", () => {
-                it(`should update the journal entry with by ID`, async () => {
+                it(`should update the journal entry by ID`, async () => {
                     const {id} = journalEntry
                 
-                    const tags = ["life, philosophy"];
                     const quote = "high on life!"
                     const subject = "testing testing testing";
                     const response  = await request(app)
                     .put(url)
                     .send({id, update: {
-                        tags,
+                        subject,
                         quote,
-                        subject
                     }})
                     .expect(200);
         
-                    expect(response.body.id).toEqual(id);
-                    expect(response.body.tags).toEqual(tags);
-                    expect(response.body.quote).toEqual(quote);
-                    
-                    expect(response.body).toHaveProperty("datetime", expect.any(String));
-                    expect(response.body).toHaveProperty("content", expect.any(String));
-                    expect(response.body).toHaveProperty("subject", expect.any(String));
-                    expect(response.body).toHaveProperty("tags", expect.arrayContaining([expect.any(String)]));
-                    expect(response.body).toHaveProperty("sharedID", null);
-                    expect(response.body).toHaveProperty("id", expect.any(String));
+                    expect(response.body).toStrictEqual({
+                        ...journalEntry,
+                        subject,
+                        quote,
+                    });
+                    journalEntry = response.body;
+                });
+                it(`should update the journal entry with a tag by ID`, async () => {
+                    const {id} = journalEntry
+                
+                    const tags = tagIds;
+                    const response  = await request(app)
+                    .put(url)
+                    .send({id, update: {
+                        tags,
+                    }})
+                    .expect(200);
+        
+                    expect(response.body).toStrictEqual({
+                        ...journalEntry,
+                        tags: globalTags,
+                    });
+                    journalEntry = response.body;
                 });
             });
             describe("Negative Tests", () => {
@@ -667,7 +844,38 @@ describe("Entry smoke tests", () => {
                         .expect(HttpErrorCode.NOT_FOUND);
         
                     expect(response).toHaveProperty("text", expect.any(String))
-                })
+                });
+                it("should throw when trying to update an entry with an invalid tag", async () => {
+                    const {id} = journalEntry
+
+                    const tags = ["InvalidTag"];
+                    const response = await request(app)
+                        .put(url)
+                        .send({
+                            id, 
+                            update: {
+                                tags
+                            }
+                        })
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+
+    
+                        expect(response.text).toContain(CustomErrors.INVALID_REQUEST);
+    
+                });
+                it("should throw when trying to update an entry with a tag that does not exist", async () => {
+                    const {id} = journalEntry
+
+                    const tags = [new mongoose.Types.ObjectId()];
+                    const response = await request(app)
+                        .put(url)
+                        .send({id, update: {tags}})
+                        .expect(HttpErrorCode.BAD_REQUEST);
+        
+                        expect(response.text).toContain(CustomErrors.INVALID_TAG);
+    
+                });
             })
     
         });
@@ -682,17 +890,7 @@ describe("Entry smoke tests", () => {
                     .send({id})
                     .expect(200);
         
-                    expect(response.body.id).toEqual(id);
-                    expect(response.body.datetime).toEqual(journalEntry.datetime);
-        
-                    
-                    expect(response.body).toHaveProperty("datetime", expect.any(String));
-                    expect(response.body.quote).toEqual(expect.any(String));
-                    expect(response.body.subject).toEqual(expect.any(String));
-                    expect(response.body.sharedID).toEqual(null);
-                    expect(response.body.tags).toEqual(expect.arrayContaining([expect.any(String)]));
-                    expect(response.body.id).toEqual(expect.any(String));
-                    expect(response.body.type).toEqual(EntryTypes.JOURNAL);
+                    expect(response.body).toStrictEqual(journalEntry);
                     
                     await waitForExpect(async () => {
                         const finalResponse = await entryModel.findById(id);
@@ -715,7 +913,6 @@ describe("Entry smoke tests", () => {
             })
         });
 
-        afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
     })
-    
+    afterAll(async () => await mongooseMemoryDB.tearDownTestEnvironment() );
 })
