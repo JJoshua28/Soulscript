@@ -1,5 +1,4 @@
 import { Model, Types } from "mongoose";
-import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 
 
@@ -28,7 +27,7 @@ export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, ta
         quote: null,
         tags: [],
         content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."],
-        datetime: new Date(moment().startOf("day").toISOString())
+        datetime
     };
 
     const testData: NewEntry[] = [
@@ -82,7 +81,7 @@ export const seedJournalEntryTestData = async (model: Model<EntryDocument>, tags
         quote: null,
         tags: [],
         content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."],
-        datetime: new Date(moment().startOf("day").toISOString())
+        datetime
     };
 
     const testData: NewEntry[] = [

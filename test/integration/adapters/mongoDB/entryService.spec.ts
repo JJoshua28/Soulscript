@@ -401,7 +401,7 @@ describe("Entries", () => {
             describe("Positive Tests", () => {
                 it.each`
                     date                                                            | arrayLength 
-                    ${new Date()}                                                   | ${4}        
+                    ${new Date()}                                                   | ${5}        
                     ${new Date("2015-05-15")}                                       | ${1}        
                     ${new Date("2018-01-01")}                                       | ${0}      
                 `("should find $arrayLength gratitude entries with date add a $message", async ({date, arrayLength}) => {
@@ -664,7 +664,7 @@ describe("Entries", () => {
             describe("Positive Tests", () => {
                 it.each`
                     date                      | arrayLength 
-                    ${todaysDate}             | ${3}        
+                    ${todaysDate}             | ${4}        
                     ${new Date("2015-05-15")} | ${1}        
                     ${new Date("2018-01-01")} | ${0}      
                 `("should find $arrayLength mood entries with date add a $message", async ({date, arrayLength}) => {
@@ -675,7 +675,7 @@ describe("Entries", () => {
                 });
                 it("should return a journal entry document", async () => {
                     const mongoService = new MongoDBEntryService( { entryModel }, EntryTypes.JOURNAL);
-                    const [response] = await mongoService.getEntryByDate(new Date(new Date(moment().startOf("day").toISOString())));
+                    const [response] = await mongoService.getEntryByDate(todaysDate);
                   
                     expect(response).toHaveProperty("id", expect.any(String));
                     expect(response).toHaveProperty("type", EntryTypes.JOURNAL);
