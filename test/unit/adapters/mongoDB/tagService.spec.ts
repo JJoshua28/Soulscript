@@ -208,4 +208,35 @@ describe("Tag", () => {
             });
         });
     });
+    describe("deleteTag", () => {
+        describe("Positive Tests", () => {
+            const responseDocument =createTagDocument(mockTag);
+            const {_id: mockTagDocumentId} = responseDocument;
+            it("should delete a tag with the specified id and return that document", async () => {
+
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
+                mockTagModel.findByIdAndDelete = jest.fn().mockResolvedValueOnce(responseDocument);
+                const mockTagId = mockTagDocumentId.toString();
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                const response = await tagService.deleteTag(mockTagId);
+                
+                expect(response).toEqual(expect.objectContaining({
+                    id: mockTagId,
+                    name: expect.any(String),
+                    description: expect.any(String),
+                    createdAt: expect.any(Date)
+                }));
+            });
+        });
+        describe("Negative Tests", () => {
+            const mockTagId = new mongoose.Types.ObjectId().toString();
+            it("should throw if no tag if exist with the provided id", async () => {
+                mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
+                
+                const tagService = new MongoDBTagService(mockTagModel);
+                await expect(tagService.deleteTag(mockTagId)).rejects.toThrow(CustomErrors.INVALID_TAG);
+            }); 
+        });
+    });
 })

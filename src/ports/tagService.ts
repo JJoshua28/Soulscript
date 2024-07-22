@@ -5,4 +5,5 @@ export interface TagService <T> {
     doAllTagsExist(tags: T[]): Promise<boolean>;
     getAllTags(): Promise<Tag[]>;
     updateTag(tagId: string, updates: TagUpdates): Promise<Tag>;
+    deleteTag(tagId: string): Promise<Tag>;
 }

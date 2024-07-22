@@ -72,6 +72,24 @@ class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
         }
         
     }
+    async deleteTag(tagId: string): Promise<Tag> {
+        try {
+            const isTagPresentWithID = !! await this.model.exists({_id: tagId});
+            if (!isTagPresentWithID) throw new Error(CustomErrors.INVALID_TAG);
+
+            const response: TagDocument | null = await this.model.findByIdAndDelete(tagId);
+            if(!response) throw new Error();
+
+            const mappedTagEntry = mapDocumentToTag(response);
+            return mappedTagEntry;
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === CustomErrors.INVALID_TAG) throw new Error(error.message);
+                throw new Error(`Something went wrong trying to remove this tag.\n Entry ID: ${tagId}\nError: ${error.message }`);
+            }
+            throw Error(`Something went wrong trying to remove this tag.\n Entry ID: ${tagId}\nError: ${error}`);
+        }
+    }
 }
 
 export default MongoDBTagService;
