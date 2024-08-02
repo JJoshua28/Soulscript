@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Entry, EntryTypes, NewEntry } from "../../../src/types/entries";
 
 import {  EntryDocument }  from "../../../src/services/mongoDB/types/document";
-import { mapDocumentsToEntry } from "../../../src/mappers/mongoDB/documents";
+import {  mapDocumentsToEntries } from "../../../src/mappers/mongoDB/documents";
 import offsetDateByHours from "../../../src/helpers/offsetDate";
 
 const datetime = offsetDateByHours(2);
@@ -39,7 +39,7 @@ export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, ta
     ];  
     const insertedEntries = await model.insertMany(testData);
     const populatedEntries = await model.populate(insertedEntries, { path: "tags" });
-    return mapDocumentsToEntry(populatedEntries);
+    return mapDocumentsToEntries(populatedEntries);
 };
 
 export const seedMoodEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
@@ -60,7 +60,7 @@ export const seedMoodEntryTestData = async (model: Model<EntryDocument>, tags: T
     ];  
     const insertedEntries = await model.insertMany(testData);
     const populatedEntries = await model.populate(insertedEntries, { path: "tags" });
-    return mapDocumentsToEntry(populatedEntries);
+    return mapDocumentsToEntries(populatedEntries);
 };
 
 export const seedJournalEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
@@ -92,5 +92,5 @@ export const seedJournalEntryTestData = async (model: Model<EntryDocument>, tags
     ];  
     const insertedEntries = await model.insertMany(testData);
     const populatedEntries = await model.populate(insertedEntries, { path: "tags" });
-    return mapDocumentsToEntry(populatedEntries);
+    return mapDocumentsToEntries(populatedEntries);
 } 

@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, UpdateWriteOpResult } from "mongoose";
 
 import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
 import CustomErrors from "../../types/error";
@@ -6,8 +6,8 @@ import type { EntryService } from "../../ports/entryService";
 import type { EntryDocument, TagDocument } from "../../services/mongoDB/types/document";
 import { TagService } from "../../ports/tagService";
 
-import { mapDocumentToEntry, mapDocumentsToEntry } from "../../mappers/mongoDB/documents";
-import { getByDateQuery } from "../../services/mongoDB/queries/moodEntry";
+import { mapDocumentToEntry, mapDocumentsToEntries } from "../../mappers/mongoDB/documents";
+import { getByDateQuery } from "../../services/mongoDB/queries/queries";
 
 class MongoDBEntryService implements EntryService {
     private entryServiceModel: Model<EntryDocument>;
@@ -60,7 +60,7 @@ class MongoDBEntryService implements EntryService {
                 }
             }
 
-            const mappedEntries = mapDocumentsToEntry(response);
+            const mappedEntries = mapDocumentsToEntries(response);
 
             return mappedEntries;
         } catch (error) {
@@ -129,6 +129,17 @@ class MongoDBEntryService implements EntryService {
             }
         }
     }
+    
+    async updateEntries(entryField: object, update: object): Promise<boolean> {
+        try{
+            const response: UpdateWriteOpResult = await this.entryServiceModel.updateMany(entryField, update);
+
+            if(!response || !response.acknowledged) throw new Error();
+            return response.acknowledged;
+        } catch (error) {
+            throw new Error(`An error trying to update Entry field: ${entryField}\nUpdate: ${update}\nError: ${error}`);
+        }
+    } 
 }
 
 export default MongoDBEntryService;

@@ -5,4 +5,5 @@ export interface EntryService {
     getEntryByDate(date: Date): Promise<Entry[] | []>
     updateEntry(id: string, update: NewCustomEntry): Promise<Entry>
     deleteEntry(id: string): Promise<Entry>
+    updateEntries(entryField: object, update: object): Promise<boolean>
 }

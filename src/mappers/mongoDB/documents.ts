@@ -57,7 +57,7 @@ export const mapDocumentToEntry = (document: EntryDocument):Entry => {
     return mappedEntry;
 } 
 
-export const mapDocumentsToEntry = (document: EntryDocument[]):Entry[] => {
+export const mapDocumentsToEntries = (document: EntryDocument[]):Entry[] => {
     const mappedEntries = document.map(document => {
         const {
             type,
