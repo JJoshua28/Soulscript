@@ -1,6 +1,6 @@
 import mongoose, { Model } from "mongoose";
 
-import type { TagDocument } from "../../../../src/services/mongoDB/types/document";
+import type { EntryDocument, TagDocument } from "../../../../src/services/mongoDB/types/document";
 import CustomErrors from "../../../../src/types/error";
 
 import tagModel from "../../../../src/services/mongoDB/models/tag";
@@ -8,6 +8,9 @@ import { mockDefaultNewTag, mockDefaultTag, mockTag } from "../../../data/tags";
 import { createTagDocument } from "../../../data/helpers/customTags";
 import MongoDBTagService from "../../../../src/adapters/mongoDB/tagService";
 import { tagExpectation } from "../../../assertions/tags";
+import DeleteTagFromAllEntriesUseCase from "../../../../src/use cases/entries/deleteTagFromAllEntries";
+import entryModel from "../../../../src/services/mongoDB/models/entry";
+import MongoDBEntryService from "../../../../src/adapters/mongoDB/entryService";
 
 
 jest.mock("../../../../src/services/mongoDB/models/tag");
@@ -20,7 +23,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValue(false);
                 mockTagModel.create = jest.fn().mockResolvedValueOnce(createTagDocument(mockDefaultNewTag));
                
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.addTag(mockDefaultNewTag);
                 
                 expect(response).toEqual(expect.objectContaining(tagExpectation));
@@ -31,7 +34,7 @@ describe("Tag", () => {
             it("should throw an error if the tag name already exists", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 await await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
         
             });
@@ -39,7 +42,7 @@ describe("Tag", () => {
                 mockTagModel.create = jest.fn().mockResolvedValueOnce(null);
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 await expect(tagService.addTag(mockDefaultNewTag)).rejects.toThrow(Error);
             });
         });
@@ -49,7 +52,7 @@ describe("Tag", () => {
             it("should return true if a document with that tag id exist", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValue(true);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.doAllTagsExist([
                     new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
                 ]);
@@ -60,7 +63,7 @@ describe("Tag", () => {
             it("should return false if no document exists with that tag id", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.doAllTagsExist([
                     new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
                 ]);
@@ -73,7 +76,7 @@ describe("Tag", () => {
                 it("should throw an error if unable to check if the tag name is taken", async () => {
                     mockTagModel.exists = jest.fn().mockRejectedValueOnce(new Error());
                     
-                    const tagService = new MongoDBTagService(mockTagModel);
+                    const tagService = new MongoDBTagService({tagModel: mockTagModel});
                     await expect(tagService.doAllTagsExist([
                         new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
                     ])).rejects.toThrow(Error);
@@ -89,7 +92,7 @@ describe("Tag", () => {
                     createTagDocument(mockTag)
                 ]);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.getAllTags(); 
                 expect(response).toEqual(expect.arrayContaining([
                     expect.objectContaining({
@@ -102,7 +105,7 @@ describe("Tag", () => {
             it("should return an empty array if no tags documents are found", async () => {
                 mockTagModel.find = jest.fn().mockResolvedValueOnce([]);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.getAllTags(); 
                 expect(response).toEqual(expect.arrayContaining([]));
             })
@@ -127,7 +130,7 @@ describe("Tag", () => {
 
                 mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.updateTag(mockDefaultTag.id, updates);
                 
                 expect(response).toEqual(expect.objectContaining({
@@ -152,7 +155,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.updateTag(mockTag.id, updates);
                 
                 expect(response).toEqual(expect.objectContaining({
@@ -179,7 +182,7 @@ describe("Tag", () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
                 mockTagModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedTagDocument);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.updateTag(mockTag.id, updates);
                 
                 expect(response).toEqual(expect.objectContaining({
@@ -194,7 +197,7 @@ describe("Tag", () => {
             it("should throw if no tag if exist with the provided id", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 await expect(tagService.updateTag(mockTag.id, {})).rejects.toThrow(CustomErrors.VOID_TAG);
             });
             it("should throw if a tag already exists with the name in the update", async () => {
@@ -203,22 +206,28 @@ describe("Tag", () => {
                 }
                 mockTagModel.exists = jest.fn().mockResolvedValue(true);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
+                const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 await expect(tagService.updateTag(mockTag.id, updates)).rejects.toThrow(CustomErrors.INVALID_TAG_EXISTS);
             });
         });
     });
     describe("deleteTag", () => {
+        const mockEntryModel = entryModel as jest.Mocked<Model<EntryDocument>>;
+        const mockEntryService = new MongoDBEntryService({entryModel: mockEntryModel});
+        
+        const tagService = new MongoDBTagService({tagModel: mockTagModel, entryService: mockEntryService});
+        
+        const executeSpy = jest.spyOn(DeleteTagFromAllEntriesUseCase.prototype, "execute");
+        executeSpy.mockResolvedValue(true);
         describe("Positive Tests", () => {
             const responseDocument =createTagDocument(mockTag);
             const {_id: mockTagDocumentId} = responseDocument;
+            const mockTagId = mockTagDocumentId.toString();
+            
+            mockTagModel.exists = jest.fn().mockResolvedValue(true);
+            mockTagModel.findByIdAndDelete = jest.fn().mockResolvedValue(responseDocument);
             it("should delete a tag with the specified id and return that document", async () => {
 
-                mockTagModel.exists = jest.fn().mockResolvedValueOnce(true);
-                mockTagModel.findByIdAndDelete = jest.fn().mockResolvedValueOnce(responseDocument);
-                const mockTagId = mockTagDocumentId.toString();
-                
-                const tagService = new MongoDBTagService(mockTagModel);
                 const response = await tagService.deleteTag(mockTagId);
                 
                 expect(response).toEqual(expect.objectContaining({
@@ -228,13 +237,19 @@ describe("Tag", () => {
                     createdAt: expect.any(Date)
                 }));
             });
+            it("should call the entry service to remove all entries with a provided tag", async () => {
+   
+                await tagService.deleteTag(mockTagId);
+
+                expect(executeSpy).toHaveBeenCalledWith(mockTagId);
+                
+            });
         });
         describe("Negative Tests", () => {
             const mockTagId = new mongoose.Types.ObjectId().toString();
             it("should throw if no tag if exist with the provided id", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
-                const tagService = new MongoDBTagService(mockTagModel);
                 await expect(tagService.deleteTag(mockTagId)).rejects.toThrow(CustomErrors.INVALID_TAG);
             }); 
         });

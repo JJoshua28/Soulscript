@@ -6,7 +6,7 @@ import GetAllTagUseCase from "../../use cases/tag/getAllTags";
 
 const handleGetAllTags = async (): Promise<Tag[]> => {
 
-    const tagService = new MongoDBTagService(tagModel);
+    const tagService = new MongoDBTagService({tagModel});
     const addTagUseCase = new GetAllTagUseCase(tagService);
     
     return await addTagUseCase.execute();

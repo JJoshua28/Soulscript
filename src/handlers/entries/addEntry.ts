@@ -37,7 +37,7 @@ const handleAddEntry = async (req: Request, type: EntryTypes): Promise<Entry> =>
     })
 
 
-    const tagService = new MongoDBTagService(tagModel);
+    const tagService = new MongoDBTagService({tagModel});
     const entryService = new MongoDBEntryService({ entryModel, tagService }, type);
     const addEntryUseCase = new AddEntryUseCase(entryService);
 

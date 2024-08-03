@@ -40,7 +40,7 @@ const handleUpdateEntry = async (
     datetime: datetime ? new Date(datetime) : undefined,
   } as NewCustomEntry;
 
-  const tagService = new MongoDBTagService(tagModel);
+  const tagService = new MongoDBTagService({tagModel});
   const entryService = new MongoDBEntryService(
     { entryModel, tagService },
     type

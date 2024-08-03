@@ -36,7 +36,7 @@ describe("Entry Service", () => {
         );
         
     });
-    describe("Specifc Entry Tests", () => {
+    describe("Specific entry type tests", () => {
         let globalMoodEntry: Entry;
         let globalGratitudeEntry: Entry;
         let globalJournalEntry: Entry;
@@ -66,7 +66,7 @@ describe("Entry Service", () => {
                         ${new Date("2022-03-22")}                            | ${"a previous custom date in 2022"}
                         ${todaysDate}                                        | ${"todays date"}
                     `("should add a mood entry containing a tag with $message", async ({date}) => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const entry = {
                              ...newEntry,
                              tags: [tagUpdateIds[0]],
@@ -85,7 +85,7 @@ describe("Entry Service", () => {
                         expect(findResponse).toHaveProperty("datetime", new Date(date));
                     });
                     it("should add a mood entry without a tag", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                     
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -106,7 +106,7 @@ describe("Entry Service", () => {
                         ${"type"}
                         ${"tags"}
                     `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                     
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -117,7 +117,7 @@ describe("Entry Service", () => {
                         
                     });
                     it("should throw an error when trying to add a mood entry with a tag that does not exist", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                     
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -194,7 +194,7 @@ describe("Entry Service", () => {
                             }
                         ];
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService =  new MongoDBEntryService( { entryModel,tagService }, EntryTypes.MOOD);
                         
                         const response = await mongoService.updateEntry(globalMoodEntry.id, entryUpdates);
@@ -227,7 +227,7 @@ describe("Entry Service", () => {
                         expect(response).not.toEqual(globalMoodEntry);
                     });
                     it("should update a mood entry with multiple tags", async ()=> {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService =  new MongoDBEntryService( { entryModel,tagService }, EntryTypes.MOOD);
                         
                         const entryUpdates = {
@@ -266,7 +266,7 @@ describe("Entry Service", () => {
                     it("should throw an error updating an entry if no tags exist with that ID provided in the update", async ()=> {
                         const update = {tags: [new mongoose.Types.ObjectId()]};
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         await expect(mongoService.updateEntry(globalMoodEntry.id, update)).rejects.toThrow(CustomErrors.INVALID_TAG);
                     });
@@ -327,7 +327,7 @@ describe("Entry Service", () => {
                         ${new Date("2022-03-22")}                           | ${"a previous custom date in 2022"}
                         ${todaysDate}                                       | ${"today's date"}
                     `("should add a gratitude entry containing a tag with $message", async ({date}) => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         
                         const entry = { 
                             ...newEntry,
@@ -346,7 +346,7 @@ describe("Entry Service", () => {
                         expect(findResponse[0]).toHaveProperty("datetime", date);
                     });
                     it("should add a gratitude entry without a tag", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                     
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.GRATITUDE);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -370,7 +370,7 @@ describe("Entry Service", () => {
                         ${"type"}
                         ${"tags"}
                     `("should throw an error if a mood entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -381,7 +381,7 @@ describe("Entry Service", () => {
                         
                     });
                     it("should throw when trying to add an entry with a tag that does not exist", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.GRATITUDE);
                         
                         const addGratitudeUseCase = new AddEntryUseCase(entryService);
@@ -456,7 +456,7 @@ describe("Entry Service", () => {
                                 }
                             ];
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.GRATITUDE);
                         const response = await mongoService.updateEntry(globalGratitudeEntry.id, entryUpdates);
                         
@@ -488,7 +488,7 @@ describe("Entry Service", () => {
                         expect(response).not.toEqual(globalGratitudeEntry);
                     });
                     it("should update a gratitude entry with multiple tags", async ()=> {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService =  new MongoDBEntryService( { entryModel,tagService }, EntryTypes.GRATITUDE);
                         
                         const entryUpdates = {
@@ -524,7 +524,7 @@ describe("Entry Service", () => {
                     it("should throw an error updating an entry if no tags exist with that ID provided in the update", async ()=> {
                         const update = {tags: [new mongoose.Types.ObjectId()]};
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.GRATITUDE);
                         await expect(mongoService.updateEntry(globalGratitudeEntry.id, update)).rejects.toThrow(CustomErrors.INVALID_TAG);
                     });
@@ -584,7 +584,7 @@ describe("Entry Service", () => {
                         ${new Date("2022-03-22")} | ${"a previous custom date in 2022"}
                         ${todaysDate}             | ${"today's date"}
                     `("should add a journal entry containing a tag with $message", async ({ date }) => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const entry = {
                             ...newEntry,
                             tags: [tagUpdateIds[0]],
@@ -606,7 +606,7 @@ describe("Entry Service", () => {
                         })
                     });
                     it("should add a journal entry without a tag", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                     
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.JOURNAL);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -632,7 +632,7 @@ describe("Entry Service", () => {
                         ${"tags" as const}
                     `("should throw an error if a journal entry does not have a $propertyToDelete property", async ({propertyToDelete}) => {
                         
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
         
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
@@ -646,7 +646,7 @@ describe("Entry Service", () => {
                         
                     });
                     it("should throw when adding a journal entry with a tag that does not exist", async () => {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const entryService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.JOURNAL);
                         const addMoodUseCase = new AddEntryUseCase(entryService);
             
@@ -725,7 +725,7 @@ describe("Entry Service", () => {
                                 }
                         ];
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService =  new MongoDBEntryService( { entryModel, tagService }, EntryTypes.JOURNAL);
                         const response = await mongoService.updateEntry(globalJournalEntry.id, entryUpdates);
                                 
@@ -756,7 +756,7 @@ describe("Entry Service", () => {
                         expect(response).not.toEqual(globalJournalEntry);
                     });
                     it("should update a journal entry with multiple tags", async ()=> {
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService =  new MongoDBEntryService( { entryModel,tagService }, EntryTypes.JOURNAL);
                         
                         const entryUpdates = {
@@ -793,7 +793,7 @@ describe("Entry Service", () => {
                     it("should throw an error updating an entry if no tags exist with that ID", async ()=> {
                         const update = {tags: [new mongoose.Types.ObjectId()]};
     
-                        const tagService = new MongoDBTagService(tagModel);
+                        const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.JOURNAL);
                         await expect(mongoService.updateEntry(globalJournalEntry.id, update)).rejects.toThrow(CustomErrors.INVALID_TAG);
                     });
@@ -844,27 +844,28 @@ describe("Entry Service", () => {
         });
     });
     describe("Update Entries", () => {
-        it("should update all entries, removing a specific tag", async () => {
-            const fieldName = "tags";
-            const tagId = tagUpdateIds[0].id;
-           
-            const findTagDocument = await entryModel.findOne({tags: [tagId]});
-            expect(findTagDocument).not.toBeNull();
-
-            const mongoService = new MongoDBEntryService( { entryModel }, EntryTypes.JOURNAL);
-            
+        describe("DeleteTagFromAllEntriesUseCase", () => { 
+            it("should update all entries, removing a specific tag", async () => {
+                const fieldName = "tags";
+                const tagId = tagUpdateIds[0].id;
+               
+                const findEntryWithTagDocument = await entryModel.findOne({tags: [tagId]});
+                expect(findEntryWithTagDocument).not.toBeNull();
     
-            const fieldFilterQuery = fieldIncludesElementQuery(fieldName, tagId);
-
-            const updateQuery = removeArrayElementQuery(fieldName, tagId);
-            const response = await mongoService.updateEntries(fieldFilterQuery, updateQuery);
-
-            expect(response).toStrictEqual(true);
-            
-            await waitForExpect(async () => {
-                const foundDocument = await entryModel.findOne({tags: [tagId]});
-                expect(foundDocument).toBeNull();
-              });
+                const mongoService = new MongoDBEntryService( { entryModel }, EntryTypes.JOURNAL);
+                
+                const fieldFilterQuery = fieldIncludesElementQuery(fieldName, tagId);
+    
+                const updateQuery = removeArrayElementQuery(fieldName, tagId);
+                const response = await mongoService.updateEntries(fieldFilterQuery, updateQuery);
+    
+                expect(response).toStrictEqual(true);
+                
+                await waitForExpect(async () => {
+                    const foundDocument = await entryModel.findOne({tags: [tagId]});
+                    expect(foundDocument).toBeNull();
+                  });
+            });
         })
     })
     afterAll(async () => {

@@ -11,12 +11,12 @@ import { getByDateQuery } from "../../services/mongoDB/queries/queries";
 
 class MongoDBEntryService implements EntryService {
     private entryServiceModel: Model<EntryDocument>;
-    private entryType: EntryTypes;
+    private entryType?: EntryTypes;
     private tagService?: TagService<mongoose.Types.ObjectId>;
 
     constructor(
         { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService<mongoose.Types.ObjectId>; },
-        entryType: EntryTypes
+        entryType?: EntryTypes
     ) {
         this.entryServiceModel = entryModel;
         if (tagService) this.tagService = tagService;
@@ -50,6 +50,7 @@ class MongoDBEntryService implements EntryService {
 
     async getEntryByDate(date: Date): Promise<Entry[] | []> {
         try {
+            if(!this.entryType) throw new Error(CustomErrors.VOID_ENTRY_TYPE);
             const dateQuery = getByDateQuery(date, this.entryType);
     
             const response:EntryDocument[] = await this.entryServiceModel.find(dateQuery).populate<{ tags: TagDocument[] }>("tags");
@@ -64,6 +65,10 @@ class MongoDBEntryService implements EntryService {
 
             return mappedEntries;
         } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === CustomErrors.VOID_ENTRY_TYPE) throw new Error(error.message);
+                throw new Error(`Something went wrong trying to retrieve an entry.\n Date query: ${date}\nError: ${error.message}`);
+            }
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`);
         }
     }

@@ -19,4 +19,4 @@ describe("Validate Date", () => {
     `("should return $result when validate date $date", ({date, result})=>{
         expect(validDate(date)).toEqual(result)
     })
-})
+});

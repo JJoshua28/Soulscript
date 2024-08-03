@@ -28,7 +28,7 @@ const mockTagModel = tagModel as jest.Mocked<Model<TagDocument>>;
 
 
 describe("Entry", ()=> {
-    const mockTagService = new MongoDBTagService(mockTagModel);
+    const mockTagService = new MongoDBTagService({tagModel: mockTagModel});
     const tagDocument = createTagDocument(mockDefaultNewTag);
     describe("Add", () => {
         jest.spyOn(mockTagService, "doAllTagsExist").mockResolvedValue(true)

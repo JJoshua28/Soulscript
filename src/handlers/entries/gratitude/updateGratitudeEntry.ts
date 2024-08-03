@@ -40,7 +40,7 @@ const handleUpdateGratitudeEntry = async (req: Request): Promise<Entry> => {
     datetime: update.datetime ? new Date(update.datetime) : undefined,
   } as NewCustomEntry;
 
-  const tagService = new MongoDBTagService(tagModel);
+  const tagService = new MongoDBTagService({tagModel});
   const entryService = new MongoDBEntryService(
     { entryModel, tagService },
     EntryTypes.GRATITUDE

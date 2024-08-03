@@ -6,7 +6,9 @@ enum CustomErrors {
     INVALID_TAG            = "Tag does not exists with the provided ID or name",
     INVALID_TAG_EXISTS     = "Tag already exists with the provided ID or name",
     VOID_TAG_SERVICE       = "Tag service not found",
+    VOID_ENTRY_SERVICE     = "Entry service not found",
     VOID_TAG               = "Tag not found by that ID or name",
+    VOID_ENTRY_TYPE        = "Entry type not provided",
     INTERNAL_TAG_REF_ERROR = "Error while trying to populated an entry with a tag"
 }
 
