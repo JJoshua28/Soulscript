@@ -19,7 +19,7 @@ import { newGratitudeEntry } from "../../../data/gratitudeEntry";
 import { seedGratitudeEntryTestData, seedJournalEntryTestData, seedMoodEntryTestData } from "../../../data/helpers/addTestEntries";
 import { newJournalEntry } from "../../../data/journalEntry";
 import { seedTagData } from "../../../data/helpers/seedTagData";
-import offsetDateByHours from "../../../../src/helpers/offsetDate";
+import formatCurrentDate from "../../../../src/helpers/formatCurrentDate";
 import { fieldIncludesElementQuery, removeArrayElementQuery } from "../../../../src/services/mongoDB/queries/queries";
 
 describe("Entry Service", () => {
@@ -41,7 +41,7 @@ describe("Entry Service", () => {
         let globalGratitudeEntry: Entry;
         let globalJournalEntry: Entry;
     
-        const todaysDate = offsetDateByHours(2);
+        const todaysDate = formatCurrentDate();
     
         beforeAll(async () => {
     
