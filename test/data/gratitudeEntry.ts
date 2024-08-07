@@ -24,7 +24,7 @@ const newGratitudeEntry: NewEntry = {
     sharedID: uuidv4(),
     subject: "test data",
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    tags: [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()],
+    tags: [new mongoose.Types.ObjectId().toString(), new mongoose.Types.ObjectId().toString()],
     content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"],
     datetime
 }

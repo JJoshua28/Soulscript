@@ -48,13 +48,15 @@ describe("Tag", () => {
         });
     });
     describe("doAllTagsExist", () => {
+        const mockTagId1 = new mongoose.Types.ObjectId().toString();
+        const mockTagId2 = new mongoose.Types.ObjectId().toString();
         describe("Positive Tests", () => {
             it("should return true if a document with that tag id exist", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValue(true);
                 
                 const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.doAllTagsExist([
-                    new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                    mockTagId1, mockTagId2
                 ]);
                 
                 
@@ -65,7 +67,7 @@ describe("Tag", () => {
                 
                 const tagService = new MongoDBTagService({tagModel: mockTagModel});
                 const response = await tagService.doAllTagsExist([
-                    new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                    mockTagId1, mockTagId2
                 ]);
                 
                 expect(response).toBeFalsy();
@@ -78,7 +80,7 @@ describe("Tag", () => {
                     
                     const tagService = new MongoDBTagService({tagModel: mockTagModel});
                     await expect(tagService.doAllTagsExist([
-                        new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()
+                        mockTagId1, mockTagId2
                     ])).rejects.toThrow(Error);
                 });
             });
@@ -250,7 +252,7 @@ describe("Tag", () => {
             it("should throw if no tag if exist with the provided id", async () => {
                 mockTagModel.exists = jest.fn().mockResolvedValueOnce(false);
                 
-                await expect(tagService.deleteTag(mockTagId)).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await expect(tagService.deleteTag(mockTagId)).rejects.toThrow(CustomErrors.VOID_TAG);
             }); 
         });
     });

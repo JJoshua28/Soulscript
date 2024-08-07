@@ -1,4 +1,4 @@
-import { Model, Types } from "mongoose";
+import { Model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 
@@ -10,7 +10,7 @@ import formatCurrentDate from "../../../src/helpers/formatCurrentDate";
 
 const datetime = formatCurrentDate();
 
-export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
+export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, tags: string[]): Promise<Entry[]> => {
     const gratitudeEntry:NewEntry = {
         type: EntryTypes.GRATITUDE,
         sharedID: uuidv4(),
@@ -42,7 +42,7 @@ export const seedGratitudeEntryTestData = async (model: Model<EntryDocument>, ta
     return mapDocumentsToEntries(populatedEntries);
 };
 
-export const seedMoodEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
+export const seedMoodEntryTestData = async (model: Model<EntryDocument>, tags: string[]): Promise<Entry[]> => {
     const defaultMoodEntry:NewEntry = {
         sharedID: uuidv4(),
         type: EntryTypes.MOOD,
@@ -63,7 +63,7 @@ export const seedMoodEntryTestData = async (model: Model<EntryDocument>, tags: T
     return mapDocumentsToEntries(populatedEntries);
 };
 
-export const seedJournalEntryTestData = async (model: Model<EntryDocument>, tags: Types.ObjectId[]): Promise<Entry[]> => {
+export const seedJournalEntryTestData = async (model: Model<EntryDocument>, tags: string[]): Promise<Entry[]> => {
     const defaultJournalEntry:NewEntry = {
         sharedID: uuidv4(),
         type: EntryTypes.JOURNAL,

@@ -20,6 +20,8 @@ describe("Tag Service", () => {
         await mongooseMemoryDB.tearDownTestEnvironment();
     });
     let globalTag: Tag;
+    const mongodbObjectId = new mongoose.Types.ObjectId().toString();
+    
     describe("POST /api/tag/add", () => { 
         describe("Positive Tests", () => {
             it("should add a tag and return a new tag", async () => {
@@ -45,15 +47,15 @@ describe("Tag Service", () => {
         describe("Positive Tests", () => {
             it("should return true if the tag is taken", async () => {
                 const tagSerivce = new MongoDBTagService({tagModel});
-                const response = await tagSerivce.doAllTagsExist([new mongoose.Types.ObjectId(globalTag.id)]);
+                const response = await tagSerivce.doAllTagsExist([globalTag.id]);
                 
                 expect(response).toBeTruthy();
             });
             it("should return false if the tag id does not exist", async () => {
+                const mongodbObjectId = new mongoose.Types.ObjectId().toString();
                 const tagSerivce = new MongoDBTagService({tagModel});
-                const response = await tagSerivce.doAllTagsExist([new mongoose.Types.ObjectId()]);
+                const response = await tagSerivce.doAllTagsExist([mongodbObjectId]);
                 
-
                 expect(response).toBeFalsy();
             })
         })
@@ -112,7 +114,7 @@ describe("Tag Service", () => {
                 }
 
                 const tagSerivce = new MongoDBTagService({tagModel});
-                await expect(tagSerivce.updateTag(new mongoose.Types.ObjectId().toString(), updates)).rejects.toThrow(CustomErrors.VOID_TAG);
+                await expect(tagSerivce.updateTag(mongodbObjectId, updates)).rejects.toThrow(CustomErrors.VOID_TAG);
             });
             it("should throw if a tag already exists with the name in the update", async () => {
                 const updates = {
@@ -164,7 +166,7 @@ describe("Tag Service", () => {
         });
         describe("Negative Tests", () => {
             it("should throw if no tags exist with that ID", async () => {
-                await expect(tagSerivce.deleteTag(new mongoose.Types.ObjectId().toString())).rejects.toThrow(CustomErrors.INVALID_TAG);
+                await expect(tagSerivce.deleteTag(mongodbObjectId)).rejects.toThrow(CustomErrors.VOID_TAG);
             });
         });
     });

@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import waitForExpect from "wait-for-expect";
 import moment from "moment";
 
@@ -23,7 +23,8 @@ import formatCurrentDate from "../../../../src/helpers/formatCurrentDate";
 import { fieldIncludesElementQuery, removeArrayElementQuery } from "../../../../src/services/mongoDB/queries/queries";
 
 describe("Entry Service", () => {
-    const tagUpdateIds:Types.ObjectId[] = [];   
+    const tagUpdateIds:string[] = []; 
+    const randomObjectId = new mongoose.Types.ObjectId().toString();  
     beforeAll(async () => {
         await mongooseMemoryDB.setupTestEnvironment();
         
@@ -31,8 +32,8 @@ describe("Entry Service", () => {
         const tagUpdate1 = await seedTagData(tagModel, "testing tag updates");
         
         tagUpdateIds.push(
-            new mongoose.Types.ObjectId(tagUpdate.id), 
-            new mongoose.Types.ObjectId(tagUpdate1.id),
+            tagUpdate.id,
+            tagUpdate1.id,
         );
         
     });
@@ -124,7 +125,7 @@ describe("Entry Service", () => {
             
                         await expect(addMoodUseCase.execute({
                             ...newEntry, 
-                            tags: [new mongoose.Types.ObjectId()]
+                            tags: [randomObjectId]
                         })).rejects.toThrow(CustomErrors.INVALID_TAG);
                     });
                     it("should throw an error if the tag service is missing", async () => {
@@ -264,7 +265,7 @@ describe("Entry Service", () => {
                         await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
                     });
                     it("should throw an error updating an entry if no tags exist with that ID provided in the update", async ()=> {
-                        const update = {tags: [new mongoose.Types.ObjectId()]};
+                        const update = {tags: [randomObjectId]};
     
                         const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.MOOD);
@@ -388,7 +389,7 @@ describe("Entry Service", () => {
             
                         await expect(addGratitudeUseCase.execute({
                             ...newEntry,
-                            tags: [new mongoose.Types.ObjectId()]
+                            tags: [randomObjectId]
                         })).rejects.toThrow(CustomErrors.INVALID_TAG);
                     });
                     it("should throw if the tag service is missing", async () => {
@@ -522,7 +523,7 @@ describe("Entry Service", () => {
                         await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error)
                     });
                     it("should throw an error updating an entry if no tags exist with that ID provided in the update", async ()=> {
-                        const update = {tags: [new mongoose.Types.ObjectId()]};
+                        const update = {tags: [randomObjectId]};
     
                         const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.GRATITUDE);
@@ -791,7 +792,7 @@ describe("Entry Service", () => {
                         await expect(mongoService.updateEntry(id.toString(), update)).rejects.toThrow(Error);
                     });
                     it("should throw an error updating an entry if no tags exist with that ID", async ()=> {
-                        const update = {tags: [new mongoose.Types.ObjectId()]};
+                        const update = {tags: [randomObjectId]};
     
                         const tagService = new MongoDBTagService({tagModel});
                         const mongoService = new MongoDBEntryService( { entryModel, tagService }, EntryTypes.JOURNAL);
@@ -847,7 +848,7 @@ describe("Entry Service", () => {
         describe("DeleteTagFromAllEntriesUseCase", () => { 
             it("should update all entries, removing a specific tag", async () => {
                 const fieldName = "tags";
-                const tagId = tagUpdateIds[0].id;
+                const tagId = tagUpdateIds[0];
                
                 const findEntryWithTagDocument = await entryModel.findOne({tags: [tagId]});
                 expect(findEntryWithTagDocument).not.toBeNull();

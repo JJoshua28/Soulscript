@@ -12,10 +12,10 @@ import { getByDateQuery } from "../../services/mongoDB/queries/queries";
 class MongoDBEntryService implements EntryService {
     private entryServiceModel: Model<EntryDocument>;
     private entryType?: EntryTypes;
-    private tagService?: TagService<mongoose.Types.ObjectId>;
+    private tagService?: TagService;
 
     constructor(
-        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService<mongoose.Types.ObjectId>; },
+        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService; },
         entryType?: EntryTypes
     ) {
         this.entryServiceModel = entryModel;

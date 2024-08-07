@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import type { Model } from "mongoose";
 
 import { TagDocument } from "../../services/mongoDB/types/document";
 import { NewTag, Tag, TagUpdates } from "../../types/tags";
@@ -9,7 +9,7 @@ import { mapDocumentToTag, mapDocumentsToTags } from "../../mappers/mongoDB/docu
 import { EntryService } from "../../ports/entryService";
 import DeleteTagFromAllEntriesUseCase from "../../use cases/entries/deleteTagFromAllEntries";
 
-class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
+class MongoDBTagService implements TagService {
     private tagServiceModel: Model<TagDocument>;
     private entryService?: EntryService;
     constructor({tagModel, entryService}: {tagModel: Model<TagDocument>, entryService?: EntryService}) {
@@ -35,7 +35,7 @@ class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
             throw Error(`Something went wrong trying to create this tag.\n Entry: ${JSON.stringify(tag)}\nError: ${error}`)
         }
     }
-    async doAllTagsExist(tagIDs: mongoose.Types.ObjectId[]): Promise<boolean> {
+    async doAllTagsExist(tagIDs: string[]): Promise<boolean> {
         for (const id of tagIDs) {
             const result = !!await this.tagServiceModel.exists({_id: id});
             if (!result) return false;
@@ -78,11 +78,14 @@ class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
     }
     async deleteTag(tagId: string): Promise<Tag> {
         try {
+
             if(!this.entryService) throw new Error(CustomErrors.VOID_ENTRY_SERVICE);
             
             const isTagPresentWithID = !! await this.tagServiceModel.exists({_id: tagId});
-            if (!isTagPresentWithID) throw new Error(CustomErrors.INVALID_TAG);
+            
+            if (!isTagPresentWithID) throw new Error(CustomErrors.VOID_TAG);
 
+            
             const response: TagDocument | null = await this.tagServiceModel.findByIdAndDelete(tagId);
             if(!response) throw new Error();
 
@@ -93,7 +96,7 @@ class MongoDBTagService implements TagService<mongoose.Types.ObjectId> {
             return mappedTagEntry;
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === CustomErrors.INVALID_TAG || error.message === CustomErrors.VOID_ENTRY_SERVICE) throw new Error(error.message);
+                if (error.message === CustomErrors.VOID_TAG || error.message === CustomErrors.VOID_ENTRY_SERVICE) throw new Error(error.message);
                 throw new Error(`Something went wrong trying to remove this tag.\n Entry ID: ${tagId}\nError: ${error.message }`);
             }
             throw Error(`Something went wrong trying to remove this tag.\n Entry ID: ${tagId}\nError: ${error}`);

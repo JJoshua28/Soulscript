@@ -6,7 +6,10 @@ import type { Tag } from "../../src/types/tags";
 import app from "../../src/config/server";
 import mongooseMemoryDB from "../services/mongoDB/config";
 import { existingTagExpectation } from "../assertions/tags";
-import CustomErrors from "../../src/types/error";
+import CustomErrors, { HttpErrorCode } from "../../src/types/error";
+import waitForExpect from "wait-for-expect";
+import tagModel from "../../src/services/mongoDB/models/tag";
+import { seedTagData } from "../data/helpers/seedTagData";
 
 describe("Tag smoke tests", () => {
     beforeAll ( async () => await mongooseMemoryDB.setupTestEnvironment() );
@@ -114,7 +117,7 @@ describe("Tag smoke tests", () => {
                 const response  = await request(app)
                 .put(url)
                 .send({id, updates: requestBody})
-                .expect(404);
+                .expect(HttpErrorCode.NOT_FOUND);
                 
                 expect(response.text).toContain(CustomErrors.VOID_TAG);
             });
@@ -132,9 +135,43 @@ describe("Tag smoke tests", () => {
             });
         });
     });
+    describe("DEL /api/tag/remove", () => {
+        const url = "/api/tag/remove";
+        describe("Positive Tests", () => {
+            it("should remove and return a tag. It should then fail to retrieve the same tag", async () => {
+                const {id} = globalTag;
+    
+                const response = await request(app)
+                    .del(url)
+                    .send({id})
+                    .expect(200);
+                
+                expect(response.body).toEqual(existingTagExpectation);
+    
+                await waitForExpect(async () => {
+                    const finalResponse = await tagModel.findById(id);
+                    expect(finalResponse).toBeFalsy();
+                }, 10000, 500); 
+            }); 
+        });
+        describe("Negative Tests", () => {
+            it("should throw 404 when attempting a valid delete an tag with an ID that does not exist", async () => {
+                const id = new mongoose.Types.ObjectId().toString();
+    
+                const response = await request(app)
+                    .del(url)
+                    .send({id})
+                    .expect(HttpErrorCode.NOT_FOUND);
+                
+                expect(response.text).toContain(CustomErrors.VOID_TAG);
+            
+            });
+        });
+    });
     describe("GET /api/tag/get-all", () => {
         const url = "/api/tag/get-all";
         it("should return all tags", async () => {
+            await seedTagData(tagModel, "test");
 
             const response = await request(app)
                 .get(url)

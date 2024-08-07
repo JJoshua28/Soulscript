@@ -1,15 +1,15 @@
 import type mongoose from "mongoose";
 import type { TagService } from "../../ports/tagService";
-import type { NewTag, Tag } from "../../types/tags";
+import type { Tag } from "../../types/tags";
 
-class AddTagUseCase {
+class DeleteTagUseCase {
     private tagService: TagService;
         constructor (tagService: TagService) {
         this.tagService  = tagService;
     }
-    async execute (tag: NewTag): Promise<Tag> {
-        return await this.tagService.addTag(tag)
+    async execute (id: string): Promise<Tag> {
+        return await this.tagService.deleteTag(id);
     }
 }
 
-export default AddTagUseCase;
+export default DeleteTagUseCase;

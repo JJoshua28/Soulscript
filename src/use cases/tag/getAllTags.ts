@@ -3,8 +3,8 @@ import type { TagService } from "../../ports/tagService";
 import type { Tag } from "../../types/tags";
 
 class GetAllTagUseCase {
-    private tagService: TagService<mongoose.Types.ObjectId>;
-        constructor (tagService: TagService<mongoose.Types.ObjectId>) {
+    private tagService: TagService;
+        constructor (tagService: TagService) {
         this.tagService  = tagService;
     }
     async execute (): Promise<Tag[]> {
