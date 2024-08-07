@@ -1,4 +1,4 @@
-import mongoose, { Model, UpdateWriteOpResult } from "mongoose";
+import { Model, UpdateWriteOpResult } from "mongoose";
 
 import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
 import CustomErrors from "../../types/error";

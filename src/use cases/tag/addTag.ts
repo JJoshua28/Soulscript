@@ -1,4 +1,3 @@
-import type mongoose from "mongoose";
 import type { TagService } from "../../ports/tagService";
 import type { NewTag, Tag } from "../../types/tags";
 
