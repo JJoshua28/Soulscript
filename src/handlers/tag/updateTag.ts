@@ -27,7 +27,7 @@ const handleUpdateTag = async (req: Request): Promise<Tag> => {
         throw new Error(CustomErrors.INVALID_REQUEST);
     }
 
-    const tagService = new MongoDBTagService(tagModel);
+    const tagService = new MongoDBTagService({tagModel});
     const updateTagUseCase = new UpdateTagUseCase(tagService);
 
     const filteredUpdates: TagUpdates = {};

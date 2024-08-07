@@ -8,11 +8,11 @@
     "test": "jest ./test/*",
     "start": "tsc && mongod --port 27017 & node dist/index.js",
     "stop": "pkill -f 'npm run start' & pkill -f 'node dist/index.js' & killall mongod & killall jest",
-    "test:unit": "jest ./test/unit/*",
-    "test:watch:unit": "jest --watch ./test/unit/*",
-    "test:integration": "jest ./test/integration/*",
-    "test:watch:integration": "jest --watch ./test/integration/*",
-    "test:smoke": "jest ./test/smoke/*"
+    "test:unit": "TZ=UTC jest ./test/unit/*",
+    "test:watch:unit": "TZ=UTC jest --watch ./test/unit/*",
+    "test:integration": "TZ=UTC jest ./test/integration/*",
+    "test:watch:integration": "TZ=UTC jest --watch ./test/integration/*",
+    "test:smoke": "TZ=UTC jest ./test/smoke/*"
   },
   "keywords": [],
   "author": "Joshua",

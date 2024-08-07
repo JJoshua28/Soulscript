@@ -4,6 +4,7 @@ import handleAddTag from "../handlers/tag/addTag";
 import handleGetAllTags from "../handlers/tag/getAllTags";
 import handleErrorMapper from "../mappers/handleErrors";
 import handleUpdateTag from "../handlers/tag/updateTag";
+import handleDeleteTag from "../handlers/tag/deleteTag";
 
 const app:Express = express();
 app.use(express.json());
@@ -33,6 +34,15 @@ tagRouter.get("/get-all", (req: Request, res: Response) => {
 
 tagRouter.put("/update", (req: Request, res: Response) => {
     handleUpdateTag(req)
+    .then(response => res.status(200).send(response))
+    .catch(error => {
+        const errorResponse = handleErrorMapper(error.message, req);
+        res.status(errorResponse.statusCode).send(errorResponse.message)
+    });
+});
+
+tagRouter.delete("/remove", (req: Request, res: Response) => {
+    handleDeleteTag(req)
     .then(response => res.status(200).send(response))
     .catch(error => {
         const errorResponse = handleErrorMapper(error.message, req);

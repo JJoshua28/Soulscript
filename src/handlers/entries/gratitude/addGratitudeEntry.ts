@@ -33,7 +33,7 @@ const handleAddGratitudeEntry = async (req: Request): Promise<Entry> => {
     datetime: new Date(formattedDate),
   });
 
-  const tagService = new MongoDBTagService(tagModel);
+  const tagService = new MongoDBTagService({tagModel});
   const entryService = new MongoDBEntryService(
     { entryModel, tagService },
     EntryTypes.GRATITUDE

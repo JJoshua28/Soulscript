@@ -59,7 +59,7 @@ describe("Add Entry", () => {
                 const requestBody = {
                     subject: "test data",
                     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    tags: [new mongoose.Types.ObjectId()],
+                    tags: [new mongoose.Types.ObjectId().toString()],
                     content: "exhausted",
                 };
                 
@@ -127,10 +127,11 @@ describe("Add Entry", () => {
                 expect(response).toHaveProperty("type", EntryTypes.JOURNAL);
             });
             it("should create a journal entry when a request does not have a datetime", async()=>{
+                const tagID = new mongoose.Types.ObjectId().toString();
                 const requestBody = {
                     subject: "test data",
                     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    tags: [new mongoose.Types.ObjectId()],
+                    tags: [tagID],
                     content: "exhausted",
                 };
                 

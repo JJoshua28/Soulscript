@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import { Model, UpdateWriteOpResult } from "mongoose";
 
 import type { Entry, EntryTypes, NewCustomEntry, NewEntry } from "../../types/entries";
 import CustomErrors from "../../types/error";
@@ -6,17 +6,17 @@ import type { EntryService } from "../../ports/entryService";
 import type { EntryDocument, TagDocument } from "../../services/mongoDB/types/document";
 import { TagService } from "../../ports/tagService";
 
-import { mapDocumentToEntry, mapDocumentsToEntry } from "../../mappers/mongoDB/documents";
-import { getByDateQuery } from "../../services/mongoDB/queries/moodEntry";
+import { mapDocumentToEntry, mapDocumentsToEntries } from "../../mappers/mongoDB/documents";
+import { getByDateQuery } from "../../services/mongoDB/queries/queries";
 
 class MongoDBEntryService implements EntryService {
     private entryServiceModel: Model<EntryDocument>;
-    private entryType: EntryTypes;
-    private tagService?: TagService<mongoose.Types.ObjectId>;
+    private entryType?: EntryTypes;
+    private tagService?: TagService;
 
     constructor(
-        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService<mongoose.Types.ObjectId>; },
-        entryType: EntryTypes
+        { entryModel, tagService }: { entryModel: Model<EntryDocument>; tagService?: TagService; },
+        entryType?: EntryTypes
     ) {
         this.entryServiceModel = entryModel;
         if (tagService) this.tagService = tagService;
@@ -50,6 +50,7 @@ class MongoDBEntryService implements EntryService {
 
     async getEntryByDate(date: Date): Promise<Entry[] | []> {
         try {
+            if(!this.entryType) throw new Error(CustomErrors.VOID_ENTRY_TYPE);
             const dateQuery = getByDateQuery(date, this.entryType);
     
             const response:EntryDocument[] = await this.entryServiceModel.find(dateQuery).populate<{ tags: TagDocument[] }>("tags");
@@ -60,10 +61,14 @@ class MongoDBEntryService implements EntryService {
                 }
             }
 
-            const mappedEntries = mapDocumentsToEntry(response);
+            const mappedEntries = mapDocumentsToEntries(response);
 
             return mappedEntries;
         } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === CustomErrors.VOID_ENTRY_TYPE) throw new Error(error.message);
+                throw new Error(`Something went wrong trying to retrieve an entry.\n Date query: ${date}\nError: ${error.message}`);
+            }
             throw Error(`Something went wrong trying to retrieve and a mood entry.\n Date query: ${date}\nError: ${error}`);
         }
     }
@@ -129,6 +134,17 @@ class MongoDBEntryService implements EntryService {
             }
         }
     }
+    
+    async updateEntries(entryField: object, update: object): Promise<boolean> {
+        try{
+            const response: UpdateWriteOpResult = await this.entryServiceModel.updateMany(entryField, update);
+
+            if(!response || !response.acknowledged) throw new Error();
+            return response.acknowledged;
+        } catch (error) {
+            throw new Error(`An error trying to update Entry field: ${entryField}\nUpdate: ${update}\nError: ${error}`);
+        }
+    } 
 }
 
 export default MongoDBEntryService;

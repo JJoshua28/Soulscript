@@ -21,7 +21,7 @@ import tagModel from "../../src/services/mongoDB/models/tag";
 
  
 describe("Entry smoke tests", () => {
-    const tagIds: mongoose.Types.ObjectId[] = [];
+    const tagIds: string[] = [];
     const globalTags: TagResponse[] = [];
     beforeAll ( async () => {
         await mongooseMemoryDB.setupTestEnvironment();
@@ -29,8 +29,8 @@ describe("Entry smoke tests", () => {
         const tag2 = await seedTagData(tagModel, "Update test");
 
         tagIds.push(
-            new mongoose.Types.ObjectId(tag1.id),
-            new mongoose.Types.ObjectId(tag2.id)
+            tag1.id,
+            tag2.id
         );
 
         globalTags.push({

@@ -1,10 +1,10 @@
 import mongoose, { Model } from "mongoose";
 
 import { EntryTypes, NewEntry } from "../../../../src/types/entries";
-import {  EntryDocument, TagDocument }  from "../../../../src/services/mongoDB/types/document";
+import type { EntryDocument, TagDocument }  from "../../../../src/services/mongoDB/types/document";
 import { defaultEntryExpectation, gratitudeEntryExpectation } from "../../../assertions/entries";
 
-import { defaultMoodEntry, newMoodEntry } from "../../../data/moodEntry";
+import { defaultMoodEntry, mockMoodEntryDocument, newMoodEntry } from "../../../data/moodEntry";
 import MongoDBEntryService from "../../../../src/adapters/mongoDB/entryService";
 import MongoDBTagService from "../../../../src/adapters/mongoDB/tagService";
 import { createEntryDocument } from "../../../data/helpers/customEntry";
@@ -15,6 +15,7 @@ import tagModel from "../../../../src/services/mongoDB/models/tag";
 import CustomErrors from "../../../../src/types/error";
 import { createTagDocument } from "../../../data/helpers/customTags";
 import { mockDefaultNewTag } from "../../../data/tags";
+import { fieldIncludesElementQuery, removeArrayElementQuery } from "../../../../src/services/mongoDB/queries/queries";
 
 jest.mock("../../../../src/services/mongoDB/models/entry");
 jest.mock("../../../../src/services/mongoDB/models/tag");
@@ -27,7 +28,7 @@ const mockTagModel = tagModel as jest.Mocked<Model<TagDocument>>;
 
 
 describe("Entry", ()=> {
-    const mockTagService = new MongoDBTagService(mockTagModel);
+    const mockTagService = new MongoDBTagService({tagModel: mockTagModel});
     const tagDocument = createTagDocument(mockDefaultNewTag);
     describe("Add", () => {
         jest.spyOn(mockTagService, "doAllTagsExist").mockResolvedValue(true)
@@ -455,8 +456,33 @@ describe("Entry", ()=> {
     
             })
         });
+    });
+    describe("Update Entries", () => {
+        describe("Positive Tests", ()=> {
+            it("should call updateMany and return true", async () => {
+                const fieldName = "tags";
+                const {tags: [tagDocumentId] } = mockMoodEntryDocument;
+
+                const fieldToUpdateQuery = fieldIncludesElementQuery(fieldName,tagDocumentId?.toString());
+                const updateQuery = removeArrayElementQuery(fieldName, [tagDocumentId?.toString()]);
+                    
+                mockEntryModel.updateMany = jest.fn().mockImplementation(() => ({
+                    acknowledged: true
+                })
+                );
+                
+                const mongoService = new MongoDBEntryService( { entryModel: mockEntryModel }, EntryTypes.MOOD);
+                
+                const response =  await mongoService.updateEntries(fieldToUpdateQuery, updateQuery);
+
+                expect(mockEntryModel.updateMany).toHaveBeenCalledWith(fieldToUpdateQuery, updateQuery);
+                expect(response).toStrictEqual(true);
+            });
+
+        });
+            
     })
-    describe("Delete entry", () => {
+    describe("Delete Entry", () => {
         const mongooseID = new mongoose.Types.ObjectId().toString();
         describe("Mood", () => {    
             describe("Positive Tests", ()=> {
@@ -541,5 +567,5 @@ describe("Entry", ()=> {
             });
         })
             
-    })
+    });
 })

@@ -1,5 +1,3 @@
-import type { Types } from "mongoose";
-
 import type { Tag } from "./tags";
 import { TagDocument } from "../services/mongoDB/types/document";
 
@@ -14,7 +12,7 @@ export interface NewEntryRequest {
   sharedID?: string;
   subject?: string;
   quote?: string;
-  tags?: Types.ObjectId[];
+  tags?: string[];
   datetime?: string;
 }
 
@@ -23,7 +21,7 @@ export interface NewEntry {
     sharedID: string | null;
     subject: string | null;
     quote: string | null;
-    tags: Types.ObjectId[];
+    tags: string[];
     datetime: Date ;
     content: string | string[];
 }
@@ -37,7 +35,7 @@ export interface NewCustomEntry {
   sharedID?: string | null,
   subject?: string | null,
   quote?: string | null,
-  tags?: Types.ObjectId[],
+  tags?: string[],
   datetime?: Date,
   content?: string | string[],
 }

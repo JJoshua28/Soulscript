@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Entry, EntryTypes, NewEntry } from "../../src/types/entries";
 import {  EntryDocument }  from "../../src/services/mongoDB/types/document";
-import offsetDateByHours from "../../src/helpers/offsetDate";
+import formatCurrentDate from "../../src/helpers/formatCurrentDate";
 
-const datetime = offsetDateByHours(2)
+const datetime = formatCurrentDate()
 
 
 const defaultGratitudeEntry:Entry = {
@@ -24,7 +24,7 @@ const newGratitudeEntry: NewEntry = {
     sharedID: uuidv4(),
     subject: "test data",
     quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    tags: [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()],
+    tags: [new mongoose.Types.ObjectId().toString(), new mongoose.Types.ObjectId().toString()],
     content: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"],
     datetime
 }

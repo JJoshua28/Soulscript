@@ -1,5 +1,5 @@
-import { Entry } from "../../types/entries";
-import { EntryService } from "../../ports/entryService";
+import type { Entry } from "../../types/entries";
+import type { EntryService } from "../../ports/entryService";
 
 class DeleteEntryUseCase {
     private entryService: EntryService;

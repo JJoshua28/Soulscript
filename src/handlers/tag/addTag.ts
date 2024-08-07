@@ -14,7 +14,7 @@ const handleAddTag = async (req: Request): Promise<Tag> => {
 
     if(req.body?.description && typeof req.body?.description != "string" || req?.body?.description === " ") throw new Error(CustomErrors.INVALID_REQUEST);
 
-    const tagService = new MongoDBTagService(tagModel);
+    const tagService = new MongoDBTagService({tagModel});
     const addTagUseCase = new AddTagUseCase(tagService);
 
     
